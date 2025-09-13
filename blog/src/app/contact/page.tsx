@@ -45,7 +45,7 @@ export default function ContactPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
       <div className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+        <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
           Get in Touch
         </h1>
         <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -56,7 +56,7 @@ export default function ContactPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
         {/* Contact Form */}
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">Send us a message</h2>
+          <h2 className="text-2xl font-bold text-white mb-8">Send us a message</h2>
           
           {submitStatus === 'success' && (
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
@@ -180,7 +180,7 @@ export default function ContactPage() {
 
         {/* Contact Information */}
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">Other ways to reach us</h2>
+          <h2 className="text-2xl font-bold text-white mb-8">Other ways to reach us</h2>
           
           <div className="space-y-8">
             <div className="flex items-start">
@@ -192,7 +192,7 @@ export default function ContactPage() {
                 </div>
               </div>
               <div className="ml-4">
-                <h3 className="text-lg font-semibold text-gray-900">Email</h3>
+                <h3 className="text-lg font-semibold text-white">Email</h3>
                 <p className="text-gray-600 mt-1">hello@yourblog.com</p>
                 <p className="text-sm text-gray-500 mt-1">We typically respond within 24 hours</p>
               </div>
@@ -207,7 +207,7 @@ export default function ContactPage() {
                 </div>
               </div>
               <div className="ml-4">
-                <h3 className="text-lg font-semibold text-gray-900">Social Media</h3>
+                <h3 className="text-lg font-semibold text-white">Social Media</h3>
                 <p className="text-gray-600 mt-1">Follow us for updates and quick questions</p>
                 <div className="flex space-x-4 mt-3">
                   <a href="#" className="text-gray-400 hover:text-blue-500 transition-colors">
@@ -242,7 +242,7 @@ export default function ContactPage() {
                 </div>
               </div>
               <div className="ml-4">
-                <h3 className="text-lg font-semibold text-gray-900">Location</h3>
+                <h3 className="text-lg font-semibold text-white">Location</h3>
                 <p className="text-gray-600 mt-1">San Francisco, CA</p>
                 <p className="text-sm text-gray-500 mt-1">Remote-first team</p>
               </div>
@@ -251,20 +251,20 @@ export default function ContactPage() {
           
           {/* FAQ Section */}
           <div className="mt-12">
-            <h3 className="text-xl font-semibold text-gray-900 mb-6">Frequently Asked Questions</h3>
+            <h3 className="text-xl font-semibold text-white mb-6">Frequently Asked Questions</h3>
             <div className="space-y-4">
               <div className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-2">How quickly do you respond to messages?</h4>
+                <h4 className="font-medium text-white mb-2">How quickly do you respond to messages?</h4>
                 <p className="text-sm text-gray-600">We typically respond to all inquiries within 24 hours during business days.</p>
               </div>
               
               <div className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-2">Do you accept guest posts?</h4>
+                <h4 className="font-medium text-white mb-2">Do you accept guest posts?</h4>
                 <p className="text-sm text-gray-600">Yes! We&apos;re always looking for quality content. Please include your article idea and writing samples.</p>
               </div>
               
               <div className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-2">Can you help with technical questions?</h4>
+                <h4 className="font-medium text-white mb-2">Can you help with technical questions?</h4>
                 <p className="text-sm text-gray-600">While we can&apos;t provide individual technical support, we encourage you to ask questions that might benefit the community.</p>
               </div>
             </div>
