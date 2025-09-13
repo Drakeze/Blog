@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Blog Application
+
+A modern blog application built with Next.js 15, TypeScript, and Tailwind CSS.
+
+## Prerequisites
+
+Before running this application, make sure you have the following installed:
+
+- [Node.js](https://nodejs.org/) (version 18 or higher)
+- [Yarn](https://yarnpkg.com/) (package manager)
 
 ## Getting Started
 
-First, run the development server:
+1. **Clone the repository** (if not already done):
+   ```bash
+   git clone <your-repository-url>
+   cd blog
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+2. **Install dependencies**:
+   ```bash
+   yarn install
+   ```
+
+3. **Run the development server**:
+   ```bash
+   yarn dev
+   ```
+
+4. **Open your browser** and navigate to:
+   - [http://localhost:3000](http://localhost:3000)
+
+## Available Scripts
+
+- `yarn dev` - Starts the development server with Turbopack
+- `yarn build` - Builds the application for production
+- `yarn start` - Starts the production server
+- `yarn lint` - Runs ESLint to check for code issues
+
+## Project Structure
+
+```
+blog/
+├── src/
+│   ├── app/
+│   │   ├── about/          # About page
+│   │   ├── blog/           # Blog listing and individual posts
+│   │   ├── contact/        # Contact page
+│   │   ├── globals.css     # Global styles
+│   │   ├── layout.tsx      # Root layout
+│   │   └── page.tsx        # Homepage
+│   └── components/
+│       ├── Header.tsx      # Navigation header
+│       └── Footer.tsx      # Site footer
+├── public/                 # Static assets
+└── package.json           # Dependencies and scripts
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- 📱 Responsive design
+- 🔍 Blog search and filtering
+- 📄 Dynamic blog post pages
+- 📧 Contact form
+- 🎨 Modern UI with Tailwind CSS
+- ⚡ Fast development with Turbopack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech Stack
 
-## Learn More
+- **Framework**: Next.js 15
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Linting**: ESLint
 
-To learn more about Next.js, take a look at the following resources:
+## Development
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The application uses Next.js App Router and includes:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Homepage with hero section and featured posts
+- Blog listing page with search and pagination
+- Individual blog post pages with dynamic routing
+- About and Contact pages
+- Responsive navigation and footer
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This application can be deployed on platforms like:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Vercel](https://vercel.com/) (recommended for Next.js)
+- [Netlify](https://netlify.com/)
+- [Railway](https://railway.app/)
+- Any platform that supports Node.js
+
+For production deployment, run:
+
+```bash
+yarn build
+yarn start
+```
+
+## Contributing
+
+Feel free to submit issues and enhancement requests!
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
