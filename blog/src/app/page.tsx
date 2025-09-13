@@ -84,7 +84,7 @@ export default function Home() {
                     <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
                       {post.category}
                     </span>
-                    <span className="text-sm text-gray-500">{post.readTime}</span>
+                    <span className="text-sm text-gray-700">{post.readTime}</span>
                   </div>
                   
                   <h3 className="text-xl font-bold text-gray-900 mb-3 hover:text-blue-600 transition-colors">
@@ -98,7 +98,7 @@ export default function Home() {
                   </p>
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-700">
                       {new Date(post.date).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'long',

@@ -276,7 +276,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
     <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Breadcrumb */}
       <nav className="mb-8">
-        <ol className="flex items-center space-x-2 text-sm text-gray-500">
+        <ol className="flex items-center space-x-2 text-sm text-gray-700">
           <li>
             <Link href="/" className="hover:text-gray-700 transition-colors">
               Home
@@ -320,7 +320,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
         </p>
         
         {/* Article Meta */}
-        <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 border-b border-gray-200 pb-6">
+        <div className="flex flex-wrap items-center gap-6 text-sm text-gray-700 border-b border-gray-200 pb-6">
           <div className="flex items-center">
             <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mr-3">
               <span className="text-gray-600 font-semibold">
@@ -329,7 +329,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
             </div>
             <div>
               <p className="font-medium text-gray-900">{post.author}</p>
-              <p className="text-gray-500">Author</p>
+              <p className="text-gray-700">Author</p>
             </div>
           </div>
           
@@ -341,12 +341,12 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
                 day: 'numeric'
               })}
             </p>
-            <p className="text-gray-500">Published</p>
+            <p className="text-gray-700">Published</p>
           </div>
           
           <div>
             <p className="font-medium text-gray-900">{post.readTime}</p>
-            <p className="text-gray-500">Read time</p>
+            <p className="text-gray-700">Read time</p>
           </div>
         </div>
       </header>
@@ -400,13 +400,13 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
           </Link>
           
           <div className="text-right">
-            <p className="text-sm text-gray-500 mb-1">Share this article</p>
+            <p className="text-sm text-gray-700 mb-1">Share this article</p>
             <div className="flex space-x-3">
               <a 
                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(window.location.href)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-blue-500 transition-colors"
+                className="text-gray-600 hover:text-blue-500 transition-colors"
               >
                 <span className="sr-only">Share on Twitter</span>
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -418,7 +418,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
                 href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-blue-700 transition-colors"
+                className="text-gray-600 hover:text-blue-700 transition-colors"
               >
                 <span className="sr-only">Share on LinkedIn</span>
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">

@@ -108,7 +108,7 @@ export default function BlogPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
           Blog Posts
         </h1>
         <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -128,7 +128,7 @@ export default function BlogPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
-            <svg className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="absolute left-3 top-3.5 h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
@@ -166,7 +166,7 @@ export default function BlogPage() {
                   <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
                     {post.category}
                   </span>
-                  <span className="text-sm text-gray-500">{post.readTime}</span>
+                  <span className="text-sm text-gray-700">{post.readTime}</span>
                 </div>
                 
                 <h2 className="text-2xl font-bold text-gray-900 mb-3 hover:text-blue-600 transition-colors">
@@ -189,7 +189,7 @@ export default function BlogPage() {
                 </div>
                 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-700">
                     {new Date(post.date).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
@@ -209,7 +209,7 @@ export default function BlogPage() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <p className="text-gray-500 text-lg mb-4">No posts found matching your criteria.</p>
+          <p className="text-gray-700 text-lg mb-4">No posts found matching your criteria.</p>
           <button 
             onClick={() => {
               setSearchTerm('');
