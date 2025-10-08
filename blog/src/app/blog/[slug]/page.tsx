@@ -10,7 +10,7 @@ const allPosts = [
     content: `
       <h2>Introduction</h2>
       <p>Next.js 15 brings exciting new features and improvements that make building modern web applications even more enjoyable. In this comprehensive guide, we'll explore the key features and how to get started.</p>
-      
+
       <h2>What's New in Next.js 15</h2>
       <p>The latest version of Next.js introduces several groundbreaking features:</p>
       <ul>
@@ -19,11 +19,11 @@ const allPosts = [
         <li><strong>New App Router Features:</strong> More flexible routing and layout options</li>
         <li><strong>Server Components:</strong> Better server-side rendering capabilities</li>
       </ul>
-      
+
       <h2>Getting Started</h2>
       <p>To create a new Next.js 15 project, run the following command:</p>
       <pre><code>npx create-next-app@latest my-app --typescript --tailwind --eslint</code></pre>
-      
+
       <h2>Key Features to Explore</h2>
       <p>Once you have your project set up, here are some key areas to focus on:</p>
       <ol>
@@ -32,7 +32,7 @@ const allPosts = [
         <li>Implementing dynamic routing</li>
         <li>Optimizing performance with built-in features</li>
       </ol>
-      
+
       <h2>Conclusion</h2>
       <p>Next.js 15 continues to push the boundaries of what's possible with React applications. Whether you're building a simple blog or a complex web application, Next.js provides the tools and performance you need.</p>
     `,
@@ -50,13 +50,13 @@ const allPosts = [
     content: `
       <h2>Why Tailwind CSS?</h2>
       <p>Tailwind CSS has revolutionized how we approach styling in modern web development. Its utility-first approach allows for rapid prototyping and consistent design systems.</p>
-      
+
       <h2>Advanced Techniques</h2>
       <p>Let's explore some advanced Tailwind CSS techniques that will elevate your UI development:</p>
-      
+
       <h3>Custom Color Palettes</h3>
       <p>Creating custom color palettes in Tailwind allows you to maintain brand consistency across your application.</p>
-      
+
       <h3>Responsive Design Patterns</h3>
       <p>Tailwind's responsive utilities make it easy to create designs that work across all device sizes:</p>
       <ul>
@@ -64,10 +64,10 @@ const allPosts = [
         <li>Breakpoint-specific utilities</li>
         <li>Container queries</li>
       </ul>
-      
+
       <h3>Component Composition</h3>
       <p>Learn how to compose reusable components while maintaining the utility-first philosophy.</p>
-      
+
       <h2>Best Practices</h2>
       <ol>
         <li>Use semantic class names for complex components</li>
@@ -89,10 +89,10 @@ const allPosts = [
     content: `
       <h2>Architecture Principles</h2>
       <p>Building scalable React applications requires careful consideration of architecture from the start. Here are the key principles to follow:</p>
-      
+
       <h3>Component Organization</h3>
       <p>Organize your components in a logical hierarchy that promotes reusability and maintainability.</p>
-      
+
       <h3>State Management</h3>
       <p>Choose the right state management solution for your application's complexity:</p>
       <ul>
@@ -100,7 +100,7 @@ const allPosts = [
         <li>Context API for shared state</li>
         <li>Redux or Zustand for complex applications</li>
       </ul>
-      
+
       <h2>Performance Optimization</h2>
       <p>Performance is crucial for user experience. Key optimization techniques include:</p>
       <ol>
@@ -109,7 +109,7 @@ const allPosts = [
         <li>Virtual scrolling for large lists</li>
         <li>Image optimization</li>
       </ol>
-      
+
       <h2>Testing Strategy</h2>
       <p>A comprehensive testing strategy ensures your application remains reliable as it grows.</p>
     `,
@@ -127,7 +127,7 @@ const allPosts = [
     content: `
       <h2>Modern TypeScript Features</h2>
       <p>TypeScript continues to evolve with new features that improve developer experience and code safety.</p>
-      
+
       <h3>Advanced Type Patterns</h3>
       <p>Master these advanced TypeScript patterns:</p>
       <ul>
@@ -136,7 +136,7 @@ const allPosts = [
         <li>Template literal types</li>
         <li>Utility types</li>
       </ul>
-      
+
       <h2>Configuration Best Practices</h2>
       <p>Proper TypeScript configuration is essential for a good development experience:</p>
       <pre><code>{
@@ -146,7 +146,7 @@ const allPosts = [
     "exactOptionalPropertyTypes": true
   }
 }</code></pre>
-      
+
       <h2>Error Handling</h2>
       <p>TypeScript's type system can help you handle errors more effectively and catch issues at compile time.</p>
     `,
@@ -164,7 +164,7 @@ const allPosts = [
     content: `
       <h2>CSS Grid Fundamentals</h2>
       <p>CSS Grid is a powerful layout system that allows you to create complex, responsive layouts with ease.</p>
-      
+
       <h3>Grid Container Properties</h3>
       <p>Understanding the key properties of grid containers:</p>
       <ul>
@@ -173,16 +173,16 @@ const allPosts = [
         <li>grid-template-rows</li>
         <li>gap</li>
       </ul>
-      
+
       <h2>Advanced Grid Techniques</h2>
       <p>Take your grid skills to the next level with these advanced techniques:</p>
-      
+
       <h3>Named Grid Lines</h3>
       <p>Use named grid lines to create more semantic and maintainable layouts.</p>
-      
+
       <h3>Grid Areas</h3>
       <p>Define grid areas for complex layouts that are easy to understand and modify.</p>
-      
+
       <h2>Responsive Grid Patterns</h2>
       <p>Create responsive layouts that adapt to different screen sizes without media queries.</p>
     `,
@@ -200,7 +200,7 @@ const allPosts = [
     content: `
       <h2>RESTful API Design Principles</h2>
       <p>Building robust APIs requires following established design principles and best practices.</p>
-      
+
       <h3>Resource-Based URLs</h3>
       <p>Design your API endpoints around resources rather than actions:</p>
       <ul>
@@ -210,7 +210,7 @@ const allPosts = [
         <li>PUT /api/users/:id - Update user</li>
         <li>DELETE /api/users/:id - Delete user</li>
       </ul>
-      
+
       <h2>Express.js Best Practices</h2>
       <p>Key practices for building maintainable Express applications:</p>
       <ol>
@@ -219,7 +219,7 @@ const allPosts = [
         <li>Structure your application with routers</li>
         <li>Use environment variables for configuration</li>
       </ol>
-      
+
       <h2>Security Considerations</h2>
       <p>Security should be built into your API from the ground up:</p>
       <ul>
@@ -252,7 +252,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: BlogPostPageProps) {
   const post = allPosts.find((post) => post.slug === params.slug);
-  
+
   if (!post) {
     return {
       title: 'Post Not Found',
@@ -310,15 +310,15 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
             {post.category}
           </span>
         </div>
-        
+
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
           {post.title}
         </h1>
-        
+
         <p className="text-xl text-gray-600 mb-8 leading-relaxed">
           {post.excerpt}
         </p>
-        
+
         {/* Article Meta */}
         <div className="flex flex-wrap items-center gap-6 text-sm text-gray-700 border-b border-gray-200 pb-6">
           <div className="flex items-center">
@@ -332,7 +332,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
               <p className="text-gray-700">Author</p>
             </div>
           </div>
-          
+
           <div>
             <p className="font-medium text-gray-900">
               {new Date(post.date).toLocaleDateString('en-US', {
@@ -343,7 +343,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
             </p>
             <p className="text-gray-700">Published</p>
           </div>
-          
+
           <div>
             <p className="font-medium text-gray-900">{post.readTime}</p>
             <p className="text-gray-700">Read time</p>
@@ -352,7 +352,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
       </header>
 
       {/* Article Content */}
-      <div 
+      <div
         className="prose prose-lg max-w-none mb-12"
         dangerouslySetInnerHTML={{ __html: post.content }}
         style={{
@@ -389,7 +389,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
       {/* Navigation */}
       <div className="border-t border-gray-200 pt-8">
         <div className="flex justify-between items-center">
-          <Link 
+          <Link
             href="/blog"
             className="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors"
           >
@@ -398,11 +398,12 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
             </svg>
             Back to Blog
           </Link>
-          
+
           <div className="text-right">
             <p className="text-sm text-gray-700 mb-1">Share this article</p>
             <div className="flex space-x-3">
-              <a 
+            const url = typeof window !== "undefined" ? window.location.href : "";
+              <a
                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(window.location.href)}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -413,8 +414,8 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
                   <path d="M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84" />
                 </svg>
               </a>
-              
-              <a 
+
+              <a
                 href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`}
                 target="_blank"
                 rel="noopener noreferrer"

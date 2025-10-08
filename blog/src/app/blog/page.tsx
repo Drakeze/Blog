@@ -151,7 +151,7 @@ export default function BlogPage() {
       {/* Results count */}
       <div className="mb-6">
         <p className="text-gray-600">
-          {filteredPosts.length === 0 ? 'No posts found' : 
+          {filteredPosts.length === 0 ? 'No posts found' :
            `Showing ${startIndex + 1}-${Math.min(startIndex + POSTS_PER_PAGE, filteredPosts.length)} of ${filteredPosts.length} posts`}
         </p>
       </div>
@@ -168,17 +168,17 @@ export default function BlogPage() {
                   </span>
                   <span className="text-sm text-gray-700">{post.readTime}</span>
                 </div>
-                
+
                 <h2 className="text-2xl font-bold text-gray-900 mb-3 hover:text-blue-600 transition-colors">
                   <Link href={`/blog/${post.slug}`}>
                     {post.title}
                   </Link>
                 </h2>
-                
+
                 <p className="text-gray-600 mb-4 line-clamp-3">
                   {post.excerpt}
                 </p>
-                
+
                 {/* Tags */}
                 <div className="flex flex-wrap gap-2 mb-4">
                   {post.tags.map(tag => (
@@ -187,7 +187,7 @@ export default function BlogPage() {
                     </span>
                   ))}
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-700">
                     {new Date(post.date).toLocaleDateString('en-US', {
@@ -196,7 +196,7 @@ export default function BlogPage() {
                       day: 'numeric'
                     })}
                   </span>
-                  <Link 
+                  <Link
                     href={`/blog/${post.slug}`}
                     className="text-blue-600 hover:text-blue-800 font-semibold text-sm transition-colors"
                   >
@@ -210,7 +210,7 @@ export default function BlogPage() {
       ) : (
         <div className="text-center py-12">
           <p className="text-gray-700 text-lg mb-4">No posts found matching your criteria.</p>
-          <button 
+          <button
             onClick={() => {
               setSearchTerm('');
               setSelectedCategory('All');
@@ -232,21 +232,21 @@ export default function BlogPage() {
           >
             Previous
           </button>
-          
+
           {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
             <button
               key={page}
               onClick={() => setCurrentPage(page)}
               className={`px-4 py-2 border rounded-lg transition-colors ${
                 currentPage === page
-                  ? 'bg-blue-600 text-white border-blue-600'
+                  ? 'bg-blue-600 text-black border-blue-600'
                   : 'border-gray-300 hover:bg-gray-50'
               }`}
             >
               {page}
             </button>
           ))}
-          
+
           <button
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
