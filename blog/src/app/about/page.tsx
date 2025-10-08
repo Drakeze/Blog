@@ -146,34 +146,14 @@ export default function AboutPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div className="text-center">
             <div className="w-32 h-32 bg-gray-300 rounded-full mx-auto mb-4 flex items-center justify-center">
-              <span className="text-2xl font-bold text-gray-600">JD</span>
+              <span className="text-2xl font-bold text-gray-600">AS</span>
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">John Doe</h3>
-            <p className="text-gray-600 mb-4">Frontend Developer & Writer</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Anthony Shead</h3>
+            <p className="text-gray-600 mb-4">Founder & Full-Stack Developer</p>
             <p className="text-sm text-gray-700">
-              Passionate about React, Next.js, and creating amazing user experiences.
-            </p>
-          </div>
-          
-          <div className="text-center">
-            <div className="w-32 h-32 bg-gray-300 rounded-full mx-auto mb-4 flex items-center justify-center">
-              <span className="text-2xl font-bold text-gray-600">JS</span>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Jane Smith</h3>
-            <p className="text-gray-600 mb-4">UI/UX Designer</p>
-            <p className="text-sm text-gray-700">
-              Focused on creating beautiful, accessible designs that users love.
-            </p>
-          </div>
-          
-          <div className="text-center">
-            <div className="w-32 h-32 bg-gray-300 rounded-full mx-auto mb-4 flex items-center justify-center">
-              <span className="text-2xl font-bold text-gray-600">MJ</span>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Mike Johnson</h3>
-            <p className="text-gray-600 mb-4">Backend Developer</p>
-            <p className="text-sm text-gray-700">
-              Expert in Node.js, databases, and building scalable server architectures.
+              I’m a passionate full-stack web developer and founder of <strong>SorenLab</strong>,
+              where I build modern web applications with Next.js, TypeScript, and Tailwind CSS.
+              I love exploring the connection between technology, design, and the human experience.
             </p>
           </div>
         </div>

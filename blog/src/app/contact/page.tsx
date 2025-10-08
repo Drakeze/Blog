@@ -243,7 +243,7 @@ export default function ContactPage() {
               </div>
               <div className="ml-4">
                 <h3 className="text-lg font-semibold text-gray-900">Location</h3>
-                <p className="text-gray-600 mt-1">San Francisco, CA</p>
+                <p className="text-gray-600 mt-1">Los Angles, CA</p>
                 <p className="text-sm text-gray-700 mt-1">Remote-first team</p>
               </div>
             </div>

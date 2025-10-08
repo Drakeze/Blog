@@ -108,10 +108,10 @@ export default function BlogPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        <h1 className="text-4xl md:text-5xl font-bold text-black mb-4">
           Blog Posts
         </h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+        <p className="text-xl text-black max-w-3xl mx-auto">
           Explore our collection of articles about web development, design, and technology.
         </p>
       </div>
@@ -126,7 +126,7 @@ export default function BlogPage() {
               placeholder="Search posts..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <svg className="absolute left-3 top-3.5 h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -139,7 +139,7 @@ export default function BlogPage() {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="w-full md:w-auto px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full md:w-auto px-4 py-3 border border-gray-300 rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             {categories.map(category => (
               <option key={category} value={category}>{category}</option>
@@ -150,7 +150,7 @@ export default function BlogPage() {
 
       {/* Results count */}
       <div className="mb-6">
-        <p className="text-gray-600">
+        <p className="text-black">
           {filteredPosts.length === 0 ? 'No posts found' : 
            `Showing ${startIndex + 1}-${Math.min(startIndex + POSTS_PER_PAGE, filteredPosts.length)} of ${filteredPosts.length} posts`}
         </p>
@@ -166,30 +166,30 @@ export default function BlogPage() {
                   <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
                     {post.category}
                   </span>
-                  <span className="text-sm text-gray-700">{post.readTime}</span>
+                  <span className="text-sm text-black">{post.readTime}</span>
                 </div>
                 
-                <h2 className="text-2xl font-bold text-gray-900 mb-3 hover:text-blue-600 transition-colors">
+                <h2 className="text-2xl font-bold text-black mb-3 hover:text-blue-600 transition-colors">
                   <Link href={`/blog/${post.slug}`}>
                     {post.title}
                   </Link>
                 </h2>
                 
-                <p className="text-gray-600 mb-4 line-clamp-3">
+                <p className="text-black mb-4 line-clamp-3">
                   {post.excerpt}
                 </p>
                 
                 {/* Tags */}
                 <div className="flex flex-wrap gap-2 mb-4">
                   {post.tags.map(tag => (
-                    <span key={tag} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
+                    <span key={tag} className="bg-gray-100 text-black text-xs px-2 py-1 rounded">
                       #{tag}
                     </span>
                   ))}
                 </div>
                 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">
+                  <span className="text-sm text-black">
                     {new Date(post.date).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
@@ -209,7 +209,7 @@ export default function BlogPage() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <p className="text-gray-700 text-lg mb-4">No posts found matching your criteria.</p>
+          <p className="text-black text-lg mb-4">No posts found matching your criteria.</p>
           <button 
             onClick={() => {
               setSearchTerm('');
@@ -228,7 +228,7 @@ export default function BlogPage() {
           <button
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 border border-gray-300 rounded-lg text-black disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
           >
             Previous
           </button>
@@ -237,7 +237,7 @@ export default function BlogPage() {
             <button
               key={page}
               onClick={() => setCurrentPage(page)}
-              className={`px-4 py-2 border rounded-lg transition-colors ${
+              className={`px-4 py-2 border rounded-lg text-black transition-colors ${
                 currentPage === page
                   ? 'bg-blue-600 text-white border-blue-600'
                   : 'border-gray-300 hover:bg-gray-50'
@@ -250,7 +250,7 @@ export default function BlogPage() {
           <button
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 border border-gray-300 rounded-lg text-black disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
           >
             Next
           </button>
