@@ -5,72 +5,41 @@ import { useState, useMemo } from 'react';
 
 // Sample blog posts data - in a real app, this would come from a CMS or API
 const allPosts = [
-  {
-    id: 1,
-    title: "Getting Started with Next.js 15",
-    excerpt: "Learn how to build modern web applications with the latest features in Next.js 15, including improved performance and developer experience.",
-    content: "Full content would go here...",
-    date: "2024-01-15",
-    readTime: "5 min read",
-    category: "Tutorial",
-    slug: "getting-started-nextjs-15",
-    tags: ["nextjs", "react", "tutorial"]
-  },
-  {
-    id: 2,
-    title: "Mastering Tailwind CSS for Modern UI",
-    excerpt: "Discover advanced Tailwind CSS techniques to create beautiful, responsive user interfaces with utility-first CSS framework.",
-    content: "Full content would go here...",
-    date: "2024-01-10",
-    readTime: "8 min read",
-    category: "Design",
-    slug: "mastering-tailwind-css",
-    tags: ["tailwind", "css", "design"]
-  },
-  {
-    id: 3,
-    title: "Building Scalable React Applications",
-    excerpt: "Best practices and patterns for building large-scale React applications that are maintainable and performant.",
-    content: "Full content would go here...",
-    date: "2024-01-05",
-    readTime: "12 min read",
-    category: "Development",
-    slug: "scalable-react-applications",
-    tags: ["react", "architecture", "development"]
-  },
-  {
-    id: 4,
-    title: "TypeScript Best Practices in 2024",
-    excerpt: "Essential TypeScript patterns and practices that every developer should know for writing better, more maintainable code.",
-    content: "Full content would go here...",
-    date: "2024-01-01",
-    readTime: "10 min read",
-    category: "Development",
-    slug: "typescript-best-practices-2024",
-    tags: ["typescript", "javascript", "development"]
-  },
-  {
-    id: 5,
-    title: "Modern CSS Grid Layouts",
-    excerpt: "Master CSS Grid to create complex, responsive layouts with ease. Learn the fundamentals and advanced techniques.",
-    content: "Full content would go here...",
-    date: "2023-12-28",
-    readTime: "7 min read",
-    category: "Design",
-    slug: "modern-css-grid-layouts",
-    tags: ["css", "grid", "layout"]
-  },
-  {
-    id: 6,
-    title: "API Design with Node.js and Express",
-    excerpt: "Learn how to design and build robust RESTful APIs using Node.js and Express with best practices and security considerations.",
-    content: "Full content would go here...",
-    date: "2023-12-20",
-    readTime: "15 min read",
-    category: "Backend",
-    slug: "api-design-nodejs-express",
-    tags: ["nodejs", "express", "api"]
-  }
+{post.socialLinks && (
+  <div className="flex gap-3 mt-4">
+    {post.socialLinks.reddit && (
+      <a
+        href={post.socialLinks.reddit}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-sm text-muted-foreground hover:underline"
+      >
+        Reddit
+      </a>
+    )}
+    {post.socialLinks.twitter && (
+      <a
+        href={post.socialLinks.twitter}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-sm text-muted-foreground hover:underline"
+      >
+        Twitter
+      </a>
+    )}
+    {post.socialLinks.linkedin && (
+      <a
+        href={post.socialLinks.linkedin}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-sm text-muted-foreground hover:underline"
+      >
+        LinkedIn
+      </a>
+    )}
+  </div>
+)}
+
 ];
 
 const POSTS_PER_PAGE = 4;
