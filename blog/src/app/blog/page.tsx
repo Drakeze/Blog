@@ -114,14 +114,14 @@ export default function BlogPage() {
 
       {/* Results count */}
       <div className="mb-6">
-        <p className="text-gray-600">
-          {filteredPosts.length === 0 ? 'No posts found' :
-        <p className="text-black">
-          {filteredPosts.length === 0 ? 'No posts found' : 
-           `Showing ${startIndex + 1}-${Math.min(startIndex + POSTS_PER_PAGE, filteredPosts.length)} of ${filteredPosts.length} posts`}
-        </p>
+        {filteredPosts.length === 0 ? (
+          <p className="text-black">No posts found</p>
+        ) : (
+          <p className="text-black">
+            Showing {startIndex + 1}-{Math.min(startIndex + POSTS_PER_PAGE, filteredPosts.length)} of {filteredPosts.length} posts
+          </p>
+        )}
       </div>
-
       {/* Blog Posts Grid */}
       {paginatedPosts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
@@ -148,6 +148,25 @@ export default function BlogPage() {
                 <p className="text-black mb-4 line-clamp-3">
                   {post.excerpt}
                 </p>
+
+                {/* Social platform badges */}
+                <div className="flex gap-2 mb-3">
+                  {post.socialLinks?.reddit && (
+                    <span className="px-2 py-1 text-xs font-semibold rounded bg-orange-100 text-orange-700">
+                      Reddit
+                    </span>
+                  )}
+                  {post.socialLinks?.twitter && (
+                    <span className="px-2 py-1 text-xs font-semibold rounded bg-blue-100 text-blue-700">
+                      Twitter
+                    </span>
+                  )}
+                  {post.socialLinks?.linkedin && (
+                    <span className="px-2 py-1 text-xs font-semibold rounded bg-sky-100 text-sky-700">
+                      LinkedIn
+                    </span>
+                  )}
+                </div>
 
                 {/* Tags */}
                 <div className="flex flex-wrap gap-2 mb-4">
