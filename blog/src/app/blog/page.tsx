@@ -5,41 +5,36 @@ import { useState, useMemo } from 'react';
 
 // Sample blog posts data - in a real app, this would come from a CMS or API
 const allPosts = [
-{post.socialLinks && (
-  <div className="flex gap-3 mt-4">
-    {post.socialLinks.reddit && (
-      <a
-        href={post.socialLinks.reddit}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-sm text-muted-foreground hover:underline"
-      >
-        Reddit
-      </a>
-    )}
-    {post.socialLinks.twitter && (
-      <a
-        href={post.socialLinks.twitter}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-sm text-muted-foreground hover:underline"
-      >
-        Twitter
-      </a>
-    )}
-    {post.socialLinks.linkedin && (
-      <a
-        href={post.socialLinks.linkedin}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-sm text-muted-foreground hover:underline"
-      >
-        LinkedIn
-      </a>
-    )}
-  </div>
-)}
-
+  {
+    id: 1,
+    title: 'Getting Started with Next.js 15',
+    excerpt: 'Learn how to build modern apps with Next.js 15 using the new App Router and server components.',
+    category: 'Tutorial',
+    tags: ['nextjs', 'react', 'typescript'],
+    date: '2024-01-14',
+    readTime: '5 min read',
+    slug: 'getting-started-nextjs-15',
+    socialLinks: {
+      reddit: 'https://reddit.com/',
+      twitter: 'https://twitter.com/',
+      linkedin: 'https://linkedin.com/',
+    },
+  },
+  {
+    id: 2,
+    title: 'Mastering Tailwind CSS for Rapid UI Design',
+    excerpt: 'Discover how Tailwind CSS can help you design beautiful, responsive UIs faster than ever.',
+    category: 'Design',
+    tags: ['tailwind', 'css', 'ui'],
+    date: '2024-02-10',
+    readTime: '6 min read',
+    slug: 'mastering-tailwind-css',
+    socialLinks: {
+      reddit: 'https://reddit.com/',
+      twitter: 'https://twitter.com/',
+      linkedin: 'https://linkedin.com/',
+    },
+  },
 ];
 
 const POSTS_PER_PAGE = 4;
@@ -214,10 +209,10 @@ export default function BlogPage() {
             <button
               key={page}
               onClick={() => setCurrentPage(page)}
-              className={`px-4 py-2 border rounded-lg text-black transition-colors ${
+              className={`px-4 py-2 border rounded-lg transition-colors ${
                 currentPage === page
-                  ? 'bg-blue-600 text-black border-blue-600'
-                  : 'border-gray-300 hover:bg-gray-50'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'border-gray-300 text-black hover:bg-gray-50'
               }`}
             >
               {page}
