@@ -135,16 +135,11 @@ export default function BlogPage() {
                   <span className="text-sm text-black">{post.readTime}</span>
                 </div>
 
-                <h2 className="text-2xl font-bold text-gray-900 mb-3 hover:text-blue-600 transition-colors">
-                
                 <h2 className="text-2xl font-bold text-black mb-3 hover:text-blue-600 transition-colors">
                   <Link href={`/blog/${post.slug}`}>
                     {post.title}
                   </Link>
                 </h2>
-
-                <p className="text-gray-600 mb-4 line-clamp-3">
-                
                 <p className="text-black mb-4 line-clamp-3">
                   {post.excerpt}
                 </p>
@@ -198,10 +193,8 @@ export default function BlogPage() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <p className="text-gray-700 text-lg mb-4">No posts found matching your criteria.</p>
-          <button
           <p className="text-black text-lg mb-4">No posts found matching your criteria.</p>
-          <button 
+          <button
             onClick={() => {
               setSearchTerm('');
               setSelectedCategory('All');
