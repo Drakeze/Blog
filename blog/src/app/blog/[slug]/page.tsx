@@ -1,3 +1,5 @@
+"use client";
+
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -272,6 +274,14 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
+  // Find index of current post for navigation
+  const postIndex = allPosts.findIndex(p => p.slug === params.slug);
+  const previousPost = allPosts[postIndex - 1];
+  const nextPost = allPosts[postIndex + 1];
+
+  // Get current URL for share links
+  const url = typeof window !== "undefined" ? window.location.href : "";
+
   return (
     <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Breadcrumb */}
@@ -402,9 +412,8 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
           <div className="text-right">
             <p className="text-sm text-gray-700 mb-1">Share this article</p>
             <div className="flex space-x-3">
-            const url = typeof window !== "undefined" ? window.location.href : "";
               <a
-                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(window.location.href)}`}
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(url)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-600 hover:text-blue-500 transition-colors"
@@ -416,7 +425,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
               </a>
 
               <a
-                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`}
+                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-600 hover:text-blue-700 transition-colors"
@@ -428,6 +437,18 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
               </a>
             </div>
           </div>
+        </div>
+        <div className="flex justify-between mt-12 text-sm">
+          {previousPost && (
+            <Link href={`/blog/${previousPost.slug}`} className="text-blue-600 hover:underline">
+              ← {previousPost.title}
+            </Link>
+          )}
+          {nextPost && (
+            <Link href={`/blog/${nextPost.slug}`} className="text-blue-600 hover:underline ml-auto">
+              {nextPost.title} →
+            </Link>
+          )}
         </div>
       </div>
     </article>
