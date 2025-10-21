@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 // Sample blog posts data - in a real app, this would come from a CMS or API
 const allPosts = [
@@ -64,7 +64,7 @@ export default function BlogPage() {
   const paginatedPosts = filteredPosts.slice(startIndex, startIndex + POSTS_PER_PAGE);
 
   // Reset to first page when filters change
-  useMemo(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedCategory]);
 

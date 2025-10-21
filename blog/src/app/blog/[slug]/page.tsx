@@ -1,7 +1,6 @@
-"use client";
-
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { CSSProperties } from 'react';
 
 // Sample blog posts data - in a real app, this would come from a CMS or API
 const allPosts = [
@@ -279,8 +278,10 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
   const previousPost = allPosts[postIndex - 1];
   const nextPost = allPosts[postIndex + 1];
 
-  // Get current URL for share links
-  const url = typeof window !== "undefined" ? window.location.href : "";
+  const deploymentHost = process.env.NEXT_PUBLIC_SITE_URL
+    ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined);
+  const normalizedBaseUrl = deploymentHost ? deploymentHost.replace(/\/$/, '') : undefined;
+  const postUrl = normalizedBaseUrl ? `${normalizedBaseUrl}/blog/${post.slug}` : `https://example.com/blog/${post.slug}`;
 
   return (
     <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -381,7 +382,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
           '--tw-prose-pre-bg': 'rgb(17 24 39)',
           '--tw-prose-th-borders': 'rgb(209 213 219)',
           '--tw-prose-td-borders': 'rgb(229 231 235)',
-        } as React.CSSProperties}
+        } as CSSProperties}
       />
 
       {/* Tags */}
@@ -413,7 +414,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
             <p className="text-sm text-gray-700 mb-1">Share this article</p>
             <div className="flex space-x-3">
               <a
-                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(url)}`}
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(postUrl)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-600 hover:text-blue-500 transition-colors"
@@ -425,7 +426,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
               </a>
 
               <a
-                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`}
+                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(postUrl)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-600 hover:text-blue-700 transition-colors"
