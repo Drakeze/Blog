@@ -1,17 +1,45 @@
 import { NextResponse } from "next/server";
 
-export async function GET() {
-  try {
-    // Fetch from the other API routes
-    const [reddit, twitter, linkedin] = await Promise.all([
-      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/reddit`).then((r) => r.json()),
-      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/twitter`).then((r) => r.json()),
-      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/linkedin`).then((r) => r.json()),
-    ]);
+interface SocialPost {
+  id: string;
+  createdAt: string;
+  [key: string]: unknown;
+}
 
-    // Combine and sort posts
-    const allPosts = [...reddit, ...twitter, ...linkedin].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+export async function GET(request: Request) {
+  try {
+    const origin = new URL(request.url).origin;
+    const endpoints = [
+      { name: "reddit", url: new URL("/api/reddit", origin) },
+      { name: "twitter", url: new URL("/api/twitter", origin) },
+      { name: "linkedin", url: new URL("/api/linkedin", origin) },
+    ];
+
+    const responses = await Promise.allSettled(
+      endpoints.map(async ({ url }) => {
+        const response = await fetch(url, { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+        return (await response.json()) as SocialPost[];
+      })
+    );
+
+    const allPosts: SocialPost[] = [];
+    responses.forEach((result, index) => {
+      if (result.status === "fulfilled") {
+        allPosts.push(...result.value);
+      } else {
+        console.warn(
+          `Failed to load ${endpoints[index]!.name} posts:`,
+          result.reason
+        );
+      }
+    });
+
+    allPosts.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
     return NextResponse.json(allPosts);
