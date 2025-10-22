@@ -1,15 +1,17 @@
 import { NextResponse } from "next/server";
 
+import { SOCIAL_PROFILES } from "@/config/social";
+
+const LINKEDIN_PROFILE = SOCIAL_PROFILES.linkedin;
+
 export async function GET() {
-  const mockLinkedinPosts = [
+  return NextResponse.json([
     {
-      id: "lnk_1",
+      id: "linkedin-profile",
       platform: "linkedin",
-      title: "Blog App integration testing in progress!",
-      url: "https://linkedin.com/in/yourprofile",
+      title: "Connect on LinkedIn for product announcements and articles.",
+      url: LINKEDIN_PROFILE,
       createdAt: new Date().toISOString(),
     },
-  ];
-
-  return NextResponse.json(mockLinkedinPosts);
+  ]);
 }

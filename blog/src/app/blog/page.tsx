@@ -1,51 +1,23 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-// Sample blog posts data - in a real app, this would come from a CMS or API
-const allPosts = [
-  {
-    id: 1,
-    title: 'Getting Started with Next.js 15',
-    excerpt: 'Learn how to build modern apps with Next.js 15 using the new App Router and server components.',
-    category: 'Tutorial',
-    tags: ['nextjs', 'react', 'typescript'],
-    date: '2024-01-14',
-    readTime: '5 min read',
-    slug: 'getting-started-nextjs-15',
-    socialLinks: {
-      reddit: 'https://reddit.com/',
-      twitter: 'https://twitter.com/',
-      linkedin: 'https://linkedin.com/',
-    },
-  },
-  {
-    id: 2,
-    title: 'Mastering Tailwind CSS for Rapid UI Design',
-    excerpt: 'Discover how Tailwind CSS can help you design beautiful, responsive UIs faster than ever.',
-    category: 'Design',
-    tags: ['tailwind', 'css', 'ui'],
-    date: '2024-02-10',
-    readTime: '6 min read',
-    slug: 'mastering-tailwind-css',
-    socialLinks: {
-      reddit: 'https://reddit.com/',
-      twitter: 'https://twitter.com/',
-      linkedin: 'https://linkedin.com/',
-    },
-  },
-];
+import { getPostSummaries } from '@/data/posts';
 
 const POSTS_PER_PAGE = 4;
 
 export default function BlogPage() {
+  const allPosts = useMemo(() => getPostSummaries(), []);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
 
   // Get unique categories
-  const categories = ['All', ...Array.from(new Set(allPosts.map(post => post.category)))];
+  const categories = useMemo(
+    () => ['All', ...Array.from(new Set(allPosts.map(post => post.category)))],
+    [allPosts]
+  );
 
   // Filter posts based on search and category
   const filteredPosts = useMemo(() => {
@@ -56,7 +28,7 @@ export default function BlogPage() {
       const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [searchTerm, selectedCategory]);
+  }, [allPosts, searchTerm, selectedCategory]);
 
   // Pagination
   const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
@@ -64,7 +36,7 @@ export default function BlogPage() {
   const paginatedPosts = filteredPosts.slice(startIndex, startIndex + POSTS_PER_PAGE);
 
   // Reset to first page when filters change
-  useMemo(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedCategory]);
 

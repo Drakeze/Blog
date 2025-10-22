@@ -3,19 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-interface Post {
-  id: string;
-  title: string;
-  excerpt: string;
-  date: string;
-  readTime: string;
-  category: string;
-  slug: string;
-}
+import SocialFeed from "@/components/SocialFeed";
+import type { BlogPostSummary } from "@/data/posts";
 
 export default function Home() {
-  const [featuredPosts, setFeaturedPosts] = useState<Post[]>([]);
+  const [featuredPosts, setFeaturedPosts] = useState<BlogPostSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [socialStatus, setSocialStatus] = useState<"loading" | "success" | "error">("loading");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
@@ -30,23 +24,69 @@ export default function Home() {
       .catch(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    fetch("/api/social")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to load social posts");
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setSocialStatus("success");
+        } else {
+          setSocialStatus("error");
+        }
+      })
+      .catch(() => setSocialStatus("error"));
+  }, []);
+
   // Social share handlers
   async function shareToLinkedIn(slug: string) {
-    await fetch("/api/linkedin/share", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug }),
-    });
-    alert("Post shared to LinkedIn!");
+    try {
+      const response = await fetch("/api/linkedin/share", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to share to LinkedIn");
+      }
+
+      const data = await response.json();
+
+      if (data.shareUrl && typeof window !== "undefined") {
+        window.open(data.shareUrl, "_blank", "noopener,noreferrer");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Unable to share this post on LinkedIn right now.");
+    }
   }
 
   async function shareToTwitter(slug: string) {
-    await fetch("/api/twitter/share", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug }),
-    });
-    alert("Post shared to Twitter!");
+    try {
+      const response = await fetch("/api/twitter/share", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to share to Twitter");
+      }
+
+      const data = await response.json();
+
+      if (data.shareUrl && typeof window !== "undefined") {
+        window.open(data.shareUrl, "_blank", "noopener,noreferrer");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Unable to share this post on Twitter right now.");
+    }
   }
 
   // Newsletter subscription
@@ -65,9 +105,14 @@ export default function Home() {
   return (
     <div className="">
       {/* ✅ API Status Banner */}
-      {!loading && (
+      {socialStatus === "success" && (
         <div className="bg-green-50 text-green-700 text-center py-2 text-sm">
           Synced with social APIs ✅
+        </div>
+      )}
+      {socialStatus === "error" && (
+        <div className="bg-red-50 text-red-700 text-center py-2 text-sm">
+          Unable to sync social feeds. Check your API keys or try again later.
         </div>
       )}
 
@@ -206,6 +251,13 @@ export default function Home() {
             </button>
           </div>
           {message && <p className="text-sm text-gray-600 mt-2">{message}</p>}
+        </div>
+      </section>
+
+      {/* Social Feed Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <SocialFeed />
         </div>
       </section>
     </div>
