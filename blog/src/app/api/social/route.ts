@@ -5,6 +5,11 @@ interface SocialPost {
   createdAt: string;
   [key: string]: unknown;
 }
+const SOCIAL_PROFILES = {
+  linkedin: process.env.LINKEDIN_PROFILE!,
+  reddit: process.env.REDDIT_PROFILE!,
+  twitter: process.env.TWITTER_PROFILE!,
+};
 
 export async function GET(request: Request) {
   try {
@@ -36,24 +41,6 @@ export async function GET(request: Request) {
         );
       }
     });
-
-    allPosts.sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-
-    const allPosts: SocialPost[] = [];
-    responses.forEach((result, index) => {
-      if (result.status === "fulfilled") {
-        allPosts.push(...result.value);
-      } else {
-        console.warn(
-          `Failed to load ${endpoints[index]!.name} posts:`,
-          result.reason
-        );
-      }
-    });
-
     allPosts.sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
