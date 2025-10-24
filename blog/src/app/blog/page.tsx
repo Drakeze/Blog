@@ -40,12 +40,16 @@ const allPosts = [
 const POSTS_PER_PAGE = 4;
 
 export default function BlogPage() {
+  const allPosts = useMemo(() => getPostSummaries(), []);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
 
   // Get unique categories
-  const categories = ['All', ...Array.from(new Set(allPosts.map(post => post.category)))];
+  const categories = useMemo(
+    () => ['All', ...Array.from(new Set(allPosts.map(post => post.category)))],
+    [allPosts]
+  );
 
   // Filter posts based on search and category
   const filteredPosts = useMemo(() => {
@@ -56,7 +60,7 @@ export default function BlogPage() {
       const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [searchTerm, selectedCategory]);
+  }, [allPosts, searchTerm, selectedCategory]);
 
   // Pagination
   const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
