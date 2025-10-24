@@ -42,6 +42,50 @@ export async function GET(request: Request) {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
+    const allPosts: SocialPost[] = [];
+    responses.forEach((result, index) => {
+      if (result.status === "fulfilled") {
+        allPosts.push(...result.value);
+      } else {
+        console.warn(
+          `Failed to load ${endpoints[index]!.name} posts:`,
+          result.reason
+        );
+      }
+    });
+
+    allPosts.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    if (allPosts.length === 0) {
+      const fallbackTimestamp = new Date().toISOString();
+      allPosts.push(
+        {
+          id: "linkedin-profile",
+          platform: "linkedin",
+          title: "Connect on LinkedIn",
+          url: SOCIAL_PROFILES.linkedin,
+          createdAt: fallbackTimestamp,
+        },
+        {
+          id: "reddit-profile",
+          platform: "reddit",
+          title: "Join the conversation on Reddit",
+          url: SOCIAL_PROFILES.reddit,
+          createdAt: fallbackTimestamp,
+        },
+        {
+          id: "twitter-profile",
+          platform: "twitter",
+          title: "Follow on X (Twitter)",
+          url: SOCIAL_PROFILES.twitter,
+          createdAt: fallbackTimestamp,
+        }
+      );
+    }
+
     return NextResponse.json(allPosts);
   } catch (err) {
     console.error("Error fetching social posts:", err);
