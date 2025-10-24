@@ -1,9 +1,41 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
-import { getPostSummaries } from '@/data/posts';
+// Sample blog posts data - in a real app, this would come from a CMS or API
+const allPosts = [
+  {
+    id: 1,
+    title: 'Getting Started with Next.js 15',
+    excerpt: 'Learn how to build modern apps with Next.js 15 using the new App Router and server components.',
+    category: 'Tutorial',
+    tags: ['nextjs', 'react', 'typescript'],
+    date: '2024-01-14',
+    readTime: '5 min read',
+    slug: 'getting-started-nextjs-15',
+    socialLinks: {
+      reddit: 'https://reddit.com/',
+      twitter: 'https://twitter.com/',
+      linkedin: 'https://linkedin.com/',
+    },
+  },
+  {
+    id: 2,
+    title: 'Mastering Tailwind CSS for Rapid UI Design',
+    excerpt: 'Discover how Tailwind CSS can help you design beautiful, responsive UIs faster than ever.',
+    category: 'Design',
+    tags: ['tailwind', 'css', 'ui'],
+    date: '2024-02-10',
+    readTime: '6 min read',
+    slug: 'mastering-tailwind-css',
+    socialLinks: {
+      reddit: 'https://reddit.com/',
+      twitter: 'https://twitter.com/',
+      linkedin: 'https://linkedin.com/',
+    },
+  },
+];
 
 const POSTS_PER_PAGE = 4;
 

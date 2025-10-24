@@ -7,7 +7,7 @@ A modern blog application built with Next.js 15, TypeScript, and Tailwind CSS.
 Before running this application, make sure you have the following installed:
 
 - [Node.js](https://nodejs.org/) (version 18 or higher)
-- [Yarn](https://yarnpkg.com/) (package manager)
+- [Bun](https://bun.com/package-manager) (package manager)
 
 ## Getting Started
 
@@ -19,12 +19,12 @@ Before running this application, make sure you have the following installed:
 
 2. **Install dependencies**:
    ```bash
-   yarn install
+   bun install
    ```
 
 3. **Run the development server**:
    ```bash
-   yarn dev
+   bun dev
    ```
 
 4. **Open your browser** and navigate to:
@@ -32,10 +32,10 @@ Before running this application, make sure you have the following installed:
 
 ## Available Scripts
 
-- `yarn dev` - Starts the development server with Turbopack
-- `yarn build` - Builds the application for production
-- `yarn start` - Starts the production server
-- `yarn lint` - Runs ESLint to check for code issues
+- `bun dev` - Starts the development server with Turbopack
+- `bun build` - Builds the application for production
+- `bun start` - Starts the production server
+- `bun lint` - Runs ESLint to check for code issues
 
 ## Project Structure
 
@@ -94,8 +94,8 @@ This application can be deployed on platforms like:
 For production deployment, run:
 
 ```bash
-yarn build
-yarn start
+bun build
+bun start
 ```
 
 ## Contributing
