@@ -1,42 +1,97 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, JSX } from 'react';
 import { getPostBySlug, posts as allPosts } from '@/data/posts';
-import type { Metadata, ResolvingMetadata } from 'next';
+import type { Metadata } from 'next';
+import type { SocialLinks } from '@/data/posts';
+
+const socialPlatformConfigs: Record<keyof SocialLinks, { label: string; icon: JSX.Element }> = {
+  twitter: {
+    label: 'Twitter',
+    icon: (
+      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+        <path d="M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84" />
+      </svg>
+    ),
+  },
+  reddit: {
+    label: 'Reddit',
+    icon: (
+      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+        <path d="M14.983 7.29a1.44 1.44 0 00-.982.377 7.1 7.1 0 00-3.24-.96l.69-2.185 1.89.398a1.45 1.45 0 102.9-.3 1.45 1.45 0 00-2.798.517l-2.179-.458a.467.467 0 00-.548.312l-.885 2.8a7.11 7.11 0 00-3.41.963 1.44 1.44 0 10-1.724 2.26 2.76 2.76 0 00-.054.51c0 2.29 2.65 4.152 5.913 4.152s5.913-1.862 5.913-4.152a2.75 2.75 0 00-.055-.513 1.44 1.44 0 00-.39-2.881zm-8.465 1.985a1.05 1.05 0 011.047-1.047 1.05 1.05 0 010 2.099 1.05 1.05 0 01-1.047-1.052zm6.028 3.227a3.597 3.597 0 01-2.546.894 3.597 3.597 0 01-2.546-.894.2.2 0 01.282-.282 3.201 3.201 0 002.264.797 3.2 3.2 0 002.264-.797.2.2 0 01.282.282zm-.264-2.18a1.05 1.05 0 110-2.1 1.05 1.05 0 010 2.1z" />
+      </svg>
+    ),
+  },
+  linkedin: {
+    label: 'LinkedIn',
+    icon: (
+      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+        <path
+          fillRule="evenodd"
+          d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248H8.014v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.778 3.203 4.092v4.711zM5.005 6.575a1.548 1.548 0 11-.003-3.096 1.548 1.548 0 01.003 3.096zm-1.337 9.763H6.34v-8.59H3.667v8.59zM17.668 1H2.328C1.595 1 1 1.581 1 2.298v15.403C1 18.418 1.595 19 2.328 19h15.34c.734 0 1.332-.582 1.332-1.299V2.298C19 1.581 18.402 1 17.668 1z"
+          clipRule="evenodd"
+        />
+      </svg>
+    ),
+  },
+};
+
+function getPostUrl(slug: string) {
+  const deploymentHost =
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined);
+  const normalizedBaseUrl = deploymentHost ? deploymentHost.replace(/\/$/, '') : undefined;
+  return normalizedBaseUrl ? `${normalizedBaseUrl}/blog/${slug}` : `https://example.com/blog/${slug}`;
+}
 
 interface BlogPostPageProps {
   params: { slug: string };
 }
 
-export async function generateMetadata(
-  { params }: BlogPostPageProps,
-  _parent?: ResolvingMetadata
-): Promise<Metadata> {
+export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const post = getPostBySlug(params.slug);
   if (!post) return { title: 'Post Not Found' };
+  const metadataTitle = `${post.title} | Blog`;
+  const postUrl = getPostUrl(post.slug);
   return {
-    title: `${post.title} | Blog`,
+    title: metadataTitle,
     description: post.excerpt,
+    openGraph: {
+      title: metadataTitle,
+      description: post.excerpt,
+      type: 'article',
+      url: postUrl,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: metadataTitle,
+      description: post.excerpt,
+    },
   };
+}
+
+export function generateStaticParams() {
+  return allPosts.map((post) => ({ slug: post.slug }));
 }
 
 export default function BlogPostPage({ params }: BlogPostPageProps) {
   const post = getPostBySlug(params.slug);
 
   if (!post) {
-    notFound();
+    return notFound();
   }
 
-  const { originalUrl } = post;
+  const { originalUrl, socialLinks } = post;
+
+  const activeSocialLinks = Object.entries(socialLinks ?? {}).filter(
+    ([, url]): url is string => typeof url === 'string' && url.length > 0
+  );
 
   const postIndex = allPosts.findIndex(p => p.slug === params.slug);
   const previousPost = allPosts[postIndex - 1];
   const nextPost = allPosts[postIndex + 1];
 
-  const deploymentHost = process.env.NEXT_PUBLIC_SITE_URL
-    ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined);
-  const normalizedBaseUrl = deploymentHost ? deploymentHost.replace(/\/$/, '') : undefined;
-  const postUrl = normalizedBaseUrl ? `${normalizedBaseUrl}/blog/${post.slug}` : `https://example.com/blog/${post.slug}`;
+  const postUrl = getPostUrl(post.slug);
 
   return (
     <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -154,6 +209,31 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
           </svg>
         </a>
       </div>
+
+      {/* Social Platforms */}
+      {activeSocialLinks.length > 0 && (
+        <div className="mb-12">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Join the conversation</h3>
+          <div className="flex flex-wrap items-center gap-3">
+            {activeSocialLinks.map(([platform, url]) => {
+              const config = socialPlatformConfigs[platform as keyof SocialLinks];
+              if (!config) return null;
+              return (
+                <a
+                  key={platform}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 text-sm font-medium text-gray-700 hover:text-blue-700 hover:border-blue-300 transition-colors"
+                >
+                  {config.icon}
+                  <span>{config.label}</span>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Tags */}
       <div className="mb-12">
