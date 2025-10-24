@@ -1,30 +1,19 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { CSSProperties } from 'react';
-
 import { getPostBySlug, posts as allPosts } from '@/data/posts';
+import type { Metadata, ResolvingMetadata } from 'next';
 
 interface BlogPostPageProps {
-  params: {
-    slug: string;
-  };
+  params: { slug: string };
 }
 
-export async function generateStaticParams() {
-  return allPosts.map((post) => ({
-    slug: post.slug,
-  }));
-}
-
-export async function generateMetadata({ params }: BlogPostPageProps) {
+export async function generateMetadata(
+  { params }: BlogPostPageProps,
+  _parent?: ResolvingMetadata
+): Promise<Metadata> {
   const post = getPostBySlug(params.slug);
-
-  if (!post) {
-    return {
-      title: 'Post Not Found',
-    };
-  }
-
+  if (!post) return { title: 'Post Not Found' };
   return {
     title: `${post.title} | Blog`,
     description: post.excerpt,
@@ -40,7 +29,6 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
 
   const { originalUrl } = post;
 
-  // Find index of current post for navigation
   const postIndex = allPosts.findIndex(p => p.slug === params.slug);
   const previousPost = allPosts[postIndex - 1];
   const nextPost = allPosts[postIndex + 1];
