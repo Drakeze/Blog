@@ -1,5 +1,3 @@
-import { SOCIAL_PROFILES } from "@/config/social";
-
 export interface SocialLinks {
   reddit?: string;
   twitter?: string;
@@ -22,12 +20,6 @@ export interface BlogPost {
 }
 
 export type BlogPostSummary = Omit<BlogPost, 'content'>;
-
-const DEFAULT_SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://sorenideas.com"
-).replace(/\/$/, "");
-
-const getOriginalUrl = (slug: string) => `${DEFAULT_SITE_URL}/blog/${slug}`;
 
 export const posts: BlogPost[] = [
   {
@@ -70,11 +62,11 @@ export const posts: BlogPost[] = [
     slug: 'getting-started-nextjs-15',
     tags: ['nextjs', 'react', 'tutorial'],
     author: 'John Doe',
-    originalUrl: getOriginalUrl('getting-started-nextjs-15'),
+    originalUrl: 'https://yourblog.com/getting-started-nextjs-15',
     socialLinks: {
-      reddit: SOCIAL_PROFILES.reddit,
-      twitter: SOCIAL_PROFILES.twitter,
-      linkedin: SOCIAL_PROFILES.linkedin,
+      reddit: 'https://reddit.com/',
+      twitter: 'https://twitter.com/',
+      linkedin: 'https://linkedin.com/',
     },
   },
   {
@@ -116,11 +108,11 @@ export const posts: BlogPost[] = [
     slug: 'mastering-tailwind-css',
     tags: ['tailwind', 'css', 'design'],
     author: 'Jane Smith',
-    originalUrl: getOriginalUrl('mastering-tailwind-css'),
+    originalUrl: 'https://yourblog.com/mastering-tailwind-css',
     socialLinks: {
-      reddit: SOCIAL_PROFILES.reddit,
-      twitter: SOCIAL_PROFILES.twitter,
-      linkedin: SOCIAL_PROFILES.linkedin,
+      reddit: 'https://reddit.com/',
+      twitter: 'https://twitter.com/',
+      linkedin: 'https://linkedin.com/',
     },
   },
   {
@@ -161,11 +153,11 @@ export const posts: BlogPost[] = [
     slug: 'scalable-react-applications',
     tags: ['react', 'architecture', 'development'],
     author: 'Mike Johnson',
-    originalUrl: getOriginalUrl('scalable-react-applications'),
+    originalUrl: 'https://yourblog.com/scalable-react-applications',
     socialLinks: {
-      reddit: SOCIAL_PROFILES.reddit,
-      twitter: SOCIAL_PROFILES.twitter,
-      linkedin: SOCIAL_PROFILES.linkedin,
+      reddit: 'https://reddit.com/',
+      twitter: 'https://twitter.com/',
+      linkedin: 'https://linkedin.com/',
     },
   },
   {
@@ -205,11 +197,11 @@ export const posts: BlogPost[] = [
     slug: 'typescript-best-practices-2024',
     tags: ['typescript', 'javascript', 'development'],
     author: 'Sarah Wilson',
-    originalUrl: getOriginalUrl('typescript-best-practices-2024'),
+    originalUrl: 'https://yourblog.com/typescript-best-practices-2024',
     socialLinks: {
-      reddit: SOCIAL_PROFILES.reddit,
-      twitter: SOCIAL_PROFILES.twitter,
-      linkedin: SOCIAL_PROFILES.linkedin,
+      reddit: 'https://reddit.com/',
+      twitter: 'https://twitter.com/',
+      linkedin: 'https://linkedin.com/',
     },
   },
   {
@@ -248,11 +240,11 @@ export const posts: BlogPost[] = [
     slug: 'modern-css-grid-layouts',
     tags: ['css', 'grid', 'layout'],
     author: 'Alex Chen',
-    originalUrl: getOriginalUrl('modern-css-grid-layouts'),
+    originalUrl: 'https://yourblog.com/modern-css-grid-layouts',
     socialLinks: {
-      reddit: SOCIAL_PROFILES.reddit,
-      twitter: SOCIAL_PROFILES.twitter,
-      linkedin: SOCIAL_PROFILES.linkedin,
+      reddit: 'https://reddit.com/',
+      twitter: 'https://twitter.com/',
+      linkedin: 'https://linkedin.com/',
     },
   },
   {
@@ -298,46 +290,14 @@ export const posts: BlogPost[] = [
     slug: 'api-design-nodejs-express',
     tags: ['nodejs', 'express', 'api'],
     author: 'David Brown',
-    originalUrl: getOriginalUrl('api-design-nodejs-express'),
+    originalUrl: 'https://yourblog.com/api-design-nodejs-express',
     socialLinks: {
-      reddit: SOCIAL_PROFILES.reddit,
-      twitter: SOCIAL_PROFILES.twitter,
-      linkedin: SOCIAL_PROFILES.linkedin,
+      reddit: 'https://reddit.com/',
+      twitter: 'https://twitter.com/',
+      linkedin: 'https://linkedin.com/',
     },
   },
 ];
-
-export const defaultPostTemplate: BlogPost = {
-  id: 0,
-  title: "Untitled Draft",
-  excerpt:
-    "Start writing your next story by updating the title, summary, and content fields.",
-  content: `
-    <h2>Introduce your idea</h2>
-    <p>Use this space to expand on the theme of your article. Swap this placeholder content with the insights you want to share.</p>
-  `,
-  date: new Date().toISOString(),
-  readTime: "5 min read",
-  category: "General",
-  slug: "draft-template",
-  tags: ["draft", "template"],
-  author: "Your Name",
-  originalUrl: `${DEFAULT_SITE_URL}/blog/draft-template`,
-  socialLinks: {
-    reddit: SOCIAL_PROFILES.reddit,
-    twitter: SOCIAL_PROFILES.twitter,
-    linkedin: SOCIAL_PROFILES.linkedin,
-  },
-};
-
-export function createPostTemplate(partial?: Partial<BlogPost>): BlogPost {
-  return {
-    ...defaultPostTemplate,
-    ...partial,
-    tags: partial?.tags ?? defaultPostTemplate.tags,
-    socialLinks: partial?.socialLinks ?? defaultPostTemplate.socialLinks,
-  };
-}
 
 export function getPostBySlug(slug: string) {
   return posts.find((post) => post.slug === slug);

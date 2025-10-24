@@ -1,14 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { SOCIAL_PROFILES } from "@/config/social";
-
 interface SocialPost {
   id: string;
   createdAt: string;
-  url?: string;
-  title?: string;
-  text?: string;
-  platform?: string;
   [key: string]: unknown;
 }
 
@@ -29,6 +23,23 @@ export async function GET(request: Request) {
         }
         return (await response.json()) as SocialPost[];
       })
+    );
+
+    const allPosts: SocialPost[] = [];
+    responses.forEach((result, index) => {
+      if (result.status === "fulfilled") {
+        allPosts.push(...result.value);
+      } else {
+        console.warn(
+          `Failed to load ${endpoints[index]!.name} posts:`,
+          result.reason
+        );
+      }
+    });
+
+    allPosts.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
     const allPosts: SocialPost[] = [];
