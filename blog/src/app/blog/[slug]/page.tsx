@@ -44,12 +44,15 @@ function getPostUrl(slug: string) {
   return normalizedBaseUrl ? `${normalizedBaseUrl}/blog/${slug}` : `https://example.com/blog/${slug}`;
 }
 
-interface BlogPostPageProps {
-  params: { slug: string };
-}
+type BlogPostParams = { slug: string };
+
+type BlogPostPageProps = {
+  params: Promise<BlogPostParams>;
+};
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
-  const post = getPostBySlug(params.slug);
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
   if (!post) return { title: 'Post Not Found' };
   const metadataTitle = `${post.title} | Blog`;
   const postUrl = getPostUrl(post.slug);
@@ -74,8 +77,9 @@ export function generateStaticParams() {
   return allPosts.map((post) => ({ slug: post.slug }));
 }
 
-export default function BlogPostPage({ params }: BlogPostPageProps) {
-  const post = getPostBySlug(params.slug);
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
 
   if (!post) {
     return notFound();
@@ -83,11 +87,15 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
 
   const { originalUrl, socialLinks } = post;
 
-  const activeSocialLinks = Object.entries(socialLinks ?? {}).filter(
-    ([, url]): url is string => typeof url === 'string' && url.length > 0
-  );
+  const activeSocialLinks = Object.entries(socialLinks ?? {}).filter((entry): entry is [
+    keyof SocialLinks,
+    string
+  ] => {
+    const [, url] = entry;
+    return typeof url === 'string' && url.length > 0;
+  });
 
-  const postIndex = allPosts.findIndex(p => p.slug === params.slug);
+  const postIndex = allPosts.findIndex(p => p.slug === slug);
   const previousPost = allPosts[postIndex - 1];
   const nextPost = allPosts[postIndex + 1];
 
