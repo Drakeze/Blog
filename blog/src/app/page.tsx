@@ -124,8 +124,7 @@ export default function Home() {
               Welcome to <span className="text-blue-600 block">SorenLab Blog</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Explore insights, tutorials, and projects across full-stack development, APIs,
-              and the future of web technology.
+              Follow my journey as an aspiring developer — sharing real project updates, lessons learned, and snippets from the path to becoming a full-stack engineer.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -153,7 +152,7 @@ export default function Home() {
               Featured Posts
             </h2>
             <p className="text-lg text-gray-600">
-              Latest articles and tutorials from the SorenLab team.
+              Latest articles and updates from the SorenLab team.
             </p>
           </div>
 
