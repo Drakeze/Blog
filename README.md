@@ -35,7 +35,20 @@ Before running this application, make sure you have the following installed:
 - `bun dev` - Starts the development server with Turbopack
 - `bun build` - Builds the application for production
 - `bun start` - Starts the production server
-- `bun lint` - Runs ESLint to check for code issues
+- `bun lint` - Runs ESLint to check for code issues (fails on warnings)
+- `bun lint:fix` - Auto-fixes lint issues where possible
+- `bun format` / `bun format:check` - Formats code with Prettier or checks formatting
+- `bun type-check` - Runs TypeScript checks without emitting files
+- `bun validate` - Runs lint, format check, and type-check together
+- `bun ci` - Runs lint, type-check, tests, and build in CI order
+
+## Automation & Quality Gates
+
+- **Husky hooks**: run `bun run prepare` (or `bunx husky install`) after installing dependencies to enable git hooks.
+  - `pre-commit`: lint-staged formatting, ESLint, Prettier check, and type-check.
+  - `pre-push`: runs tests and a production build.
+- **Commitlint**: enforces Conventional Commits locally and in CI.
+- **CI workflow**: `.github/workflows/ci.yml` runs lint, type-check, test, and build on pushes and pull requests using Bun.
 
 ## Project Structure
 

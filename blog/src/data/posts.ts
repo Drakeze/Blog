@@ -1,7 +1,10 @@
+export type PostStatus = 'draft' | 'published';
+
 export interface SocialLinks {
   reddit?: string;
   twitter?: string;
   linkedin?: string;
+  patreon?: string;
 }
 
 export interface BlogPost {
@@ -10,18 +13,36 @@ export interface BlogPost {
   excerpt: string;
   content: string;
   date: string;
+  updatedAt?: string;
   readTime: string;
+  readTimeMinutes: number;
   category: string;
   slug: string;
   tags: string[];
   author: string;
   originalUrl: string;
   socialLinks?: SocialLinks;
+  status: PostStatus;
 }
 
 export type BlogPostSummary = Omit<BlogPost, 'content'>;
 
-export const posts: BlogPost[] = [
+type UpsertPostInput = {
+  title: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  tags: string[];
+  author: string;
+  readTimeMinutes: number;
+  date?: string;
+  socialLinks?: SocialLinks;
+  status?: PostStatus;
+  slug?: string;
+  originalUrl?: string;
+};
+
+const initialPosts: BlogPost[] = [
   {
     id: 1,
     title: 'Getting Started with Next.js 15',
@@ -57,7 +78,9 @@ export const posts: BlogPost[] = [
       <p>Next.js 15 continues to push the boundaries of what's possible with React applications. Whether you're building a simple blog or a complex web application, Next.js provides the tools and performance you need.</p>
     `,
     date: '2024-01-15',
+    updatedAt: '2024-01-18',
     readTime: '5 min read',
+    readTimeMinutes: 5,
     category: 'Tutorial',
     slug: 'getting-started-nextjs-15',
     tags: ['nextjs', 'react', 'tutorial'],
@@ -67,7 +90,9 @@ export const posts: BlogPost[] = [
       reddit: 'https://reddit.com/',
       twitter: 'https://twitter.com/',
       linkedin: 'https://linkedin.com/',
+      patreon: 'https://patreon.com/',
     },
+    status: 'published',
   },
   {
     id: 2,
@@ -103,7 +128,9 @@ export const posts: BlogPost[] = [
       </ol>
     `,
     date: '2024-01-10',
+    updatedAt: '2024-01-12',
     readTime: '8 min read',
+    readTimeMinutes: 8,
     category: 'Design',
     slug: 'mastering-tailwind-css',
     tags: ['tailwind', 'css', 'design'],
@@ -113,7 +140,9 @@ export const posts: BlogPost[] = [
       reddit: 'https://reddit.com/',
       twitter: 'https://twitter.com/',
       linkedin: 'https://linkedin.com/',
+      patreon: 'https://patreon.com/',
     },
+    status: 'published',
   },
   {
     id: 3,
@@ -148,7 +177,9 @@ export const posts: BlogPost[] = [
       <p>A comprehensive testing strategy ensures your application remains reliable as it grows.</p>
     `,
     date: '2024-01-05',
+    updatedAt: '2024-01-07',
     readTime: '12 min read',
+    readTimeMinutes: 12,
     category: 'Development',
     slug: 'scalable-react-applications',
     tags: ['react', 'architecture', 'development'],
@@ -158,7 +189,9 @@ export const posts: BlogPost[] = [
       reddit: 'https://reddit.com/',
       twitter: 'https://twitter.com/',
       linkedin: 'https://linkedin.com/',
+      patreon: 'https://patreon.com/',
     },
+    status: 'draft',
   },
   {
     id: 4,
@@ -192,7 +225,9 @@ export const posts: BlogPost[] = [
       <p>TypeScript's type system can help you handle errors more effectively and catch issues at compile time.</p>
     `,
     date: '2024-01-01',
+    updatedAt: '2024-01-02',
     readTime: '10 min read',
+    readTimeMinutes: 10,
     category: 'Development',
     slug: 'typescript-best-practices-2024',
     tags: ['typescript', 'javascript', 'development'],
@@ -202,7 +237,9 @@ export const posts: BlogPost[] = [
       reddit: 'https://reddit.com/',
       twitter: 'https://twitter.com/',
       linkedin: 'https://linkedin.com/',
+      patreon: 'https://patreon.com/',
     },
+    status: 'published',
   },
   {
     id: 5,
@@ -235,7 +272,9 @@ export const posts: BlogPost[] = [
       <p>Create responsive layouts that adapt to different screen sizes without media queries.</p>
     `,
     date: '2023-12-28',
+    updatedAt: '2023-12-28',
     readTime: '7 min read',
+    readTimeMinutes: 7,
     category: 'Design',
     slug: 'modern-css-grid-layouts',
     tags: ['css', 'grid', 'layout'],
@@ -245,7 +284,9 @@ export const posts: BlogPost[] = [
       reddit: 'https://reddit.com/',
       twitter: 'https://twitter.com/',
       linkedin: 'https://linkedin.com/',
+      patreon: 'https://patreon.com/',
     },
+    status: 'draft',
   },
   {
     id: 6,
@@ -285,7 +326,9 @@ export const posts: BlogPost[] = [
       </ul>
     `,
     date: '2023-12-20',
+    updatedAt: '2023-12-22',
     readTime: '15 min read',
+    readTimeMinutes: 15,
     category: 'Backend',
     slug: 'api-design-nodejs-express',
     tags: ['nodejs', 'express', 'api'],
@@ -295,26 +338,136 @@ export const posts: BlogPost[] = [
       reddit: 'https://reddit.com/',
       twitter: 'https://twitter.com/',
       linkedin: 'https://linkedin.com/',
+      patreon: 'https://patreon.com/',
     },
+    status: 'published',
   },
 ];
 
+let postStore: BlogPost[] = [...initialPosts];
+
+const STATUS_VALUES: PostStatus[] = ['draft', 'published'];
+
+function normalizeSlug(title: string) {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
+function buildReadTime(minutes?: number) {
+  if (!minutes || Number.isNaN(minutes)) return '5 min read';
+  return `${Math.max(1, Math.round(minutes))} min read`;
+}
+
+function getNextId() {
+  return postStore.reduce((max, post) => Math.max(max, post.id), 0) + 1;
+}
+
+export function getAllPosts(): BlogPost[] {
+  return [...postStore].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
+
 export function getPostBySlug(slug: string): BlogPost | undefined {
-  return posts.find((post) => post.slug === slug);
+  return postStore.find((post) => post.slug === slug);
+}
+
+export function getPostById(id: number): BlogPost | undefined {
+  return postStore.find((post) => post.id === id);
 }
 
 export function getPostSummaries(limit?: number): BlogPostSummary[] {
-  const summaries = posts
-    .map((post) => {
-      const { content, ...summary } = post;
-      void content;
-      return summary;
-    })
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
+  const summaries = getAllPosts().map(({ content, ...summary }) => summary);
   if (typeof limit === 'number') {
     return summaries.slice(0, limit);
   }
-
   return summaries;
 }
+
+export function filterPosts(filters?: {
+  tag?: string;
+  readTimeMinutes?: number;
+  date?: string;
+  status?: PostStatus;
+}): BlogPost[] {
+  const { tag, readTimeMinutes, date, status } = filters ?? {};
+  return getAllPosts().filter((post) => {
+    const tagMatch = tag ? post.tags.includes(tag) : true;
+    const readTimeMatch = typeof readTimeMinutes === 'number' ? post.readTimeMinutes <= readTimeMinutes : true;
+    const dateMatch = date ? post.date.startsWith(date) : true;
+    const statusMatch = status ? post.status === status : true;
+    return tagMatch && readTimeMatch && dateMatch && statusMatch;
+  });
+}
+
+export function addPost(input: UpsertPostInput): BlogPost {
+  const now = new Date().toISOString();
+  const status: PostStatus = STATUS_VALUES.includes(input.status ?? 'draft') ? (input.status ?? 'draft') : 'draft';
+  const slug = input.slug ? normalizeSlug(input.slug) : normalizeSlug(input.title);
+  const readTimeMinutes = Math.max(1, Math.round(input.readTimeMinutes ?? 5));
+
+  const newPost: BlogPost = {
+    id: getNextId(),
+    title: input.title,
+    excerpt: input.excerpt,
+    content: input.content,
+    date: input.date ?? now,
+    updatedAt: now,
+    readTimeMinutes,
+    readTime: buildReadTime(readTimeMinutes),
+    category: input.category,
+    slug,
+    tags: input.tags,
+    author: input.author,
+    originalUrl: input.originalUrl ?? `https://example.com/blog/${slug}`,
+    socialLinks: input.socialLinks,
+    status,
+  };
+
+  postStore = [newPost, ...postStore];
+  return newPost;
+}
+
+export function updatePost(id: number, updates: Partial<UpsertPostInput>): BlogPost | undefined {
+  const existing = getPostById(id);
+  if (!existing) return undefined;
+
+  const merged = {
+    ...existing,
+    ...updates,
+  } satisfies Partial<BlogPost>;
+
+  const status: PostStatus = updates.status && STATUS_VALUES.includes(updates.status)
+    ? updates.status
+    : existing.status;
+  const readTimeMinutes = updates.readTimeMinutes ?? existing.readTimeMinutes;
+  const slug = updates.slug ? normalizeSlug(updates.slug) : existing.slug;
+
+  const updatedPost: BlogPost = {
+    ...existing,
+    ...merged,
+    status,
+    slug,
+    readTimeMinutes: Math.max(1, Math.round(readTimeMinutes)),
+    readTime: buildReadTime(readTimeMinutes),
+    updatedAt: new Date().toISOString(),
+    tags: updates.tags ?? existing.tags,
+    socialLinks: updates.socialLinks ?? existing.socialLinks,
+  };
+
+  postStore = postStore.map((post) => (post.id === id ? updatedPost : post));
+  return updatedPost;
+}
+
+export function removePost(id: number): boolean {
+  const exists = postStore.some((post) => post.id === id);
+  if (!exists) return false;
+  postStore = postStore.filter((post) => post.id !== id);
+  return true;
+}
+
+export function resetPosts() {
+  postStore = [...initialPosts];
+}
+

@@ -4,16 +4,17 @@ import { appendJsonRecord } from '@/data/storage';
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { name, email, message } = body ?? {};
+  const { name, email, subject, message } = body ?? {};
 
-  if (!name || !email) {
-    return NextResponse.json({ error: 'Name and email are required.' }, { status: 400 });
+  if (!name || !email || !subject || !message) {
+    return NextResponse.json({ error: 'Name, email, subject, and message are required.' }, { status: 400 });
   }
 
-  await appendJsonRecord('subscribers.json', {
+  await appendJsonRecord('contact-messages.json', {
     name,
     email,
-    message: message ?? '',
+    subject,
+    message,
     createdAt: new Date().toISOString(),
   });
 

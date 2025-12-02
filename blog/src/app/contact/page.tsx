@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 export default function ContactPage() {
+  const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -11,6 +13,10 @@ export default function ContactPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [showSubscribe, setShowSubscribe] = useState(false);
+  const [subscribeData, setSubscribeData] = useState({ name: '', email: '', message: '' });
+  const [subscribeStatus, setSubscribeStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [subscribeSubmitting, setSubscribeSubmitting] = useState(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -20,18 +26,35 @@ export default function ContactPage() {
     }));
   };
 
+  useEffect(() => {
+    const subjectParam = searchParams.get('subject');
+    if (subjectParam) {
+      setFormData(prev => ({ ...prev, subject: decodeURIComponent(subjectParam) }));
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (showSubscribe) {
+      setSubscribeStatus('idle');
+    }
+  }, [showSubscribe]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
-    // Simulate form submission
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // In a real app, you would send the data to your backend
-      console.log('Form submitted:', formData);
-      
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Unable to send message. Please try again later.');
+      }
+
       setSubmitStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
     } catch {
@@ -41,46 +64,85 @@ export default function ContactPage() {
     }
   };
 
+  const handleSubscribeSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setSubscribeSubmitting(true);
+    setSubscribeStatus('idle');
+
+    try {
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(subscribeData),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error ?? 'Unable to subscribe.');
+      }
+
+      setSubscribeStatus('success');
+      setSubscribeData({ name: '', email: '', message: '' });
+      setTimeout(() => setShowSubscribe(false), 800);
+    } catch {
+      setSubscribeStatus('error');
+    } finally {
+      setSubscribeSubmitting(false);
+    }
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* Header */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header */}
       <div className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 dark:text-neutral-50">
           Get in Touch
         </h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+        <p className="text-xl text-gray-600 max-w-3xl mx-auto dark:text-neutral-200">
           Have a question, suggestion, or just want to say hello? We&apos;d love to hear from you.
         </p>
+        <div className="mt-6 flex justify-center">
+          <button
+            type="button"
+            onClick={() => setShowSubscribe(true)}
+            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 5v14m-7-7h14" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Subscribe for updates
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-        {/* Contact Form */}
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">Send us a message</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+          {/* Contact Form */}
+          <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-8 dark:text-neutral-100">Send us a message</h2>
           
           {submitStatus === 'success' && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-emerald-700 dark:bg-emerald-900/30">
               <div className="flex">
-                <svg className="w-5 h-5 text-green-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="mr-3 mt-0.5 h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
                 <div>
-                  <h3 className="text-sm font-medium text-green-800">Message sent successfully!</h3>
-                  <p className="text-sm text-green-700 mt-1">Thank you for reaching out. We&apos;ll get back to you soon.</p>
+                  <h3 className="text-sm font-medium text-green-800 dark:text-emerald-200">Message sent successfully!</h3>
+                  <p className="mt-1 text-sm text-green-700 dark:text-emerald-100">Thank you for reaching out. We&apos;ll get back to you soon.</p>
                 </div>
               </div>
             </div>
           )}
-          
+
           {submitStatus === 'error' && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/30">
               <div className="flex">
-                <svg className="w-5 h-5 text-red-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="mr-3 mt-0.5 h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
                 <div>
-                  <h3 className="text-sm font-medium text-red-800">Error sending message</h3>
-                  <p className="text-sm text-red-700 mt-1">Please try again later or contact us directly.</p>
+                  <h3 className="text-sm font-medium text-red-800 dark:text-red-100">Error sending message</h3>
+                  <p className="mt-1 text-sm text-red-700 dark:text-red-100">Please try again later or contact us directly.</p>
                 </div>
               </div>
             </div>
@@ -89,7 +151,7 @@ export default function ContactPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2 dark:text-neutral-200">
                   Name *
                 </label>
                 <input
@@ -99,13 +161,13 @@ export default function ContactPage() {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
                   placeholder="Your full name"
                 />
               </div>
-              
+
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2 dark:text-neutral-200">
                   Email *
                 </label>
                 <input
@@ -115,35 +177,30 @@ export default function ContactPage() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
                   placeholder="your.email@example.com"
                 />
               </div>
             </div>
             
             <div>
-              <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="subject" className="mb-2 block text-sm font-medium text-gray-700 dark:text-neutral-200">
                 Subject *
               </label>
-              <select
+              <input
+                type="text"
                 id="subject"
                 name="subject"
                 value={formData.subject}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Select a subject</option>
-                <option value="general">General Inquiry</option>
-                <option value="feedback">Feedback</option>
-                <option value="collaboration">Collaboration</option>
-                <option value="technical">Technical Question</option>
-                <option value="other">Other</option>
-              </select>
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+                placeholder="How can we help?"
+              />
             </div>
             
             <div>
-              <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2 dark:text-neutral-200">
                 Message *
               </label>
               <textarea
@@ -153,7 +210,7 @@ export default function ContactPage() {
                 onChange={handleChange}
                 required
                 rows={6}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 resize-vertical focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
                 placeholder="Tell us more about your inquiry..."
               />
             </div>
@@ -270,6 +327,89 @@ export default function ContactPage() {
             </div>
           </div>
         </div>
+
+        {showSubscribe && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+            <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl dark:bg-neutral-900">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-neutral-50">Subscribe for updates</h3>
+                  <p className="text-sm text-gray-600 dark:text-neutral-300">Stay in the loop with new posts and announcements.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowSubscribe(false)}
+                  className="text-gray-500 hover:text-gray-800 dark:text-neutral-300"
+                >
+                  <span className="sr-only">Close</span>
+                  ×
+                </button>
+              </div>
+
+              {subscribeStatus === 'success' && (
+                <div className="mt-4 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-800 dark:border-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-100">
+                  Thanks for subscribing! We&apos;ll keep you updated.
+                </div>
+              )}
+              {subscribeStatus === 'error' && (
+                <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-100">
+                  Unable to subscribe right now. Please try again.
+                </div>
+              )}
+
+              <form onSubmit={handleSubscribeSubmit} className="mt-6 space-y-4">
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-200">Name</label>
+                  <input
+                    type="text"
+                    value={subscribeData.name}
+                    onChange={(e) => setSubscribeData(prev => ({ ...prev, name: e.target.value }))}
+                    required
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
+                    placeholder="Your name"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-200">Email</label>
+                  <input
+                    type="email"
+                    value={subscribeData.email}
+                    onChange={(e) => setSubscribeData(prev => ({ ...prev, email: e.target.value }))}
+                    required
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
+                    placeholder="you@example.com"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-200">Message (optional)</label>
+                  <textarea
+                    value={subscribeData.message}
+                    onChange={(e) => setSubscribeData(prev => ({ ...prev, message: e.target.value }))}
+                    rows={3}
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
+                    placeholder="Topics you care about"
+                  />
+                </div>
+                <div className="flex items-center justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowSubscribe(false)}
+                    className="rounded-lg px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 dark:text-neutral-200 dark:hover:bg-neutral-800"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={subscribeSubmitting}
+                    className="inline-flex items-center rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow hover:bg-blue-700 disabled:opacity-60"
+                  >
+                    {subscribeSubmitting ? 'Submitting...' : 'Subscribe'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

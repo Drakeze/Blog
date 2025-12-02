@@ -1,16 +1,26 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { getPostSummaries } from '@/data/posts';
+
+import type { BlogPostSummary } from '@/data/posts';
+import BlogCard from '@/components/BlogCard';
 
 const POSTS_PER_PAGE = 4;
 
 export default function BlogPage() {
-  const allPosts = useMemo(() => getPostSummaries(), []);
+  const [allPosts, setAllPosts] = useState<BlogPostSummary[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/posts')
+      .then((response) => response.json())
+      .then((data: BlogPostSummary[]) => setAllPosts(data))
+      .catch(() => setAllPosts([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   // Get unique categories
   const categories = useMemo(
@@ -40,19 +50,19 @@ export default function BlogPage() {
   }, [searchTerm, selectedCategory]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold text-black mb-4">
+      <div className="mb-12 text-center">
+        <h1 className="mb-4 text-4xl font-bold text-gray-900 md:text-5xl dark:text-neutral-50">
           Blog Posts
         </h1>
-        <p className="text-xl text-black max-w-3xl mx-auto">
+        <p className="mx-auto max-w-3xl text-xl text-gray-700 dark:text-neutral-300">
           Explore our collection of articles about web development, design, and technology.
         </p>
       </div>
 
       {/* Search and Filter */}
-      <div className="mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div className="mb-8 flex flex-col items-center justify-between gap-4 md:flex-row">
         {/* Search */}
         <div className="w-full md:w-1/2">
           <div className="relative">
@@ -61,7 +71,7 @@ export default function BlogPage() {
               placeholder="Search posts..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 pl-10 text-gray-900 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
             />
             <svg className="absolute left-3 top-3.5 h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -74,7 +84,7 @@ export default function BlogPage() {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="w-full md:w-auto px-4 py-3 border border-gray-300 rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 md:w-auto"
           >
             {categories.map(category => (
               <option key={category} value={category}>{category}</option>
@@ -84,93 +94,33 @@ export default function BlogPage() {
       </div>
 
       {/* Results count */}
-      <div className="mb-6">
-        {filteredPosts.length === 0 ? (
-          <p className="text-black">No posts found</p>
+      <div className="mb-6 text-gray-800 dark:text-neutral-200">
+        {loading ? (
+          <p>Loading posts...</p>
+        ) : filteredPosts.length === 0 ? (
+          <p>No posts found</p>
         ) : (
-          <p className="text-black">
-            Showing {startIndex + 1}-{Math.min(startIndex + POSTS_PER_PAGE, filteredPosts.length)} of {filteredPosts.length} posts
-          </p>
+          <p>Showing {startIndex + 1}-{Math.min(startIndex + POSTS_PER_PAGE, filteredPosts.length)} of {filteredPosts.length} posts</p>
         )}
       </div>
       {/* Blog Posts Grid */}
-      {paginatedPosts.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+      {loading ? (
+        <div className="py-12 text-center text-gray-900 dark:text-neutral-100">Loading posts...</div>
+      ) : paginatedPosts.length > 0 ? (
+        <div className="mb-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {paginatedPosts.map((post) => (
-            <article key={post.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-200">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
-                    {post.category}
-                  </span>
-                  <span className="text-sm text-black">{post.readTime}</span>
-                </div>
-
-                <h2 className="text-2xl font-bold text-black mb-3 hover:text-blue-600 transition-colors">
-                  <Link href={`/blog/${post.slug}`}>
-                    {post.title}
-                  </Link>
-                </h2>
-                <p className="text-black mb-4 line-clamp-3">
-                  {post.excerpt}
-                </p>
-
-                {/* Social platform badges */}
-                <div className="flex gap-2 mb-3">
-                  {post.socialLinks?.reddit && (
-                    <span className="px-2 py-1 text-xs font-semibold rounded bg-orange-100 text-orange-700">
-                      Reddit
-                    </span>
-                  )}
-                  {post.socialLinks?.twitter && (
-                    <span className="px-2 py-1 text-xs font-semibold rounded bg-blue-100 text-blue-700">
-                      Twitter
-                    </span>
-                  )}
-                  {post.socialLinks?.linkedin && (
-                    <span className="px-2 py-1 text-xs font-semibold rounded bg-sky-100 text-sky-700">
-                      LinkedIn
-                    </span>
-                  )}
-                </div>
-
-                {/* Tags */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {post.tags.map(tag => (
-                    <span key={tag} className="bg-gray-100 text-black text-xs px-2 py-1 rounded">
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-black">
-                    {new Date(post.date).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </span>
-                  <Link
-                    href={`/blog/${post.slug}`}
-                    className="text-blue-600 hover:text-blue-800 font-semibold text-sm transition-colors"
-                  >
-                    Read More →
-                  </Link>
-                </div>
-              </div>
-            </article>
+            <BlogCard key={post.id} post={post} />
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
-          <p className="text-black text-lg mb-4">No posts found matching your criteria.</p>
+        <div className="py-12 text-center">
+          <p className="mb-4 text-lg text-gray-900 dark:text-neutral-100">No posts found matching your criteria.</p>
           <button
             onClick={() => {
               setSearchTerm('');
               setSelectedCategory('All');
             }}
-            className="text-blue-600 hover:text-blue-800 font-semibold"
+            className="font-semibold text-blue-600 hover:text-blue-800"
           >
             Clear filters
           </button>
@@ -179,11 +129,11 @@ export default function BlogPage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center items-center space-x-2">
+        <div className="flex items-center justify-center space-x-2">
           <button
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-black disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+            className="rounded-lg border border-gray-300 px-4 py-2 text-gray-900 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700 dark:text-neutral-100 dark:hover:bg-neutral-800"
           >
             Previous
           </button>
@@ -192,10 +142,10 @@ export default function BlogPage() {
             <button
               key={page}
               onClick={() => setCurrentPage(page)}
-              className={`px-4 py-2 border rounded-lg transition-colors ${
+              className={`rounded-lg border px-4 py-2 transition-colors ${
                 currentPage === page
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'border-gray-300 text-black hover:bg-gray-50'
+                  ? 'border-blue-600 bg-blue-600 text-white'
+                  : 'border-gray-300 text-gray-900 hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-100 dark:hover:bg-neutral-800'
               }`}
             >
               {page}
@@ -205,7 +155,7 @@ export default function BlogPage() {
           <button
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-black disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+            className="rounded-lg border border-gray-300 px-4 py-2 text-gray-900 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700 dark:text-neutral-100 dark:hover:bg-neutral-800"
           >
             Next
           </button>
