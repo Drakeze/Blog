@@ -5,7 +5,8 @@ import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Modern Blog - Soren Technologies",
-  description: "A modern blog built with Next.js, React, and Tailwind CSS. Sharing insights about web development and technology.",
+  description:
+    "A modern blog built with Next.js, React, and Tailwind CSS. Sharing insights about web development and technology.",
 };
 
 export default function RootLayout({

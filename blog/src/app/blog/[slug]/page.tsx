@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { CSSProperties, JSX } from 'react';
-import { getPostBySlug, posts as allPosts } from '@/data/posts';
+import { getAllPosts, getPostBySlug } from '@/data/posts';
 import type { Metadata } from 'next';
 import type { SocialLinks } from '@/data/posts';
 
@@ -74,7 +74,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 }
 
 export function generateStaticParams() {
-  return allPosts.map((post) => ({ slug: post.slug }));
+  return getAllPosts().map((post) => ({ slug: post.slug }));
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
@@ -95,7 +95,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     return typeof url === 'string' && url.length > 0;
   });
 
-  const postIndex = allPosts.findIndex(p => p.slug === slug);
+  const allPosts = getAllPosts();
+  const postIndex = allPosts.findIndex((p) => p.slug === slug);
   const previousPost = allPosts[postIndex - 1];
   const nextPost = allPosts[postIndex + 1];
 
