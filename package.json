@@ -22,16 +22,16 @@
     "react-dom": "19.1.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
     "@commitlint/cli": "^19",
     "@commitlint/config-conventional": "^19",
+    "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint-plugin-simple-import-sort": "^12",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
     "husky": "^9",
     "lint-staged": "^15",
     "prettier": "^3",
