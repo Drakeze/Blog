@@ -2,15 +2,25 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { getPostSummaries } from '@/data/posts';
+
+import type { BlogPostSummary } from '@/data/posts';
 
 const POSTS_PER_PAGE = 4;
 
 export default function BlogPage() {
-  const allPosts = useMemo(() => getPostSummaries(), []);
+  const [allPosts, setAllPosts] = useState<BlogPostSummary[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/posts')
+      .then((response) => response.json())
+      .then((data: BlogPostSummary[]) => setAllPosts(data))
+      .catch(() => setAllPosts([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   // Get unique categories
   const categories = useMemo(
@@ -85,7 +95,9 @@ export default function BlogPage() {
 
       {/* Results count */}
       <div className="mb-6">
-        {filteredPosts.length === 0 ? (
+        {loading ? (
+          <p className="text-black">Loading posts...</p>
+        ) : filteredPosts.length === 0 ? (
           <p className="text-black">No posts found</p>
         ) : (
           <p className="text-black">
@@ -94,7 +106,9 @@ export default function BlogPage() {
         )}
       </div>
       {/* Blog Posts Grid */}
-      {paginatedPosts.length > 0 ? (
+      {loading ? (
+        <div className="text-center py-12 text-black">Loading posts...</div>
+      ) : paginatedPosts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           {paginatedPosts.map((post) => (
             <article key={post.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-200">
