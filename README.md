@@ -12,17 +12,20 @@ Before running this application, make sure you have the following installed:
 ## Getting Started
 
 1. **Clone the repository** (if not already done):
+
    ```bash
    git clone <your-repository-url>
    cd blog
    ```
 
 2. **Install dependencies**:
+
    ```bash
    bun install
    ```
 
 3. **Run the development server**:
+
    ```bash
    bun dev
    ```

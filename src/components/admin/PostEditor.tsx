@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
-import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
 
 import type { BlogPost, PostStatus, SocialLinks } from '@/data/posts';
+
 import SocialBadgeInput from './SocialBadgeInput';
 
 const defaultPost: Partial<BlogPost> = {
@@ -91,7 +92,9 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
     <div className="grid gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-sm text-gray-500">{mode === 'edit' ? 'Update content and metadata' : 'Create a brand new post'}</p>
+          <p className="text-sm text-gray-500">
+            {mode === 'edit' ? 'Update content and metadata' : 'Create a brand new post'}
+          </p>
           <h1 className="text-2xl font-semibold text-gray-900">
             {mode === 'edit' ? `Editing: ${initialPost?.title}` : 'New Post'}
           </h1>
@@ -158,7 +161,10 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
           {preview && (
             <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
               <p className="mb-2 text-sm font-semibold text-gray-900">Preview</p>
-              <div className="prose max-w-none text-gray-800" dangerouslySetInnerHTML={{ __html: previewHtml }} />
+              <div
+                className="prose max-w-none text-gray-800"
+                dangerouslySetInnerHTML={{ __html: previewHtml }}
+              />
             </div>
           )}
         </div>
@@ -202,7 +208,9 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
                 type="number"
                 min={1}
                 value={formState.readTimeMinutes ?? 5}
-                onChange={(event) => handleFieldChange('readTimeMinutes', Number(event.target.value))}
+                onChange={(event) =>
+                  handleFieldChange('readTimeMinutes', Number(event.target.value))
+                }
                 className="rounded-lg border border-gray-200 px-3 py-2"
               />
             </label>

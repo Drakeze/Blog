@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
@@ -19,19 +19,28 @@ type FilterState = {
 };
 
 export default function PostTable({ posts }: PostTableProps) {
-  const [filters, setFilters] = useState<FilterState>({ tag: 'all', status: 'all', maxReadTime: '0', date: '' });
+  const [filters, setFilters] = useState<FilterState>({
+    tag: 'all',
+    status: 'all',
+    maxReadTime: '0',
+    date: '',
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState<string | null>(null);
 
-  const uniqueTags = useMemo(() => Array.from(new Set(posts.flatMap((post) => post.tags))), [posts]);
+  const uniqueTags = useMemo(
+    () => Array.from(new Set(posts.flatMap((post) => post.tags))),
+    [posts]
+  );
 
   const filteredPosts = useMemo(() => {
     return posts.filter((post) => {
       const tagMatch = filters.tag === 'all' ? true : post.tags.includes(filters.tag);
       const statusMatch = filters.status === 'all' ? true : post.status === filters.status;
-      const readTimeMatch = filters.maxReadTime && Number(filters.maxReadTime) > 0
-        ? post.readTimeMinutes <= Number(filters.maxReadTime)
-        : true;
+      const readTimeMatch =
+        filters.maxReadTime && Number(filters.maxReadTime) > 0
+          ? post.readTimeMinutes <= Number(filters.maxReadTime)
+          : true;
       const dateMatch = filters.date ? post.date.startsWith(filters.date) : true;
       return tagMatch && statusMatch && readTimeMatch && dateMatch;
     });
@@ -59,7 +68,9 @@ export default function PostTable({ posts }: PostTableProps) {
       <div className="flex flex-col gap-4 border-b border-gray-200 p-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-xl font-semibold text-gray-900">Posts</h1>
-          <p className="text-sm text-gray-500">Filter by tag, publish status, read time, or date.</p>
+          <p className="text-sm text-gray-500">
+            Filter by tag, publish status, read time, or date.
+          </p>
         </div>
         <div className="flex flex-wrap gap-3 text-sm">
           <select
@@ -134,7 +145,10 @@ export default function PostTable({ posts }: PostTableProps) {
                 <td className="px-6 py-4 text-gray-700">
                   <div className="flex flex-wrap gap-1">
                     {post.tags.map((tag) => (
-                      <span key={tag} className="rounded bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-700">
+                      <span
+                        key={tag}
+                        className="rounded bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-700"
+                      >
                         {tag}
                       </span>
                     ))}
@@ -152,7 +166,9 @@ export default function PostTable({ posts }: PostTableProps) {
                   </span>
                 </td>
                 <td className="px-6 py-4 text-gray-700">{post.readTime}</td>
-                <td className="px-6 py-4 text-gray-700">{new Date(post.date).toLocaleDateString()}</td>
+                <td className="px-6 py-4 text-gray-700">
+                  {new Date(post.date).toLocaleDateString()}
+                </td>
                 <td className="px-6 py-4">
                   <div className="flex gap-2 text-xs font-semibold">
                     <Link
@@ -178,7 +194,8 @@ export default function PostTable({ posts }: PostTableProps) {
 
       <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3 text-sm">
         <p className="text-gray-600">
-          Showing {startIndex + 1}-{Math.min(startIndex + PAGE_SIZE, filteredPosts.length)} of {filteredPosts.length}
+          Showing {startIndex + 1}-{Math.min(startIndex + PAGE_SIZE, filteredPosts.length)} of{' '}
+          {filteredPosts.length}
         </p>
         <div className="flex items-center gap-2">
           <button

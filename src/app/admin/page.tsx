@@ -43,7 +43,10 @@ export default function AdminHomePage() {
           <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
             <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
               <h2 className="text-lg font-semibold text-gray-900">Recent posts</h2>
-              <Link href="/admin/posts" className="text-sm font-semibold text-blue-600 hover:text-blue-700">
+              <Link
+                href="/admin/posts"
+                className="text-sm font-semibold text-blue-600 hover:text-blue-700"
+              >
                 View all
               </Link>
             </div>
@@ -52,7 +55,9 @@ export default function AdminHomePage() {
                 <li key={post.id} className="flex items-center justify-between px-4 py-3">
                   <div>
                     <p className="text-sm font-semibold text-gray-900">{post.title}</p>
-                    <p className="text-xs text-gray-500">{post.readTime} • {post.category}</p>
+                    <p className="text-xs text-gray-500">
+                      {post.readTime} • {post.category}
+                    </p>
                   </div>
                   <div className="flex items-center gap-3 text-xs font-semibold">
                     <span
@@ -80,10 +85,16 @@ export default function AdminHomePage() {
           <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
             <h3 className="text-sm font-semibold text-gray-900">Quick actions</h3>
             <div className="mt-3 flex flex-col gap-2 text-sm font-semibold text-blue-700">
-              <Link href="/admin/posts/new" className="rounded-lg bg-blue-50 px-3 py-2 hover:bg-blue-100">
+              <Link
+                href="/admin/posts/new"
+                className="rounded-lg bg-blue-50 px-3 py-2 hover:bg-blue-100"
+              >
                 + Create post
               </Link>
-              <Link href="/admin/posts" className="rounded-lg bg-blue-50 px-3 py-2 hover:bg-blue-100">
+              <Link
+                href="/admin/posts"
+                className="rounded-lg bg-blue-50 px-3 py-2 hover:bg-blue-100"
+              >
                 Edit posts
               </Link>
               <Link href="/blog" className="rounded-lg bg-blue-50 px-3 py-2 hover:bg-blue-100">
@@ -136,9 +147,7 @@ type StatusPillProps = { status: 'healthy' | 'warning' };
 
 function StatusPill({ status }: StatusPillProps) {
   const styles =
-    status === 'healthy'
-      ? 'bg-green-100 text-green-700'
-      : 'bg-amber-100 text-amber-700';
+    status === 'healthy' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700';
 
   return (
     <span className={`rounded-full px-3 py-1 text-xs font-semibold ${styles}`}>

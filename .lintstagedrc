@@ -1,8 +1,4 @@
 {
-  "*.{js,jsx,ts,tsx}": [
-    "bunx eslint --fix --max-warnings=0"
-  ],
-  "*.{json,md,mdx,css,scss,html}": [
-    "bunx prettier --write"
-  ]
+  "*.{js,jsx,ts,tsx}": ["bunx eslint --fix --max-warnings=0"],
+  "*.{json,md,mdx,css,scss,html}": ["bunx prettier --write"]
 }

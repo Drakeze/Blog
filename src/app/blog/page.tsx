@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-import type { BlogPostSummary } from '@/data/posts';
 import BlogCard from '@/components/BlogCard';
+import type { BlogPostSummary } from '@/data/posts';
 
 const POSTS_PER_PAGE = 4;
 
@@ -24,16 +24,17 @@ export default function BlogPage() {
 
   // Get unique categories
   const categories = useMemo(
-    () => ['All', ...Array.from(new Set(allPosts.map(post => post.category)))],
+    () => ['All', ...Array.from(new Set(allPosts.map((post) => post.category)))],
     [allPosts]
   );
 
   // Filter posts based on search and category
   const filteredPosts = useMemo(() => {
-    return allPosts.filter(post => {
-      const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+    return allPosts.filter((post) => {
+      const matchesSearch =
+        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.tags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
       const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
@@ -71,10 +72,20 @@ export default function BlogPage() {
               placeholder="Search posts..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 pl-10 text-gray-900 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 pl-10 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
             />
-            <svg className="absolute left-3 top-3.5 h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg
+              className="absolute top-3.5 left-3 h-5 w-5 text-gray-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
             </svg>
           </div>
         </div>
@@ -84,10 +95,12 @@ export default function BlogPage() {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 md:w-auto"
+            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none md:w-auto dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
           >
-            {categories.map(category => (
-              <option key={category} value={category}>{category}</option>
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
             ))}
           </select>
         </div>
@@ -100,12 +113,17 @@ export default function BlogPage() {
         ) : filteredPosts.length === 0 ? (
           <p>No posts found</p>
         ) : (
-          <p>Showing {startIndex + 1}-{Math.min(startIndex + POSTS_PER_PAGE, filteredPosts.length)} of {filteredPosts.length} posts</p>
+          <p>
+            Showing {startIndex + 1}-{Math.min(startIndex + POSTS_PER_PAGE, filteredPosts.length)}{' '}
+            of {filteredPosts.length} posts
+          </p>
         )}
       </div>
       {/* Blog Posts Grid */}
       {loading ? (
-        <div className="py-12 text-center text-gray-900 dark:text-neutral-100">Loading posts...</div>
+        <div className="py-12 text-center text-gray-900 dark:text-neutral-100">
+          Loading posts...
+        </div>
       ) : paginatedPosts.length > 0 ? (
         <div className="mb-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {paginatedPosts.map((post) => (
@@ -114,7 +132,9 @@ export default function BlogPage() {
         </div>
       ) : (
         <div className="py-12 text-center">
-          <p className="mb-4 text-lg text-gray-900 dark:text-neutral-100">No posts found matching your criteria.</p>
+          <p className="mb-4 text-lg text-gray-900 dark:text-neutral-100">
+            No posts found matching your criteria.
+          </p>
           <button
             onClick={() => {
               setSearchTerm('');
@@ -131,14 +151,14 @@ export default function BlogPage() {
       {totalPages > 1 && (
         <div className="flex items-center justify-center space-x-2">
           <button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
             className="rounded-lg border border-gray-300 px-4 py-2 text-gray-900 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700 dark:text-neutral-100 dark:hover:bg-neutral-800"
           >
             Previous
           </button>
 
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
             <button
               key={page}
               onClick={() => setCurrentPage(page)}
@@ -153,7 +173,7 @@ export default function BlogPage() {
           ))}
 
           <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
             className="rounded-lg border border-gray-300 px-4 py-2 text-gray-900 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700 dark:text-neutral-100 dark:hover:bg-neutral-800"
           >
