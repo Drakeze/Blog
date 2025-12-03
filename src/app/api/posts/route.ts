@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { addPost, filterPosts, getPostSummaries, type PostStatus } from '@/data/posts';
+import { addPost, filterPosts, type PostStatus } from '@/data/posts';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -8,13 +8,16 @@ export async function GET(request: Request) {
   const date = searchParams.get('date') ?? undefined;
   const readTimeMinutes = searchParams.get('readTime');
   const statusParam = searchParams.get('status');
-  const status: PostStatus | undefined = statusParam === 'draft' || statusParam === 'published' ? statusParam : undefined;
+  const status: PostStatus | undefined =
+    statusParam === 'draft' || statusParam === 'published' ? statusParam : undefined;
 
   const filtered = filterPosts({
     tag,
     date,
     status,
     readTimeMinutes: readTimeMinutes ? Number(readTimeMinutes) : undefined,
+    // Exclude full content for the summaries returned by the API
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   }).map(({ content, ...summary }) => summary);
 
   return NextResponse.json(filtered);
@@ -35,7 +38,10 @@ export async function POST(request: Request) {
   } = body ?? {};
 
   if (!title || !excerpt || !content || !category || !author) {
-    return NextResponse.json({ error: 'Title, excerpt, content, category, and author are required.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Title, excerpt, content, category, and author are required.' },
+      { status: 400 }
+    );
   }
 
   const newPost = addPost({
@@ -51,8 +57,4 @@ export async function POST(request: Request) {
   });
 
   return NextResponse.json(newPost, { status: 201 });
-}
-
-export function revalidateTag() {
-  return getPostSummaries();
 }

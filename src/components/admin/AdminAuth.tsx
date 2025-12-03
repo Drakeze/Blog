@@ -45,9 +45,15 @@ export default function AdminAuth({ authorized, children }: AdminAuthProps) {
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 dark:bg-neutral-950">
       <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-neutral-50">Admin access</h1>
-        <p className="mt-2 text-sm text-gray-600 dark:text-neutral-300">Enter the admin password to continue.</p>
+        <p className="mt-2 text-sm text-gray-600 dark:text-neutral-300">
+          Enter the admin password to continue.
+        </p>
 
-        {error && <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-900/30 dark:text-red-100">{error}</p>}
+        {error && (
+          <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-900/30 dark:text-red-100">
+            {error}
+          </p>
+        )}
 
         <label className="mt-4 block text-sm font-medium text-gray-700 dark:text-neutral-200">
           Password

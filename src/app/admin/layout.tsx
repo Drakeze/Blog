@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 
+import AdminAuth from '@/components/admin/AdminAuth';
 import AdminHeader from '@/components/admin/AdminHeader';
 import AdminSidebar from '@/components/admin/AdminSidebar';
-import AdminAuth from '@/components/admin/AdminAuth';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,9 +12,7 @@ export const metadata: Metadata = {
   description: 'Manage blog posts, drafts, and publishing from the admin dashboard.',
 };
 
-export default async function AdminLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default async function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const cookieStore = await cookies();
   const isAuthorized = cookieStore.get('admin-auth')?.value === 'true';
 

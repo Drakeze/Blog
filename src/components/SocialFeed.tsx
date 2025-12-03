@@ -1,7 +1,7 @@
-"use client";
-import { useEffect, useState } from "react";
+'use client';
+import { useEffect, useState } from 'react';
 
-import { SOCIAL_PROFILES } from "@/config/social";
+import { SOCIAL_PROFILES } from '@/config/social';
 
 interface Post {
   id: string;
@@ -13,9 +13,9 @@ interface Post {
 }
 
 const fallbackLinks = [
-  { label: "LinkedIn", platform: "linkedin", url: SOCIAL_PROFILES.linkedin },
-  { label: "Reddit", platform: "reddit", url: SOCIAL_PROFILES.reddit },
-  { label: "X (Twitter)", platform: "twitter", url: SOCIAL_PROFILES.twitter },
+  { label: 'LinkedIn', platform: 'linkedin', url: SOCIAL_PROFILES.linkedin },
+  { label: 'Reddit', platform: 'reddit', url: SOCIAL_PROFILES.reddit },
+  { label: 'X (Twitter)', platform: 'twitter', url: SOCIAL_PROFILES.twitter },
 ];
 
 export default function SocialFeed() {
@@ -27,7 +27,7 @@ export default function SocialFeed() {
 
     const fetchAll = async () => {
       try {
-        const response = await fetch("/api/social", { cache: "no-store" });
+        const response = await fetch('/api/social', { cache: 'no-store' });
         if (!response.ok) {
           throw new Error(`Request failed with status ${response.status}`);
         }
@@ -38,16 +38,14 @@ export default function SocialFeed() {
         if (Array.isArray(data)) {
           const sorted = [...data].sort(
             (a, b) =>
-              new Date((b as Post).createdAt).getTime() -
-              new Date((a as Post).createdAt).getTime()
+              new Date((b as Post).createdAt).getTime() - new Date((a as Post).createdAt).getTime()
           ) as Post[];
           setPosts(sorted);
           setError(sorted.length === 0);
         } else {
           setError(true);
         }
-      } catch (err) {
-        console.error("Failed to load social feed", err);
+      } catch {
         if (active) {
           setError(true);
         }
@@ -67,9 +65,8 @@ export default function SocialFeed() {
 
       {error && (
         <div className="rounded-md border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-900">
-          We couldn&apos;t load the latest social posts automatically. Follow the
-          profiles below to stay in the loop while API access is being
-          finalized.
+          We couldn&apos;t load the latest social posts automatically. Follow the profiles below to
+          stay in the loop while API access is being finalized.
         </div>
       )}
 
@@ -77,12 +74,10 @@ export default function SocialFeed() {
         posts.map((post) => (
           <div
             key={post.id}
-            className="border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition"
+            className="rounded-lg border bg-white p-4 shadow-sm transition hover:shadow-md"
           >
-            <p className="text-black">
-              {post.title || post.text || "Untitled post"}
-            </p>
-            <div className="flex justify-between text-sm text-gray-500 mt-2">
+            <p className="text-black">{post.title || post.text || 'Untitled post'}</p>
+            <div className="mt-2 flex justify-between text-sm text-gray-500">
               <span>{post.platform.toUpperCase()}</span>
               <a
                 href={post.url}

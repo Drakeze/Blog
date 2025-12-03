@@ -1,17 +1,19 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import type { Metadata } from 'next';
 
 import SocialBadge from '@/components/SocialBadge';
-import { getAllPosts, getPostBySlug } from '@/data/posts';
 import type { SocialLinks } from '@/data/posts';
+import { getAllPosts, getPostBySlug } from '@/data/posts';
 
 function getPostUrl(slug: string) {
   const deploymentHost =
     process.env.NEXT_PUBLIC_SITE_URL ??
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined);
   const normalizedBaseUrl = deploymentHost ? deploymentHost.replace(/\/$/, '') : undefined;
-  return normalizedBaseUrl ? `${normalizedBaseUrl}/blog/${slug}` : `https://example.com/blog/${slug}`;
+  return normalizedBaseUrl
+    ? `${normalizedBaseUrl}/blog/${slug}`
+    : `https://example.com/blog/${slug}`;
 }
 
 type BlogPostParams = { slug: string };
@@ -74,28 +76,40 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <nav className="mb-8">
         <ol className="flex items-center space-x-2 text-sm text-gray-700 dark:text-neutral-300">
           <li>
-            <Link href="/" className="transition-colors hover:text-gray-700 dark:hover:text-neutral-100">
+            <Link
+              href="/"
+              className="transition-colors hover:text-gray-700 dark:hover:text-neutral-100"
+            >
               Home
             </Link>
           </li>
           <li>
             <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                clipRule="evenodd"
+              />
             </svg>
           </li>
           <li>
-            <Link href="/blog" className="transition-colors hover:text-gray-700 dark:hover:text-neutral-100">
+            <Link
+              href="/blog"
+              className="transition-colors hover:text-gray-700 dark:hover:text-neutral-100"
+            >
               Blog
             </Link>
           </li>
           <li>
             <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                clipRule="evenodd"
+              />
             </svg>
           </li>
-          <li className="truncate font-medium text-gray-900 dark:text-neutral-100">
-            {post.title}
-          </li>
+          <li className="truncate font-medium text-gray-900 dark:text-neutral-100">{post.title}</li>
         </ol>
       </nav>
 
@@ -107,7 +121,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </span>
         </div>
 
-        <h1 className="mb-6 text-4xl font-bold leading-tight text-gray-900 md:text-5xl dark:text-neutral-50">
+        <h1 className="mb-6 text-4xl leading-tight font-bold text-gray-900 md:text-5xl dark:text-neutral-50">
           {post.title}
         </h1>
 
@@ -120,7 +134,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           <div className="flex items-center">
             <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-gray-300 dark:bg-neutral-700">
               <span className="font-semibold text-gray-600 dark:text-neutral-100">
-                {post.author?.split(' ').map((name) => name[0]).join('')}
+                {post.author
+                  ?.split(' ')
+                  .map((name) => name[0])
+                  .join('')}
               </span>
             </div>
             <div>
@@ -149,7 +166,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
       {/* Article Content */}
       <div
-        className="prose prose-lg prose-neutral mb-12 max-w-none leading-relaxed dark:prose-invert"
+        className="prose prose-lg prose-neutral dark:prose-invert mb-12 max-w-none leading-relaxed"
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
 
@@ -162,7 +179,13 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           className="inline-flex items-center gap-2 font-semibold text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
         >
           Visit original publication
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <svg
+            className="h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
           </svg>
         </a>
@@ -171,7 +194,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       {/* Social Platforms */}
       {activeSocialLinks.length > 0 && (
         <div className="mb-12">
-          <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-neutral-100">Join the conversation</h3>
+          <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-neutral-100">
+            Join the conversation
+          </h3>
           <div className="flex flex-wrap items-center gap-3">
             {activeSocialLinks.map(([platform, url]) => (
               <SocialBadge key={platform} platform={platform} url={url} />
@@ -185,7 +210,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-neutral-100">Tags</h3>
         <div className="flex flex-wrap gap-2">
           {post.tags.map((tag) => (
-            <span key={tag} className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700 dark:bg-neutral-800 dark:text-neutral-200">
+            <span
+              key={tag}
+              className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700 dark:bg-neutral-800 dark:text-neutral-200"
+            >
               #{tag}
             </span>
           ))}
@@ -200,7 +228,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             className="inline-flex items-center font-semibold text-blue-600 transition-colors hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
           >
             <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             Back to Blog
           </Link>
@@ -228,7 +261,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               >
                 <span className="sr-only">Share on LinkedIn</span>
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248H8.014v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.778 3.203 4.092v4.711zM5.005 6.575a1.548 1.548 0 11-.003-3.096 1.548 1.548 0 01.003 3.096zm-1.337 9.763H6.34v-8.59H3.667v8.59zM17.668 1H2.328C1.595 1 1 1.581 1 2.298v15.403C1 18.418 1.595 19 2.328 19h15.34c.734 0 1.332-.582 1.332-1.299V2.298C19 1.581 18.402 1 17.668 1z" clipRule="evenodd" />
+                  <path
+                    fillRule="evenodd"
+                    d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248H8.014v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.778 3.203 4.092v4.711zM5.005 6.575a1.548 1.548 0 11-.003-3.096 1.548 1.548 0 01.003 3.096zm-1.337 9.763H6.34v-8.59H3.667v8.59zM17.668 1H2.328C1.595 1 1 1.581 1 2.298v15.403C1 18.418 1.595 19 2.328 19h15.34c.734 0 1.332-.582 1.332-1.299V2.298C19 1.581 18.402 1 17.668 1z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </a>
             </div>
@@ -236,12 +273,18 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
         <div className="mt-12 flex justify-between text-sm">
           {previousPost && (
-            <Link href={`/blog/${previousPost.slug}`} className="text-blue-600 hover:underline dark:text-blue-400 dark:hover:text-blue-300">
+            <Link
+              href={`/blog/${previousPost.slug}`}
+              className="text-blue-600 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+            >
               ← {previousPost.title}
             </Link>
           )}
           {nextPost && (
-            <Link href={`/blog/${nextPost.slug}`} className="ml-auto text-blue-600 hover:underline dark:text-blue-400 dark:hover:text-blue-300">
+            <Link
+              href={`/blog/${nextPost.slug}`}
+              className="ml-auto text-blue-600 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+            >
               {nextPost.title} →
             </Link>
           )}

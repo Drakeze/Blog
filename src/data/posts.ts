@@ -378,7 +378,9 @@ export function getPostById(id: number): BlogPost | undefined {
 }
 
 export function getPostSummaries(limit?: number): BlogPostSummary[] {
-  const summaries = getAllPosts().map(({ content, ...summary }) => summary);
+  const summaries = getAllPosts()
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    .map(({ content, ...summary }) => summary);
   if (typeof limit === 'number') {
     return summaries.slice(0, limit);
   }
@@ -394,7 +396,8 @@ export function filterPosts(filters?: {
   const { tag, readTimeMinutes, date, status } = filters ?? {};
   return getAllPosts().filter((post) => {
     const tagMatch = tag ? post.tags.includes(tag) : true;
-    const readTimeMatch = typeof readTimeMinutes === 'number' ? post.readTimeMinutes <= readTimeMinutes : true;
+    const readTimeMatch =
+      typeof readTimeMinutes === 'number' ? post.readTimeMinutes <= readTimeMinutes : true;
     const dateMatch = date ? post.date.startsWith(date) : true;
     const statusMatch = status ? post.status === status : true;
     return tagMatch && readTimeMatch && dateMatch && statusMatch;
@@ -403,7 +406,9 @@ export function filterPosts(filters?: {
 
 export function addPost(input: UpsertPostInput): BlogPost {
   const now = new Date().toISOString();
-  const status: PostStatus = STATUS_VALUES.includes(input.status ?? 'draft') ? (input.status ?? 'draft') : 'draft';
+  const status: PostStatus = STATUS_VALUES.includes(input.status ?? 'draft')
+    ? (input.status ?? 'draft')
+    : 'draft';
   const slug = input.slug ? normalizeSlug(input.slug) : normalizeSlug(input.title);
   const readTimeMinutes = Math.max(1, Math.round(input.readTimeMinutes ?? 5));
 
@@ -438,9 +443,8 @@ export function updatePost(id: number, updates: Partial<UpsertPostInput>): BlogP
     ...updates,
   } satisfies Partial<BlogPost>;
 
-  const status: PostStatus = updates.status && STATUS_VALUES.includes(updates.status)
-    ? updates.status
-    : existing.status;
+  const status: PostStatus =
+    updates.status && STATUS_VALUES.includes(updates.status) ? updates.status : existing.status;
   const readTimeMinutes = updates.readTimeMinutes ?? existing.readTimeMinutes;
   const slug = updates.slug ? normalizeSlug(updates.slug) : existing.slug;
 
@@ -470,4 +474,3 @@ export function removePost(id: number): boolean {
 export function resetPosts() {
   postStore = [...initialPosts];
 }
-

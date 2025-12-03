@@ -11,19 +11,13 @@ export async function POST(request: Request) {
   const slug = body.slug;
 
   if (!slug) {
-    return NextResponse.json(
-      { error: 'Missing post slug' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'Missing post slug' }, { status: 400 });
   }
 
   const post = getPostBySlug(slug);
 
   if (!post) {
-    return NextResponse.json(
-      { error: 'Post not found' },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: 'Post not found' }, { status: 404 });
   }
 
   return NextResponse.json({

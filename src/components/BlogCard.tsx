@@ -1,11 +1,14 @@
 import Link from 'next/link';
 
-import SocialBadge from './SocialBadge';
 import type { BlogPostSummary, SocialLinks } from '@/data/posts';
+
+import SocialBadge from './SocialBadge';
 
 function getActiveSocialLinks(socialLinks?: SocialLinks) {
   if (!socialLinks) return [] as Array<[keyof SocialLinks, string]>;
-  return (Object.entries(socialLinks) as Array<[keyof SocialLinks, string]>).filter(([, url]) => Boolean(url));
+  return (Object.entries(socialLinks) as Array<[keyof SocialLinks, string]>).filter(([, url]) =>
+    Boolean(url)
+  );
 }
 
 type BlogCardProps = {
