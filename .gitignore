@@ -1,0 +1,42 @@
+# Node modules
+node_modules/
+.pnp/
+.pnp.js
+
+# Bun
+.bun/
+
+# Next.js
+.next/
+out/
+.next-env.d.ts
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+bun-debug.log*
+
+# Env files
+.env
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build output
+build/
+dist/
+coverage/
+
+# Vercel
+.vercel
+
+# Typescript
+*.tsbuildinfo
+
+# Editor
+.vscode/
+*.swp
