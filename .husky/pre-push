@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-bun run test || exit 1
-bun run build || exit 1

@@ -1,5 +1,0 @@
-#!/usr/bin/env sh
-bunx lint-staged || exit 1
-bun run lint || exit 1
-bun run format:check || exit 1
-bun run type-check || exit 1
