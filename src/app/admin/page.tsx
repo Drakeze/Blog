@@ -1,157 +1,103 @@
-import Link from 'next/link';
+import { BlogHeader } from "@/components/blog-header"
+import { BlogFooter } from "@/components/blog-footer"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-import { getPostSummaries } from '@/data/posts';
-
-export default function AdminHomePage() {
-  const posts = getPostSummaries();
-  const totalPosts = posts.length;
-  const published = posts.filter((post) => post.status === 'published').length;
-  const drafts = posts.filter((post) => post.status === 'draft').length;
-  const recentPosts = posts.slice(0, 5);
-
+export default function AdminPage() {
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <p className="text-sm text-gray-500">Overview</p>
-          <h1 className="text-3xl font-semibold text-gray-900">Publishing Control Center</h1>
-        </div>
-        <div className="flex flex-wrap gap-3 text-sm">
-          <Link
-            href="/admin/posts/new"
-            className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white shadow hover:bg-blue-700"
-          >
-            New Post
-          </Link>
-          <Link
-            href="/admin/posts"
-            className="rounded-lg border border-gray-200 px-4 py-2 font-semibold text-gray-800 hover:bg-gray-50"
-          >
-            Manage Posts
-          </Link>
-        </div>
-      </div>
+    <div className="min-h-screen bg-background">
+      <BlogHeader />
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Total posts" value={totalPosts} />
-        <StatCard label="Published" value={published} accent="green" />
-        <StatCard label="Drafts" value={drafts} accent="amber" />
-      </div>
+      <main className="container mx-auto px-4 py-12 max-w-4xl">
+        <h1 className="text-4xl font-serif font-bold mb-8">Create New Post</h1>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
-            <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
-              <h2 className="text-lg font-semibold text-gray-900">Recent posts</h2>
-              <Link
-                href="/admin/posts"
-                className="text-sm font-semibold text-blue-600 hover:text-blue-700"
-              >
-                View all
-              </Link>
-            </div>
-            <ul className="divide-y divide-gray-100">
-              {recentPosts.map((post) => (
-                <li key={post.id} className="flex items-center justify-between px-4 py-3">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">{post.title}</p>
-                    <p className="text-xs text-gray-500">
-                      {post.readTime} • {post.category}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3 text-xs font-semibold">
-                    <span
-                      className={`rounded-full px-2.5 py-1 ${
-                        post.status === 'published'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}
-                    >
-                      {post.status}
-                    </span>
-                    <Link
-                      href={`/admin/posts/${post.id}/edit`}
-                      className="rounded-lg border border-gray-200 px-3 py-1 text-gray-800 hover:bg-gray-50"
-                    >
-                      Edit
-                    </Link>
-                  </div>
-                </li>
-              ))}
-            </ul>
+        <form className="space-y-8">
+          <div className="space-y-2">
+            <Label htmlFor="title" className="text-base">
+              Title
+            </Label>
+            <Input id="title" type="text" placeholder="Enter post title" className="h-12 text-lg" />
           </div>
-        </div>
-        <div className="space-y-4">
-          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-            <h3 className="text-sm font-semibold text-gray-900">Quick actions</h3>
-            <div className="mt-3 flex flex-col gap-2 text-sm font-semibold text-blue-700">
-              <Link
-                href="/admin/posts/new"
-                className="rounded-lg bg-blue-50 px-3 py-2 hover:bg-blue-100"
-              >
-                + Create post
-              </Link>
-              <Link
-                href="/admin/posts"
-                className="rounded-lg bg-blue-50 px-3 py-2 hover:bg-blue-100"
-              >
-                Edit posts
-              </Link>
-              <Link href="/blog" className="rounded-lg bg-blue-50 px-3 py-2 hover:bg-blue-100">
-                View live blog
-              </Link>
+
+          <div className="space-y-2">
+            <Label htmlFor="excerpt" className="text-base">
+              Excerpt
+            </Label>
+            <Textarea id="excerpt" placeholder="Brief description of the post" className="min-h-[80px] text-base" />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="content" className="text-base">
+              Content
+            </Label>
+            <Textarea
+              id="content"
+              placeholder="Write your post content (HTML supported)"
+              className="min-h-[400px] font-mono text-sm"
+            />
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="source" className="text-base">
+                Source
+              </Label>
+              <Select>
+                <SelectTrigger id="source" className="h-12">
+                  <SelectValue placeholder="Select source" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="blog">Blog Post</SelectItem>
+                  <SelectItem value="reddit">Reddit</SelectItem>
+                  <SelectItem value="twitter">Twitter/X</SelectItem>
+                  <SelectItem value="linkedin">LinkedIn</SelectItem>
+                  <SelectItem value="patreon">Patreon</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="sourceUrl" className="text-base">
+                Source URL (optional)
+              </Label>
+              <Input id="sourceUrl" type="url" placeholder="https://..." className="h-12" />
             </div>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-            <h3 className="text-sm font-semibold text-gray-900">Health</h3>
-            <ul className="mt-3 space-y-2 text-sm text-gray-700">
-              <li className="flex items-center justify-between">
-                <span>Publishing pipeline</span>
-                <StatusPill status="healthy" />
-              </li>
-              <li className="flex items-center justify-between">
-                <span>API connectivity</span>
-                <StatusPill status="healthy" />
-              </li>
-              <li className="flex items-center justify-between">
-                <span>Draft backlog</span>
-                <StatusPill status={drafts > 3 ? 'warning' : 'healthy'} />
-              </li>
-            </ul>
+
+          <div className="space-y-2">
+            <Label htmlFor="tags" className="text-base">
+              Tags
+            </Label>
+            <Input
+              id="tags"
+              type="text"
+              placeholder="web development, technology, design (comma separated)"
+              className="h-12"
+            />
           </div>
-        </div>
-      </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="image" className="text-base">
+              Hero Image URL
+            </Label>
+            <Input id="image" type="url" placeholder="https://..." className="h-12" />
+          </div>
+
+          <div className="flex gap-4 pt-4">
+            <Button type="submit" size="lg" className="flex-1">
+              Publish Post
+            </Button>
+            <Button type="button" variant="outline" size="lg" className="flex-1 bg-transparent">
+              Save Draft
+            </Button>
+          </div>
+        </form>
+      </main>
+
+      <BlogFooter />
     </div>
-  );
-}
-
-type StatCardProps = { label: string; value: number; accent?: 'green' | 'amber' };
-
-function StatCard({ label, value, accent }: StatCardProps) {
-  const accentClasses =
-    accent === 'green'
-      ? 'bg-green-50 text-green-700'
-      : accent === 'amber'
-        ? 'bg-amber-50 text-amber-700'
-        : 'bg-blue-50 text-blue-700';
-
-  return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className={`mt-2 text-3xl font-semibold ${accentClasses}`}>{value}</p>
-    </div>
-  );
-}
-
-type StatusPillProps = { status: 'healthy' | 'warning' };
-
-function StatusPill({ status }: StatusPillProps) {
-  const styles =
-    status === 'healthy' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700';
-
-  return (
-    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${styles}`}>
-      {status === 'healthy' ? 'Healthy' : 'Attention needed'}
-    </span>
-  );
+  )
 }
