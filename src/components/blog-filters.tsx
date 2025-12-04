@@ -1,5 +1,8 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
+import { Select } from "@/components/ui/select"
+
 type BlogFiltersProps = {
   categories: string[]
   tags: string[]
@@ -21,31 +24,28 @@ export function BlogFilters({
     <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
       <div className="flex flex-wrap gap-2">
         {categories.map((filter) => (
-          <button
+          <Button
             key={filter}
+            variant={activeCategory === filter ? "primary" : "outline"}
+            size="sm"
             onClick={() => onCategoryChange(filter)}
-            className={`rounded-full border px-3 py-2 text-sm ${
-              activeCategory === filter
-                ? "bg-foreground text-background"
-                : "bg-background text-foreground hover:bg-muted"
-            }`}
           >
             {filter}
-          </button>
+          </Button>
         ))}
       </div>
 
-      <select
+      <Select
         value={activeTag}
         onChange={(event) => onTagChange(event.target.value)}
-        className="w-[200px] rounded-lg border border-border bg-background px-3 py-2 text-sm"
+        className="w-[200px]"
       >
         {tags.map((tag) => (
           <option key={tag} value={tag}>
             {tag === "all" ? "All tags" : tag}
           </option>
         ))}
-      </select>
+      </Select>
     </div>
   )
 }
