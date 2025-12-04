@@ -1,3 +1,4 @@
+import { Card, CardContent } from "@/components/ui/card"
 import { BlogCard } from "@/components/blog-card"
 import type { BlogPostSummary } from "@/data/posts"
 
@@ -8,9 +9,9 @@ type BlogGridProps = {
 export function BlogGrid({ posts }: BlogGridProps) {
   if (posts.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-muted-foreground">
-        No posts found.
-      </div>
+      <Card className="border-dashed">
+        <CardContent className="p-8 text-center text-muted-foreground">No posts found.</CardContent>
+      </Card>
     )
   }
 
