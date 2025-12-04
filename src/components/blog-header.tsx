@@ -3,6 +3,8 @@
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
+import { Button } from "@/components/ui/button"
+
 export function BlogHeader() {
   const [theme, setTheme] = useState<"light" | "dark">("light")
   const [mounted, setMounted] = useState(false)
@@ -24,30 +26,32 @@ export function BlogHeader() {
   }
 
   return (
-    <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-xl font-serif font-bold">Thoughts</span>
+    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+        <div className="flex items-center gap-3">
+          <Link href="/" className="rounded-full bg-foreground px-3 py-1 text-sm font-semibold text-background">
+            Thoughts
           </Link>
-
-          <nav className="flex items-center gap-6">
-            <Link href="/" className="text-sm font-medium transition-colors hover:text-foreground/80">
-              Home
-            </Link>
-            <Link href="/subscribe" className="text-sm font-medium transition-colors hover:text-foreground/80">
-              Subscribe
-            </Link>
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-sm transition hover:bg-muted"
-              aria-label="Toggle theme"
-            >
-              {mounted && theme === "dark" ? "☀️" : "🌙"}
-            </button>
-          </nav>
+          <p className="hidden text-sm text-muted-foreground sm:block">Ideas, stories, and notes from the studio.</p>
         </div>
+
+        <nav className="flex items-center gap-4 text-sm font-semibold text-muted-foreground">
+          <Link href="/" className="rounded-full px-3 py-2 transition hover:bg-muted hover:text-foreground">
+            Home
+          </Link>
+          <Link href="/subscribe" className="rounded-full px-3 py-2 transition hover:bg-muted hover:text-foreground">
+            Subscribe
+          </Link>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+          >
+            {mounted && theme === "dark" ? "☀️" : "🌙"}
+          </Button>
+        </nav>
       </div>
     </header>
   )

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 
 import { BlogFooter } from "@/components/blog-footer"
 import { BlogHeader } from "@/components/blog-header"
+import { SourceBadge } from "@/components/source-badge"
 import { getPostBySlug } from "@/data/posts"
 
 function buildShareUrl(slug: string) {
@@ -24,7 +25,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
   }
 
   const shareUrl = buildShareUrl(post.slug)
-  const heroImage = post.image ?? "/placeholder.jpg"
+  const heroImage = post.heroImage ?? "/placeholder.jpg"
 
   return (
     <div className="min-h-screen bg-background">
@@ -50,29 +51,38 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
           {post.title}
         </h1>
 
-        <div className="mb-8 flex flex-wrap items-center gap-4 border-b border-border pb-8">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted font-semibold">
+        <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-border bg-card/60 p-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-muted font-semibold">
               {post.author[0]}
             </div>
             <div>
               <p className="font-medium">{post.author}</p>
               <p className="text-sm text-muted-foreground">
-                {new Date(post.date).toLocaleDateString()} · {post.readTime}
+                {new Date(post.createdAt).toLocaleDateString()} · {post.readTime}
               </p>
             </div>
           </div>
 
-          <div className="ml-auto flex items-center gap-2 text-sm text-muted-foreground">
-            <span className="rounded-full border border-border px-3 py-1 text-foreground">{post.category}</span>
-            <a
-              href={post.originalUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-full border border-border px-3 py-1 hover:bg-muted"
-            >
-              Source
-            </a>
+          <div className="flex flex-wrap items-center gap-3">
+            <SourceBadge source={post.source} />
+            <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+              {post.tags.map((tag) => (
+                <span key={tag} className="rounded-full border border-border px-3 py-1 text-foreground">
+                  {tag}
+                </span>
+              ))}
+            </div>
+            {post.source !== "blog" && post.sourceUrl && (
+              <a
+                href={post.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full border border-border px-3 py-1 text-sm font-semibold text-primary underline-offset-4 hover:bg-muted"
+              >
+                View original
+              </a>
+            )}
           </div>
         </div>
 

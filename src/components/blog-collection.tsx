@@ -9,24 +9,24 @@ import type { BlogPostSummary } from "@/data/posts"
 const DEFAULT_PAGE_SIZE = 6
 
 type BlogCollectionProps = {
-  posts: Array<BlogPostSummary & { image?: string }>
+  posts: BlogPostSummary[]
   enablePagination?: boolean
   pageSize?: number
 }
 
 export function BlogCollection({ posts, enablePagination = false, pageSize = DEFAULT_PAGE_SIZE }: BlogCollectionProps) {
-  const [activeCategory, setActiveCategory] = useState("All")
+  const [activeSource, setActiveSource] = useState("all")
   const [activeTag, setActiveTag] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [page, setPage] = useState(1)
 
-  const categories = useMemo(
-    () => ["All", ...Array.from(new Set(posts.map((post) => post.category)))],
+  const tags = useMemo(
+    () => ["all", ...Array.from(new Set(posts.flatMap((post) => post.tags)))],
     [posts]
   )
 
-  const tags = useMemo(
-    () => ["all", ...Array.from(new Set(posts.flatMap((post) => post.tags)))],
+  const sources = useMemo(
+    () => ["all", ...Array.from(new Set(posts.map((post) => post.source)))],
     [posts]
   )
 
@@ -34,7 +34,7 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
     const normalizedSearch = searchTerm.toLowerCase().trim()
 
     return posts.filter((post) => {
-      const matchesCategory = activeCategory === "All" || post.category === activeCategory
+      const matchesSource = activeSource === "all" || post.source === activeSource
       const matchesTag = activeTag === "all" || post.tags.includes(activeTag)
       const matchesSearch =
         normalizedSearch.length === 0 ||
@@ -42,9 +42,9 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
         post.excerpt.toLowerCase().includes(normalizedSearch) ||
         post.tags.some((tag) => tag.toLowerCase().includes(normalizedSearch))
 
-      return matchesCategory && matchesTag && matchesSearch
+      return matchesSource && matchesTag && matchesSearch
     })
-  }, [activeCategory, activeTag, posts, searchTerm])
+  }, [activeSource, activeTag, posts, searchTerm])
 
   const totalPages = enablePagination ? Math.max(1, Math.ceil(filteredPosts.length / pageSize)) : 1
   const startIndex = enablePagination ? (page - 1) * pageSize : 0
@@ -57,8 +57,8 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
     setPage(1)
   }
 
-  const handleCategoryChange = (value: string) => {
-    setActiveCategory(value)
+  const handleSourceChange = (value: string) => {
+    setActiveSource(value)
     setPage(1)
   }
 
@@ -81,11 +81,11 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
       </div>
 
       <BlogFilters
-        categories={categories}
+        sources={sources}
         tags={tags}
-        activeCategory={activeCategory}
+        activeSource={activeSource}
         activeTag={activeTag}
-        onCategoryChange={handleCategoryChange}
+        onSourceChange={handleSourceChange}
         onTagChange={handleTagChange}
       />
 

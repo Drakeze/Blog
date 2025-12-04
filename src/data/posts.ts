@@ -1,55 +1,50 @@
-export type PostStatus = 'draft' | 'published';
+export type PostStatus = "draft" | "published"
 
-export interface SocialLinks {
-  reddit?: string;
-  twitter?: string;
-  linkedin?: string;
-  patreon?: string;
-}
+export type PostSource = "blog" | "twitter" | "linkedin" | "reddit" | "patreon"
 
 export interface BlogPost {
-  id: number;
-  title: string;
-  excerpt: string;
-  content: string;
-  date: string;
-  updatedAt?: string;
-  readTime: string;
-  readTimeMinutes: number;
-  category: string;
-  slug: string;
-  tags: string[];
-  author: string;
-  originalUrl: string;
-  socialLinks?: SocialLinks;
-  image?: string;
-  status: PostStatus;
+  id: number
+  title: string
+  excerpt: string
+  content: string
+  slug: string
+  source: PostSource
+  sourceUrl?: string
+  heroImage?: string
+  tags: string[]
+  readTime: string
+  readTimeMinutes: number
+  status: PostStatus
+  createdAt: string
+  updatedAt: string
+  author: string
 }
 
-export type BlogPostSummary = Omit<BlogPost, 'content'>;
+export type BlogPostSummary = Omit<BlogPost, "content">
 
 type UpsertPostInput = {
-  title: string;
-  excerpt: string;
-  content: string;
-  category: string;
-  tags: string[];
-  author: string;
-  readTimeMinutes: number;
-  date?: string;
-  socialLinks?: SocialLinks;
-  status?: PostStatus;
-  slug?: string;
-  originalUrl?: string;
-  image?: string;
-};
+  title?: string
+  excerpt?: string
+  content?: string
+  slug?: string
+  source?: PostSource
+  sourceUrl?: string
+  heroImage?: string
+  tags?: string[]
+  readTimeMinutes?: number
+  status?: PostStatus
+  author?: string
+}
+
+const STATUS_VALUES: PostStatus[] = ["draft", "published"]
+const SOURCE_VALUES: PostSource[] = ["blog", "reddit", "twitter", "linkedin", "patreon"]
 
 const initialPosts: BlogPost[] = [
   {
     id: 1,
-    title: 'Getting Started with Next.js 15',
+    title: "Getting Started with Next.js 15",
     excerpt:
-      'Learn how to build modern web applications with the latest features in Next.js 15, including improved performance and developer experience.',
+      "Learn how to build modern web applications with the latest features in Next.js 15, including improved performance and developer experience.",
     content: `
       <h2>Introduction</h2>
       <p>Next.js 15 brings exciting new features and improvements that make building modern web applications even more enjoyable. In this comprehensive guide, we'll explore the key features and how to get started.</p>
@@ -79,29 +74,23 @@ const initialPosts: BlogPost[] = [
       <h2>Conclusion</h2>
       <p>Next.js 15 continues to push the boundaries of what's possible with React applications. Whether you're building a simple blog or a complex web application, Next.js provides the tools and performance you need.</p>
     `,
-    date: '2024-01-15',
-    updatedAt: '2024-01-18',
-    readTime: '5 min read',
+    slug: "getting-started-nextjs-15",
+    source: "blog",
+    sourceUrl: "https://yourblog.com/getting-started-nextjs-15",
+    heroImage: "/modern-web-development.png",
+    tags: ["nextjs", "react", "tutorial"],
+    readTime: "5 min read",
     readTimeMinutes: 5,
-    category: 'Tutorial',
-    slug: 'getting-started-nextjs-15',
-    tags: ['nextjs', 'react', 'tutorial'],
-    author: 'John Doe',
-    originalUrl: 'https://yourblog.com/getting-started-nextjs-15',
-    socialLinks: {
-      reddit: 'https://reddit.com/',
-      twitter: 'https://twitter.com/',
-      linkedin: 'https://linkedin.com/',
-      patreon: 'https://patreon.com/',
-    },
-    image: '/modern-web-development.png',
-    status: 'published',
+    status: "published",
+    createdAt: "2024-01-15T00:00:00.000Z",
+    updatedAt: "2024-01-18T00:00:00.000Z",
+    author: "John Doe",
   },
   {
     id: 2,
-    title: 'Mastering Tailwind CSS for Modern UI',
+    title: "Mastering Tailwind CSS for Modern UI",
     excerpt:
-      'Discover advanced Tailwind CSS techniques to create beautiful, responsive user interfaces with utility-first CSS framework.',
+      "Discover advanced Tailwind CSS techniques to create beautiful, responsive user interfaces with utility-first CSS framework.",
     content: `
       <h2>Why Tailwind CSS?</h2>
       <p>Tailwind CSS has revolutionized how we approach styling in modern web development. Its utility-first approach allows for rapid prototyping and consistent design systems.</p>
@@ -130,29 +119,23 @@ const initialPosts: BlogPost[] = [
         <li>Optimize for production with purging</li>
       </ol>
     `,
-    date: '2024-01-10',
-    updatedAt: '2024-01-12',
-    readTime: '8 min read',
+    slug: "mastering-tailwind-css",
+    source: "twitter",
+    sourceUrl: "https://twitter.com/",
+    heroImage: "/design-system-components.png",
+    tags: ["tailwind", "css", "design"],
+    readTime: "8 min read",
     readTimeMinutes: 8,
-    category: 'Design',
-    slug: 'mastering-tailwind-css',
-    tags: ['tailwind', 'css', 'design'],
-    author: 'Jane Smith',
-    originalUrl: 'https://yourblog.com/mastering-tailwind-css',
-    socialLinks: {
-      reddit: 'https://reddit.com/',
-      twitter: 'https://twitter.com/',
-      linkedin: 'https://linkedin.com/',
-      patreon: 'https://patreon.com/',
-    },
-    image: '/design-system-components.png',
-    status: 'published',
+    status: "published",
+    createdAt: "2024-01-10T00:00:00.000Z",
+    updatedAt: "2024-01-12T00:00:00.000Z",
+    author: "Jane Smith",
   },
   {
     id: 3,
-    title: 'Building Scalable React Applications',
+    title: "Building Scalable React Applications",
     excerpt:
-      'Best practices and patterns for building large-scale React applications that are maintainable and performant.',
+      "Best practices and patterns for building large-scale React applications that are maintainable and performant.",
     content: `
       <h2>Architecture Principles</h2>
       <p>Building scalable React applications requires careful consideration of architecture from the start. Here are the key principles to follow:</p>
@@ -180,29 +163,23 @@ const initialPosts: BlogPost[] = [
       <h2>Testing Strategy</h2>
       <p>A comprehensive testing strategy ensures your application remains reliable as it grows.</p>
     `,
-    date: '2024-01-05',
-    updatedAt: '2024-01-07',
-    readTime: '12 min read',
+    slug: "scalable-react-applications",
+    source: "linkedin",
+    sourceUrl: "https://linkedin.com/",
+    heroImage: "/ai-coding-assistant.jpg",
+    tags: ["react", "architecture", "development"],
+    readTime: "12 min read",
     readTimeMinutes: 12,
-    category: 'Development',
-    slug: 'scalable-react-applications',
-    tags: ['react', 'architecture', 'development'],
-    author: 'Mike Johnson',
-    originalUrl: 'https://yourblog.com/scalable-react-applications',
-    socialLinks: {
-      reddit: 'https://reddit.com/',
-      twitter: 'https://twitter.com/',
-      linkedin: 'https://linkedin.com/',
-      patreon: 'https://patreon.com/',
-    },
-    image: '/ai-coding-assistant.jpg',
-    status: 'draft',
+    status: "draft",
+    createdAt: "2024-01-05T00:00:00.000Z",
+    updatedAt: "2024-01-07T00:00:00.000Z",
+    author: "Mike Johnson",
   },
   {
     id: 4,
-    title: 'TypeScript Best Practices in 2024',
+    title: "TypeScript Best Practices in 2024",
     excerpt:
-      'Essential TypeScript patterns and practices that every developer should know for writing better, more maintainable code.',
+      "Essential TypeScript patterns and practices that every developer should know for writing better, more maintainable code.",
     content: `
       <h2>Modern TypeScript Features</h2>
       <p>TypeScript continues to evolve with new features that improve developer experience and code safety.</p>
@@ -229,29 +206,23 @@ const initialPosts: BlogPost[] = [
       <h2>Error Handling</h2>
       <p>TypeScript's type system can help you handle errors more effectively and catch issues at compile time.</p>
     `,
-    date: '2024-01-01',
-    updatedAt: '2024-01-02',
-    readTime: '10 min read',
+    slug: "typescript-best-practices-2024",
+    source: "blog",
+    sourceUrl: "https://yourblog.com/typescript-best-practices-2024",
+    heroImage: "/typescript-code.png",
+    tags: ["typescript", "javascript", "development"],
+    readTime: "10 min read",
     readTimeMinutes: 10,
-    category: 'Development',
-    slug: 'typescript-best-practices-2024',
-    tags: ['typescript', 'javascript', 'development'],
-    author: 'Sarah Wilson',
-    originalUrl: 'https://yourblog.com/typescript-best-practices-2024',
-    socialLinks: {
-      reddit: 'https://reddit.com/',
-      twitter: 'https://twitter.com/',
-      linkedin: 'https://linkedin.com/',
-      patreon: 'https://patreon.com/',
-    },
-    image: '/typescript-code.png',
-    status: 'published',
+    status: "published",
+    createdAt: "2024-01-01T00:00:00.000Z",
+    updatedAt: "2024-01-02T00:00:00.000Z",
+    author: "Sarah Wilson",
   },
   {
     id: 5,
-    title: 'Modern CSS Grid Layouts',
+    title: "Modern CSS Grid Layouts",
     excerpt:
-      'Master CSS Grid to create complex, responsive layouts with ease. Learn the fundamentals and advanced techniques.',
+      "Master CSS Grid to create complex, responsive layouts with ease. Learn the fundamentals and advanced techniques.",
     content: `
       <h2>CSS Grid Fundamentals</h2>
       <p>CSS Grid is a powerful layout system that allows you to create complex, responsive layouts with ease.</p>
@@ -277,29 +248,23 @@ const initialPosts: BlogPost[] = [
       <h2>Responsive Grid Patterns</h2>
       <p>Create responsive layouts that adapt to different screen sizes without media queries.</p>
     `,
-    date: '2023-12-28',
-    updatedAt: '2023-12-28',
-    readTime: '7 min read',
+    slug: "modern-css-grid-layouts",
+    source: "reddit",
+    sourceUrl: "https://reddit.com/",
+    heroImage: "/modern-web-development-abstract.jpg",
+    tags: ["css", "grid", "layout"],
+    readTime: "7 min read",
     readTimeMinutes: 7,
-    category: 'Design',
-    slug: 'modern-css-grid-layouts',
-    tags: ['css', 'grid', 'layout'],
-    author: 'Alex Chen',
-    originalUrl: 'https://yourblog.com/modern-css-grid-layouts',
-    socialLinks: {
-      reddit: 'https://reddit.com/',
-      twitter: 'https://twitter.com/',
-      linkedin: 'https://linkedin.com/',
-      patreon: 'https://patreon.com/',
-    },
-    image: '/modern-web-development-abstract.jpg',
-    status: 'draft',
+    status: "draft",
+    createdAt: "2023-12-28T00:00:00.000Z",
+    updatedAt: "2023-12-28T00:00:00.000Z",
+    author: "Alex Chen",
   },
   {
     id: 6,
-    title: 'API Design with Node.js and Express',
+    title: "API Design with Node.js and Express",
     excerpt:
-      'Learn how to design and build robust RESTful APIs using Node.js and Express with best practices and security considerations.',
+      "Learn how to design and build robust RESTful APIs using Node.js and Express with best practices and security considerations.",
     content: `
       <h2>RESTful API Design Principles</h2>
       <p>Building robust APIs requires following established design principles and best practices.</p>
@@ -332,155 +297,215 @@ const initialPosts: BlogPost[] = [
         <li>CORS configuration</li>
       </ul>
     `,
-    date: '2023-12-20',
-    updatedAt: '2023-12-22',
-    readTime: '15 min read',
+    slug: "api-design-nodejs-express",
+    source: "patreon",
+    sourceUrl: "https://patreon.com/",
+    heroImage: "/website-performance-metrics.jpg",
+    tags: ["nodejs", "express", "api"],
+    readTime: "15 min read",
     readTimeMinutes: 15,
-    category: 'Backend',
-    slug: 'api-design-nodejs-express',
-    tags: ['nodejs', 'express', 'api'],
-    author: 'David Brown',
-    originalUrl: 'https://yourblog.com/api-design-nodejs-express',
-    socialLinks: {
-      reddit: 'https://reddit.com/',
-      twitter: 'https://twitter.com/',
-      linkedin: 'https://linkedin.com/',
-      patreon: 'https://patreon.com/',
-    },
-    image: '/website-performance-metrics.jpg',
-    status: 'published',
+    status: "published",
+    createdAt: "2023-12-20T00:00:00.000Z",
+    updatedAt: "2023-12-22T00:00:00.000Z",
+    author: "David Brown",
   },
-];
+]
 
-let postStore: BlogPost[] = [...initialPosts];
+let postStore: BlogPost[] = [...initialPosts]
 
-const STATUS_VALUES: PostStatus[] = ['draft', 'published'];
-
-function normalizeSlug(title: string) {
-  return title
+function normalizeSlug(value: string) {
+  return value
     .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/[^a-z0-9\s-]/g, "")
     .trim()
-    .replace(/\s+/g, '-');
+    .replace(/\s+/g, "-")
+}
+
+function sanitizeTags(tags?: unknown[]): string[] {
+  if (!Array.isArray(tags)) return []
+  const unique = new Set(tags.map((tag) => String(tag).trim()).filter(Boolean))
+  return Array.from(unique)
+}
+
+function isValidUrl(value?: string | null) {
+  if (!value) return false
+  if (value.startsWith("/")) return true
+  try {
+    // eslint-disable-next-line no-new
+    new URL(value)
+    return true
+  } catch (error) {
+    return false
+  }
+}
+
+function ensureUniqueSlug(slug: string, currentId?: number) {
+  const baseSlug = normalizeSlug(slug)
+  let candidate = baseSlug
+  let suffix = 2
+
+  while (postStore.some((post) => post.slug === candidate && post.id !== currentId)) {
+    candidate = `${baseSlug}-${suffix}`
+    suffix += 1
+  }
+
+  return candidate
 }
 
 function buildReadTime(minutes?: number) {
-  if (!minutes || Number.isNaN(minutes)) return '5 min read';
-  return `${Math.max(1, Math.round(minutes))} min read`;
+  if (!minutes || Number.isNaN(minutes)) return "5 min read"
+  return `${Math.max(1, Math.round(minutes))} min read`
 }
 
 function getNextId() {
-  return postStore.reduce((max, post) => Math.max(max, post.id), 0) + 1;
+  return postStore.reduce((max, post) => Math.max(max, post.id), 0) + 1
+}
+
+function parseStatus(value?: PostStatus | string | null): PostStatus | undefined {
+  if (!value) return undefined
+  return STATUS_VALUES.includes(value as PostStatus) ? (value as PostStatus) : undefined
+}
+
+function parseSource(value?: PostSource | string | null): PostSource | undefined {
+  if (!value) return undefined
+  return SOURCE_VALUES.includes(value as PostSource) ? (value as PostSource) : undefined
+}
+
+function validateAndNormalizeInput(input: UpsertPostInput, existing?: BlogPost) {
+  const title = (input.title ?? existing?.title ?? "").trim()
+  if (!title) throw new Error("Title is required")
+
+  const excerpt = (input.excerpt ?? existing?.excerpt ?? "").trim()
+  if (!excerpt) throw new Error("Excerpt is required")
+
+  const content = (input.content ?? existing?.content ?? "").trim()
+  if (!content) throw new Error("Content is required")
+
+  const source = parseSource(input.source ?? existing?.source)
+  if (!source) throw new Error("Source must be one of blog, twitter, linkedin, reddit, or patreon")
+
+  const status = parseStatus(input.status ?? existing?.status) ?? "draft"
+
+  const sourceUrl = (input.sourceUrl ?? existing?.sourceUrl)?.trim()
+  if (sourceUrl && !isValidUrl(sourceUrl)) {
+    throw new Error("Source URL must be a valid URL")
+  }
+
+  const heroImage = (input.heroImage ?? existing?.heroImage)?.trim()
+  if (heroImage && !isValidUrl(heroImage)) {
+    throw new Error("Hero image must be a valid URL")
+  }
+
+  const readTimeMinutes = Number.isFinite(input.readTimeMinutes)
+    ? Math.max(1, Math.round(Number(input.readTimeMinutes)))
+    : existing?.readTimeMinutes ?? 5
+
+  const tags = sanitizeTags(input.tags ?? existing?.tags)
+
+  const author = (input.author ?? existing?.author ?? "Content Team").trim()
+
+  const providedSlug = input.slug ?? existing?.slug
+  const slugBase = providedSlug && providedSlug.trim().length > 0 ? providedSlug : normalizeSlug(title)
+  const slug = ensureUniqueSlug(slugBase, existing?.id)
+
+  const createdAt = existing?.createdAt ?? new Date().toISOString()
+
+  return {
+    title,
+    excerpt,
+    content,
+    slug,
+    source,
+    sourceUrl: sourceUrl || undefined,
+    heroImage: heroImage || undefined,
+    tags,
+    readTimeMinutes,
+    readTime: buildReadTime(readTimeMinutes),
+    status,
+    author,
+    createdAt,
+    updatedAt: new Date().toISOString(),
+  }
 }
 
 export function getAllPosts(): BlogPost[] {
-  return [...postStore].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  return [...postStore].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
 }
 
 export function getPostBySlug(slug: string): BlogPost | undefined {
-  return postStore.find((post) => post.slug === slug);
+  return postStore.find((post) => post.slug === slug)
 }
 
 export function getPostById(id: number): BlogPost | undefined {
-  return postStore.find((post) => post.id === id);
+  return postStore.find((post) => post.id === id)
 }
 
 export function getPostSummaries(limit?: number): BlogPostSummary[] {
-  const summaries = getAllPosts()
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    .map(({ content, ...summary }) => summary);
-  if (typeof limit === 'number') {
-    return summaries.slice(0, limit);
+  const summaries = getAllPosts().map(({ content, ...summary }) => summary)
+  if (typeof limit === "number") {
+    return summaries.slice(0, limit)
   }
-  return summaries;
+  return summaries
 }
 
 export function filterPosts(filters?: {
-  tag?: string;
-  readTimeMinutes?: number;
-  date?: string;
-  status?: PostStatus;
+  tag?: string
+  source?: PostSource
+  status?: PostStatus
+  search?: string
 }): BlogPost[] {
-  const { tag, readTimeMinutes, date, status } = filters ?? {};
+  const { tag, source, status, search } = filters ?? {}
+  const normalizedSearch = search?.toLowerCase().trim() ?? ""
+
   return getAllPosts().filter((post) => {
-    const tagMatch = tag ? post.tags.includes(tag) : true;
-    const readTimeMatch =
-      typeof readTimeMinutes === 'number' ? post.readTimeMinutes <= readTimeMinutes : true;
-    const dateMatch = date ? post.date.startsWith(date) : true;
-    const statusMatch = status ? post.status === status : true;
-    return tagMatch && readTimeMatch && dateMatch && statusMatch;
-  });
+    const tagMatch = tag ? post.tags.includes(tag) : true
+    const sourceMatch = source ? post.source === source : true
+    const statusMatch = status ? post.status === status : true
+    const searchMatch =
+      normalizedSearch.length === 0 ||
+      post.title.toLowerCase().includes(normalizedSearch) ||
+      post.excerpt.toLowerCase().includes(normalizedSearch) ||
+      post.tags.some((postTag) => postTag.toLowerCase().includes(normalizedSearch))
+
+    return tagMatch && sourceMatch && statusMatch && searchMatch
+  })
 }
 
 export function addPost(input: UpsertPostInput): BlogPost {
-  const now = new Date().toISOString();
-  const status: PostStatus = STATUS_VALUES.includes(input.status ?? 'draft')
-    ? (input.status ?? 'draft')
-    : 'draft';
-  const slug = input.slug ? normalizeSlug(input.slug) : normalizeSlug(input.title);
-  const readTimeMinutes = Math.max(1, Math.round(input.readTimeMinutes ?? 5));
+  const normalized = validateAndNormalizeInput(input)
 
   const newPost: BlogPost = {
     id: getNextId(),
-    title: input.title,
-    excerpt: input.excerpt,
-    content: input.content,
-    date: input.date ?? now,
-    updatedAt: now,
-    readTimeMinutes,
-    readTime: buildReadTime(readTimeMinutes),
-    category: input.category,
-    slug,
-    tags: input.tags,
-    author: input.author,
-    originalUrl: input.originalUrl ?? `https://example.com/blog/${slug}`,
-    socialLinks: input.socialLinks,
-    image: input.image,
-    status,
-  };
+    ...normalized,
+  }
 
-  postStore = [newPost, ...postStore];
-  return newPost;
+  postStore = [newPost, ...postStore]
+  return newPost
 }
 
-export function updatePost(id: number, updates: Partial<UpsertPostInput>): BlogPost | undefined {
-  const existing = getPostById(id);
-  if (!existing) return undefined;
+export function updatePost(id: number, updates: UpsertPostInput): BlogPost | undefined {
+  const existing = getPostById(id)
+  if (!existing) return undefined
 
-  const merged = {
-    ...existing,
-    ...updates,
-  } satisfies Partial<BlogPost>;
-
-  const status: PostStatus =
-    updates.status && STATUS_VALUES.includes(updates.status) ? updates.status : existing.status;
-  const readTimeMinutes = updates.readTimeMinutes ?? existing.readTimeMinutes;
-  const slug = updates.slug ? normalizeSlug(updates.slug) : existing.slug;
+  const normalized = validateAndNormalizeInput(updates, existing)
 
   const updatedPost: BlogPost = {
     ...existing,
-    ...merged,
-    status,
-    slug,
-    readTimeMinutes: Math.max(1, Math.round(readTimeMinutes)),
-    readTime: buildReadTime(readTimeMinutes),
-    updatedAt: new Date().toISOString(),
-    tags: updates.tags ?? existing.tags,
-    socialLinks: updates.socialLinks ?? existing.socialLinks,
-    image: updates.image ?? existing.image,
-  };
+    ...normalized,
+    id: existing.id,
+  }
 
-  postStore = postStore.map((post) => (post.id === id ? updatedPost : post));
-  return updatedPost;
+  postStore = postStore.map((post) => (post.id === id ? updatedPost : post))
+  return updatedPost
 }
 
 export function removePost(id: number): boolean {
-  const exists = postStore.some((post) => post.id === id);
-  if (!exists) return false;
-  postStore = postStore.filter((post) => post.id !== id);
-  return true;
+  const exists = postStore.some((post) => post.id === id)
+  if (!exists) return false
+  postStore = postStore.filter((post) => post.id !== id)
+  return true
 }
 
 export function resetPosts() {
-  postStore = [...initialPosts];
+  postStore = [...initialPosts]
 }

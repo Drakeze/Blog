@@ -1,20 +1,22 @@
 import Image from "next/image"
 import Link from "next/link"
 
+import { SourceBadge } from "@/components/source-badge"
+import { Badge } from "@/components/ui/badge"
 import type { BlogPostSummary } from "@/data/posts"
 
 interface BlogCardProps {
-  post: BlogPostSummary & { image?: string }
+  post: BlogPostSummary
 }
 
 const FALLBACK_IMAGE = "/placeholder.jpg"
 
 export function BlogCard({ post }: BlogCardProps) {
-  const imageSrc = post.image ?? FALLBACK_IMAGE
+  const imageSrc = post.heroImage ?? FALLBACK_IMAGE
 
   return (
-    <Link href={`/blog/${post.slug}`} className="group">
-      <article className="h-full overflow-hidden rounded-2xl border border-border bg-card transition-all hover:border-foreground/20 hover:shadow-lg">
+    <article className="group h-full overflow-hidden rounded-3xl border border-border bg-card transition-all hover:-translate-y-1 hover:border-foreground/20 hover:shadow-xl">
+      <Link href={`/blog/${post.slug}`} className="block">
         <div className="relative aspect-[3/2] overflow-hidden bg-muted">
           <Image
             src={imageSrc}
@@ -28,8 +30,8 @@ export function BlogCard({ post }: BlogCardProps) {
 
         <div className="space-y-4 p-6">
           <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-            <span className="rounded-full bg-muted px-2 py-1 text-foreground">{post.category}</span>
-            <span>{post.readTime}</span>
+            <SourceBadge source={post.source} />
+            <span className="rounded-full bg-muted px-2 py-1 text-[11px] font-semibold uppercase tracking-wide">{post.readTime}</span>
           </div>
 
           <h2 className="text-balance font-serif text-xl font-bold leading-tight transition-colors group-hover:text-primary">
@@ -38,16 +40,29 @@ export function BlogCard({ post }: BlogCardProps) {
 
           <p className="text-pretty text-sm leading-relaxed text-muted-foreground line-clamp-3">{post.excerpt}</p>
 
-          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-            <span>{new Date(post.date).toLocaleDateString()}</span>
+          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <span className="rounded-full bg-muted px-2 py-1">{new Date(post.createdAt).toLocaleDateString()}</span>
             {post.tags.slice(0, 3).map((tag) => (
-              <span key={tag} className="rounded-full border border-border px-2 py-1">
+              <Badge key={tag} tone="outline" className="text-[11px]">
                 #{tag}
-              </span>
+              </Badge>
             ))}
           </div>
         </div>
-      </article>
-    </Link>
+      </Link>
+
+      {post.source !== "blog" && post.sourceUrl && (
+        <div className="px-6 pb-6">
+          <a
+            href={post.sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-semibold text-primary underline-offset-4 hover:underline"
+          >
+            View original
+          </a>
+        </div>
+      )}
+    </article>
   )
 }
