@@ -4,10 +4,10 @@ import { removePost, updatePost } from '@/data/posts';
 
 type RouteParams = { id: string };
 
-type RouteContext = { params: Promise<RouteParams> };
+type RouteContext = { params: RouteParams };
 
-export async function PUT(request: Request, context: RouteContext) {
-  const { id } = await context.params;
+export async function PUT(request: Request, { params }: RouteContext) {
+  const { id } = params;
   const postId = Number(id);
 
   if (!Number.isFinite(postId)) {
@@ -24,8 +24,8 @@ export async function PUT(request: Request, context: RouteContext) {
   return NextResponse.json(updated);
 }
 
-export async function DELETE(_request: Request, context: RouteContext) {
-  const { id } = await context.params;
+export async function DELETE(_request: Request, { params }: RouteContext) {
+  const { id } = params;
   const postId = Number(id);
 
   if (!Number.isFinite(postId)) {

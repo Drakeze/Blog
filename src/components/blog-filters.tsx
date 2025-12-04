@@ -1,50 +1,51 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useState } from "react"
+type BlogFiltersProps = {
+  categories: string[]
+  tags: string[]
+  activeCategory: string
+  activeTag: string
+  onCategoryChange: (value: string) => void
+  onTagChange: (value: string) => void
+}
 
-type FilterType = "all" | "blog" | "reddit" | "twitter" | "linkedin" | "patreon"
-
-export function BlogFilters() {
-  const [activeFilter, setActiveFilter] = useState<FilterType>("all")
-
-  const filters: { value: FilterType; label: string }[] = [
-    { value: "all", label: "All" },
-    { value: "blog", label: "Blog" },
-    { value: "reddit", label: "Reddit" },
-    { value: "twitter", label: "Twitter/X" },
-    { value: "linkedin", label: "LinkedIn" },
-    { value: "patreon", label: "Patreon" },
-  ]
-
+export function BlogFilters({
+  categories,
+  tags,
+  activeCategory,
+  activeTag,
+  onCategoryChange,
+  onTagChange,
+}: BlogFiltersProps) {
   return (
-    <div className="mb-12 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+    <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
       <div className="flex flex-wrap gap-2">
-        {filters.map((filter) => (
-          <Button
-            key={filter.value}
-            variant={activeFilter === filter.value ? "default" : "outline"}
-            onClick={() => setActiveFilter(filter.value)}
-            className="rounded-full"
+        {categories.map((filter) => (
+          <button
+            key={filter}
+            onClick={() => onCategoryChange(filter)}
+            className={`rounded-full border px-3 py-2 text-sm ${
+              activeCategory === filter
+                ? "bg-foreground text-background"
+                : "bg-background text-foreground hover:bg-muted"
+            }`}
           >
-            {filter.label}
-          </Button>
+            {filter}
+          </button>
         ))}
       </div>
 
-      <Select defaultValue="all">
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Filter by tag" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All tags</SelectItem>
-          <SelectItem value="web-dev">Web Development</SelectItem>
-          <SelectItem value="design">Design</SelectItem>
-          <SelectItem value="ai">AI & ML</SelectItem>
-          <SelectItem value="career">Career</SelectItem>
-        </SelectContent>
-      </Select>
+      <select
+        value={activeTag}
+        onChange={(event) => onTagChange(event.target.value)}
+        className="w-[200px] rounded-lg border border-border bg-background px-3 py-2 text-sm"
+      >
+        {tags.map((tag) => (
+          <option key={tag} value={tag}>
+            {tag === "all" ? "All tags" : tag}
+          </option>
+        ))}
+      </select>
     </div>
   )
 }

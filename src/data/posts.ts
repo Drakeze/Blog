@@ -22,6 +22,7 @@ export interface BlogPost {
   author: string;
   originalUrl: string;
   socialLinks?: SocialLinks;
+  image?: string;
   status: PostStatus;
 }
 
@@ -40,6 +41,7 @@ type UpsertPostInput = {
   status?: PostStatus;
   slug?: string;
   originalUrl?: string;
+  image?: string;
 };
 
 const initialPosts: BlogPost[] = [
@@ -92,6 +94,7 @@ const initialPosts: BlogPost[] = [
       linkedin: 'https://linkedin.com/',
       patreon: 'https://patreon.com/',
     },
+    image: '/modern-web-development.png',
     status: 'published',
   },
   {
@@ -142,6 +145,7 @@ const initialPosts: BlogPost[] = [
       linkedin: 'https://linkedin.com/',
       patreon: 'https://patreon.com/',
     },
+    image: '/design-system-components.png',
     status: 'published',
   },
   {
@@ -191,6 +195,7 @@ const initialPosts: BlogPost[] = [
       linkedin: 'https://linkedin.com/',
       patreon: 'https://patreon.com/',
     },
+    image: '/ai-coding-assistant.jpg',
     status: 'draft',
   },
   {
@@ -239,6 +244,7 @@ const initialPosts: BlogPost[] = [
       linkedin: 'https://linkedin.com/',
       patreon: 'https://patreon.com/',
     },
+    image: '/typescript-code.png',
     status: 'published',
   },
   {
@@ -286,6 +292,7 @@ const initialPosts: BlogPost[] = [
       linkedin: 'https://linkedin.com/',
       patreon: 'https://patreon.com/',
     },
+    image: '/modern-web-development-abstract.jpg',
     status: 'draft',
   },
   {
@@ -340,6 +347,7 @@ const initialPosts: BlogPost[] = [
       linkedin: 'https://linkedin.com/',
       patreon: 'https://patreon.com/',
     },
+    image: '/website-performance-metrics.jpg',
     status: 'published',
   },
 ];
@@ -427,6 +435,7 @@ export function addPost(input: UpsertPostInput): BlogPost {
     author: input.author,
     originalUrl: input.originalUrl ?? `https://example.com/blog/${slug}`,
     socialLinks: input.socialLinks,
+    image: input.image,
     status,
   };
 
@@ -458,6 +467,7 @@ export function updatePost(id: number, updates: Partial<UpsertPostInput>): BlogP
     updatedAt: new Date().toISOString(),
     tags: updates.tags ?? existing.tags,
     socialLinks: updates.socialLinks ?? existing.socialLinks,
+    image: updates.image ?? existing.image,
   };
 
   postStore = postStore.map((post) => (post.id === id ? updatedPost : post));
