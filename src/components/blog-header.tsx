@@ -1,22 +1,26 @@
 "use client"
 
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Moon, Sun } from "lucide-react"
 import { useEffect, useState } from "react"
 
 export function BlogHeader() {
   const [theme, setTheme] = useState<"light" | "dark">("light")
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    const isDark = document.documentElement.classList.contains("dark")
-    setTheme(isDark ? "dark" : "light")
+    const stored = window.localStorage.getItem("theme")
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+    const initialTheme = stored === "dark" || (!stored && prefersDark) ? "dark" : "light"
+    document.documentElement.classList.toggle("dark", initialTheme === "dark")
+    setTheme(initialTheme)
+    setMounted(true)
   }, [])
 
   const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light"
-    setTheme(newTheme)
-    document.documentElement.classList.toggle("dark")
+    const nextTheme = theme === "dark" ? "light" : "dark"
+    document.documentElement.classList.toggle("dark", nextTheme === "dark")
+    window.localStorage.setItem("theme", nextTheme)
+    setTheme(nextTheme)
   }
 
   return (
@@ -34,10 +38,14 @@ export function BlogHeader() {
             <Link href="/subscribe" className="text-sm font-medium transition-colors hover:text-foreground/80">
               Subscribe
             </Link>
-            <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9">
-              {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-              <span className="sr-only">Toggle theme</span>
-            </Button>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-sm transition hover:bg-muted"
+              aria-label="Toggle theme"
+            >
+              {mounted && theme === "dark" ? "☀️" : "🌙"}
+            </button>
           </nav>
         </div>
       </div>
