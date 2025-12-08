@@ -4,47 +4,44 @@ import { useMemo, useState } from "react"
 
 import { BlogFilters } from "@/components/blog-filters"
 import { BlogGrid } from "@/components/blog-grid"
-import type { BlogPostSummary } from "@/data/posts"
+import type { BlogPostSummary, PostSource } from "@/data/posts"
 
 const DEFAULT_PAGE_SIZE = 6
 
 type BlogCollectionProps = {
-  posts: Array<BlogPostSummary & { image?: string }>
+  posts: Array<BlogPostSummary & { heroImage?: string }>
   enablePagination?: boolean
   pageSize?: number
 }
 
 export function BlogCollection({ posts, enablePagination = false, pageSize = DEFAULT_PAGE_SIZE }: BlogCollectionProps) {
-  const [activeCategory, setActiveCategory] = useState("All")
   const [activeTag, setActiveTag] = useState("all")
+  const [activeSource, setActiveSource] = useState<PostSource | "all">("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [page, setPage] = useState(1)
-
-  const categories = useMemo(
-    () => ["All", ...Array.from(new Set(posts.map((post) => post.category)))],
-    [posts]
-  )
 
   const tags = useMemo(
     () => ["all", ...Array.from(new Set(posts.flatMap((post) => post.tags)))],
     [posts]
   )
 
+  const sources = useMemo(() => ["all", ...Array.from(new Set(posts.map((post) => post.source)))], [posts])
+
   const filteredPosts = useMemo(() => {
     const normalizedSearch = searchTerm.toLowerCase().trim()
 
     return posts.filter((post) => {
-      const matchesCategory = activeCategory === "All" || post.category === activeCategory
       const matchesTag = activeTag === "all" || post.tags.includes(activeTag)
+      const matchesSource = activeSource === "all" || post.source === activeSource
       const matchesSearch =
         normalizedSearch.length === 0 ||
         post.title.toLowerCase().includes(normalizedSearch) ||
         post.excerpt.toLowerCase().includes(normalizedSearch) ||
         post.tags.some((tag) => tag.toLowerCase().includes(normalizedSearch))
 
-      return matchesCategory && matchesTag && matchesSearch
+      return matchesTag && matchesSearch && matchesSource
     })
-  }, [activeCategory, activeTag, posts, searchTerm])
+  }, [activeSource, activeTag, posts, searchTerm])
 
   const totalPages = enablePagination ? Math.max(1, Math.ceil(filteredPosts.length / pageSize)) : 1
   const startIndex = enablePagination ? (page - 1) * pageSize : 0
@@ -57,13 +54,13 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
     setPage(1)
   }
 
-  const handleCategoryChange = (value: string) => {
-    setActiveCategory(value)
+  const handleTagChange = (value: string) => {
+    setActiveTag(value)
     setPage(1)
   }
 
-  const handleTagChange = (value: string) => {
-    setActiveTag(value)
+  const handleSourceChange = (value: PostSource | "all") => {
+    setActiveSource(value)
     setPage(1)
   }
 
@@ -81,11 +78,11 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
       </div>
 
       <BlogFilters
-        categories={categories}
+        sources={sources}
         tags={tags}
-        activeCategory={activeCategory}
+        activeSource={activeSource}
         activeTag={activeTag}
-        onCategoryChange={handleCategoryChange}
+        onSourceChange={handleSourceChange}
         onTagChange={handleTagChange}
       />
 

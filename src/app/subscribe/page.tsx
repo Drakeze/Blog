@@ -1,3 +1,7 @@
+"use client"
+
+import { useState } from "react"
+
 import { BlogHeader } from "@/components/blog-header"
 import { BlogFooter } from "@/components/blog-footer"
 import { Button } from "@/components/ui/button"
@@ -6,6 +10,41 @@ import { Label } from "@/components/ui/label"
 import { Github, Linkedin, Twitter } from "lucide-react"
 
 export default function SubscribePage() {
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [submitting, setSubmitting] = useState(false)
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
+  const [error, setError] = useState<string | null>(null)
+
+  const submit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setSubmitting(true)
+    setStatus("idle")
+    setError(null)
+
+    try {
+      const response = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email }),
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error ?? "Unable to subscribe")
+      }
+
+      setStatus("success")
+      setName("")
+      setEmail("")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Subscription failed")
+      setStatus("error")
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <BlogHeader />
@@ -21,35 +60,55 @@ export default function SubscribePage() {
         <div className="mb-12 p-8 bg-muted/50 rounded-2xl border border-border">
           <h2 className="text-2xl font-serif font-bold mb-4">About</h2>
           <p className="text-lg leading-relaxed text-muted-foreground">
-            I'm Zen — documenting my journey building Soren Tech, Earth Plus, and mastering full-stack engineering. This
-            blog collects my posts from Twitter, Reddit, LinkedIn, Patreon, and my personal writing into one place. If
-            you want more behind-the-scenes updates or want to support the work, Patreon is where everything connects.
+            My name is Zen. I share thoughts on engineering, learning, productivity, and building Soren Tech and Earth Plus.
           </p>
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-8 md:p-12">
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={submit}>
             <div className="space-y-2">
               <Label htmlFor="name" className="text-base">
                 Name (optional)
               </Label>
-              <Input id="name" type="text" placeholder="Your name" className="h-12 text-base" />
+              <Input
+                id="name"
+                type="text"
+                placeholder="Your name"
+                className="h-12 text-base"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="email" className="text-base">
                 Email *
               </Label>
-              <Input id="email" type="email" placeholder="your@email.com" required className="h-12 text-base" />
+              <Input
+                id="email"
+                type="email"
+                placeholder="your@email.com"
+                required
+                className="h-12 text-base"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+              />
             </div>
 
-            <Button type="submit" size="lg" className="w-full h-12 text-base">
-              Subscribe
+            <Button type="submit" size="lg" className="w-full h-12 text-base" disabled={submitting}>
+              {submitting ? "Subscribing..." : "Subscribe"}
             </Button>
 
             <p className="text-sm text-muted-foreground text-center">
               I respect your privacy. Unsubscribe at any time.
             </p>
+
+            {status === "success" && (
+              <p className="rounded-lg bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700">Thanks for subscribing!</p>
+            )}
+            {status === "error" && error && (
+              <p className="rounded-lg bg-destructive/10 px-4 py-3 text-sm text-destructive">{error}</p>
+            )}
           </form>
         </div>
 
@@ -104,14 +163,52 @@ export default function SubscribePage() {
           </div>
         </div>
 
-        <div className="mt-12 text-center p-6 bg-primary/5 rounded-2xl border border-primary/10">
-          <p className="text-sm text-muted-foreground">
-            Want more?{" "}
-            <a href="https://patreon.com" className="text-primary hover:underline font-medium">
-              Join the Patreon community
-            </a>{" "}
-            for deeper insights and exclusive updates.
-          </p>
+        <div className="mt-12 space-y-6">
+          <div className="text-center p-6 bg-primary/5 rounded-2xl border border-primary/10">
+            <p className="text-sm text-muted-foreground">
+              For deeper content and behind-the-scenes development updates, join the Patreon.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-xl border border-border p-4 text-left">
+              <p className="text-sm text-muted-foreground mb-2">Socials</p>
+              <ul className="space-y-1 text-sm">
+                <li>
+                  <a className="text-primary hover:underline" href="https://twitter.com" target="_blank" rel="noreferrer">
+                    Twitter/X
+                  </a>
+                </li>
+                <li>
+                  <a className="text-primary hover:underline" href="https://linkedin.com" target="_blank" rel="noreferrer">
+                    LinkedIn
+                  </a>
+                </li>
+                <li>
+                  <a className="text-primary hover:underline" href="https://reddit.com" target="_blank" rel="noreferrer">
+                    Reddit
+                  </a>
+                </li>
+                <li>
+                  <a className="text-primary hover:underline" href="https://patreon.com" target="_blank" rel="noreferrer">
+                    Patreon
+                  </a>
+                </li>
+                <li>
+                  <a className="text-primary hover:underline" href="https://github.com" target="_blank" rel="noreferrer">
+                    GitHub
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div className="rounded-xl border border-border p-4 text-left">
+              <p className="text-sm text-muted-foreground mb-2">Why subscribe?</p>
+              <p className="text-sm text-foreground">
+                Stay updated on new posts across Blog, Reddit, Twitter, LinkedIn, and Patreon in a single digest.
+              </p>
+            </div>
+          </div>
         </div>
       </main>
 

@@ -1,48 +1,43 @@
-export type PostStatus = 'draft' | 'published';
+export type PostSource = 'blog' | 'reddit' | 'twitter' | 'linkedin' | 'patreon'
 
-export interface SocialLinks {
-  reddit?: string;
-  twitter?: string;
-  linkedin?: string;
-  patreon?: string;
-}
+export type PostStatus = 'draft' | 'published'
 
 export interface BlogPost {
-  id: number;
-  title: string;
-  excerpt: string;
-  content: string;
-  date: string;
-  updatedAt?: string;
-  readTime: string;
-  readTimeMinutes: number;
-  category: string;
-  slug: string;
-  tags: string[];
-  author: string;
-  originalUrl: string;
-  socialLinks?: SocialLinks;
-  image?: string;
-  status: PostStatus;
+  id: number
+  title: string
+  excerpt: string
+  content: string
+  readTime: string
+  readTimeMinutes: number
+  tags: string[]
+  category: string
+  source: PostSource
+  slug: string
+  heroImage?: string
+  sourceURL?: string
+  createdAt: string
+  updatedAt: string
+  externalID?: string
+  status: PostStatus
 }
 
-export type BlogPostSummary = Omit<BlogPost, 'content'>;
+export type BlogPostSummary = Omit<BlogPost, 'content'>
 
 type UpsertPostInput = {
-  title: string;
-  excerpt: string;
-  content: string;
-  category: string;
-  tags: string[];
-  author: string;
-  readTimeMinutes: number;
-  date?: string;
-  socialLinks?: SocialLinks;
-  status?: PostStatus;
-  slug?: string;
-  originalUrl?: string;
-  image?: string;
-};
+  title: string
+  excerpt: string
+  content: string
+  category: string
+  tags: string[]
+  readTimeMinutes: number
+  source: PostSource
+  sourceURL?: string
+  slug?: string
+  heroImage?: string
+  createdAt?: string
+  externalID?: string
+  status?: PostStatus
+}
 
 const initialPosts: BlogPost[] = [
   {
@@ -79,22 +74,16 @@ const initialPosts: BlogPost[] = [
       <h2>Conclusion</h2>
       <p>Next.js 15 continues to push the boundaries of what's possible with React applications. Whether you're building a simple blog or a complex web application, Next.js provides the tools and performance you need.</p>
     `,
-    date: '2024-01-15',
-    updatedAt: '2024-01-18',
+    createdAt: '2024-01-15T00:00:00.000Z',
+    updatedAt: '2024-01-18T00:00:00.000Z',
     readTime: '5 min read',
     readTimeMinutes: 5,
     category: 'Tutorial',
+    source: 'blog',
     slug: 'getting-started-nextjs-15',
     tags: ['nextjs', 'react', 'tutorial'],
-    author: 'John Doe',
-    originalUrl: 'https://yourblog.com/getting-started-nextjs-15',
-    socialLinks: {
-      reddit: 'https://reddit.com/',
-      twitter: 'https://twitter.com/',
-      linkedin: 'https://linkedin.com/',
-      patreon: 'https://patreon.com/',
-    },
-    image: '/modern-web-development.png',
+    sourceURL: 'https://yourblog.com/getting-started-nextjs-15',
+    heroImage: '/modern-web-development.png',
     status: 'published',
   },
   {
@@ -130,22 +119,16 @@ const initialPosts: BlogPost[] = [
         <li>Optimize for production with purging</li>
       </ol>
     `,
-    date: '2024-01-10',
-    updatedAt: '2024-01-12',
+    createdAt: '2024-01-10T00:00:00.000Z',
+    updatedAt: '2024-01-12T00:00:00.000Z',
     readTime: '8 min read',
     readTimeMinutes: 8,
     category: 'Design',
+    source: 'linkedin',
     slug: 'mastering-tailwind-css',
     tags: ['tailwind', 'css', 'design'],
-    author: 'Jane Smith',
-    originalUrl: 'https://yourblog.com/mastering-tailwind-css',
-    socialLinks: {
-      reddit: 'https://reddit.com/',
-      twitter: 'https://twitter.com/',
-      linkedin: 'https://linkedin.com/',
-      patreon: 'https://patreon.com/',
-    },
-    image: '/design-system-components.png',
+    sourceURL: 'https://yourblog.com/mastering-tailwind-css',
+    heroImage: '/design-system-components.png',
     status: 'published',
   },
   {
@@ -180,23 +163,17 @@ const initialPosts: BlogPost[] = [
       <h2>Testing Strategy</h2>
       <p>A comprehensive testing strategy ensures your application remains reliable as it grows.</p>
     `,
-    date: '2024-01-05',
-    updatedAt: '2024-01-07',
+    createdAt: '2024-01-05T00:00:00.000Z',
+    updatedAt: '2024-01-07T00:00:00.000Z',
     readTime: '12 min read',
     readTimeMinutes: 12,
     category: 'Development',
+    source: 'blog',
     slug: 'scalable-react-applications',
     tags: ['react', 'architecture', 'development'],
-    author: 'Mike Johnson',
-    originalUrl: 'https://yourblog.com/scalable-react-applications',
-    socialLinks: {
-      reddit: 'https://reddit.com/',
-      twitter: 'https://twitter.com/',
-      linkedin: 'https://linkedin.com/',
-      patreon: 'https://patreon.com/',
-    },
-    image: '/ai-coding-assistant.jpg',
-    status: 'draft',
+    sourceURL: 'https://yourblog.com/scalable-react-applications',
+    heroImage: '/ai-coding-assistant.jpg',
+    status: 'published',
   },
   {
     id: 4,
@@ -229,22 +206,16 @@ const initialPosts: BlogPost[] = [
       <h2>Error Handling</h2>
       <p>TypeScript's type system can help you handle errors more effectively and catch issues at compile time.</p>
     `,
-    date: '2024-01-01',
-    updatedAt: '2024-01-02',
+    createdAt: '2024-01-01T00:00:00.000Z',
+    updatedAt: '2024-01-02T00:00:00.000Z',
     readTime: '10 min read',
     readTimeMinutes: 10,
     category: 'Development',
+    source: 'blog',
     slug: 'typescript-best-practices-2024',
     tags: ['typescript', 'javascript', 'development'],
-    author: 'Sarah Wilson',
-    originalUrl: 'https://yourblog.com/typescript-best-practices-2024',
-    socialLinks: {
-      reddit: 'https://reddit.com/',
-      twitter: 'https://twitter.com/',
-      linkedin: 'https://linkedin.com/',
-      patreon: 'https://patreon.com/',
-    },
-    image: '/typescript-code.png',
+    sourceURL: 'https://yourblog.com/typescript-best-practices-2024',
+    heroImage: '/typescript-code.png',
     status: 'published',
   },
   {
@@ -277,23 +248,17 @@ const initialPosts: BlogPost[] = [
       <h2>Responsive Grid Patterns</h2>
       <p>Create responsive layouts that adapt to different screen sizes without media queries.</p>
     `,
-    date: '2023-12-28',
-    updatedAt: '2023-12-28',
+    createdAt: '2023-12-28T00:00:00.000Z',
+    updatedAt: '2023-12-28T00:00:00.000Z',
     readTime: '7 min read',
     readTimeMinutes: 7,
     category: 'Design',
+    source: 'patreon',
     slug: 'modern-css-grid-layouts',
     tags: ['css', 'grid', 'layout'],
-    author: 'Alex Chen',
-    originalUrl: 'https://yourblog.com/modern-css-grid-layouts',
-    socialLinks: {
-      reddit: 'https://reddit.com/',
-      twitter: 'https://twitter.com/',
-      linkedin: 'https://linkedin.com/',
-      patreon: 'https://patreon.com/',
-    },
-    image: '/modern-web-development-abstract.jpg',
-    status: 'draft',
+    sourceURL: 'https://yourblog.com/modern-css-grid-layouts',
+    heroImage: '/modern-web-development-abstract.jpg',
+    status: 'published',
   },
   {
     id: 6,
@@ -332,155 +297,148 @@ const initialPosts: BlogPost[] = [
         <li>CORS configuration</li>
       </ul>
     `,
-    date: '2023-12-20',
-    updatedAt: '2023-12-22',
+    createdAt: '2023-12-20T00:00:00.000Z',
+    updatedAt: '2023-12-22T00:00:00.000Z',
     readTime: '15 min read',
     readTimeMinutes: 15,
     category: 'Backend',
+    source: 'reddit',
     slug: 'api-design-nodejs-express',
     tags: ['nodejs', 'express', 'api'],
-    author: 'David Brown',
-    originalUrl: 'https://yourblog.com/api-design-nodejs-express',
-    socialLinks: {
-      reddit: 'https://reddit.com/',
-      twitter: 'https://twitter.com/',
-      linkedin: 'https://linkedin.com/',
-      patreon: 'https://patreon.com/',
-    },
-    image: '/website-performance-metrics.jpg',
+    sourceURL: 'https://yourblog.com/api-design-nodejs-express',
+    heroImage: '/website-performance-metrics.jpg',
     status: 'published',
   },
 ];
 
 let postStore: BlogPost[] = [...initialPosts];
 
-const STATUS_VALUES: PostStatus[] = ['draft', 'published'];
-
 function normalizeSlug(title: string) {
   return title
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, '')
     .trim()
-    .replace(/\s+/g, '-');
+    .replace(/\s+/g, '-')
 }
 
 function buildReadTime(minutes?: number) {
-  if (!minutes || Number.isNaN(minutes)) return '5 min read';
-  return `${Math.max(1, Math.round(minutes))} min read`;
+  if (!minutes || Number.isNaN(minutes)) return '5 min read'
+  return `${Math.max(1, Math.round(minutes))} min read`
 }
 
 function getNextId() {
-  return postStore.reduce((max, post) => Math.max(max, post.id), 0) + 1;
+  return postStore.reduce((max, post) => Math.max(max, post.id), 0) + 1
 }
 
-export function getAllPosts(): BlogPost[] {
-  return [...postStore].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+export function getAllPosts(includeDrafts = false): BlogPost[] {
+  const visiblePosts = includeDrafts
+    ? [...postStore]
+    : postStore.filter((post) => post.status === 'published')
+
+  return visiblePosts.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  )
 }
 
-export function getPostBySlug(slug: string): BlogPost | undefined {
-  return postStore.find((post) => post.slug === slug);
+export function getPostBySlug(slug: string, includeDrafts = false): BlogPost | undefined {
+  return getAllPosts(includeDrafts).find((post) => post.slug === slug)
 }
 
 export function getPostById(id: number): BlogPost | undefined {
-  return postStore.find((post) => post.id === id);
+  return postStore.find((post) => post.id === id)
 }
 
-export function getPostSummaries(limit?: number): BlogPostSummary[] {
-  const summaries = getAllPosts()
+export function getPostSummaries(limit?: number, includeDrafts = false): BlogPostSummary[] {
+  const summaries = getAllPosts(includeDrafts)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    .map(({ content, ...summary }) => summary);
+    .map(({ content, ...summary }) => summary)
   if (typeof limit === 'number') {
-    return summaries.slice(0, limit);
+    return summaries.slice(0, limit)
   }
-  return summaries;
+  return summaries
 }
 
 export function filterPosts(filters?: {
-  tag?: string;
-  readTimeMinutes?: number;
-  date?: string;
-  status?: PostStatus;
-}): BlogPost[] {
-  const { tag, readTimeMinutes, date, status } = filters ?? {};
-  return getAllPosts().filter((post) => {
-    const tagMatch = tag ? post.tags.includes(tag) : true;
+  tag?: string
+  readTimeMinutes?: number
+  createdAt?: string
+  source?: PostSource
+  status?: PostStatus
+}, includeDrafts = false): BlogPost[] {
+  const { tag, readTimeMinutes, createdAt, source, status } = filters ?? {}
+  return getAllPosts(includeDrafts).filter((post) => {
+    const tagMatch = tag ? post.tags.includes(tag) : true
     const readTimeMatch =
-      typeof readTimeMinutes === 'number' ? post.readTimeMinutes <= readTimeMinutes : true;
-    const dateMatch = date ? post.date.startsWith(date) : true;
-    const statusMatch = status ? post.status === status : true;
-    return tagMatch && readTimeMatch && dateMatch && statusMatch;
-  });
+      typeof readTimeMinutes === 'number' ? post.readTimeMinutes <= readTimeMinutes : true
+    const dateMatch = createdAt ? post.createdAt.startsWith(createdAt) : true
+    const sourceMatch = source ? post.source === source : true
+    const statusMatch = status ? post.status === status : true
+    return tagMatch && readTimeMatch && dateMatch && sourceMatch && statusMatch
+  })
 }
 
 export function addPost(input: UpsertPostInput): BlogPost {
-  const now = new Date().toISOString();
-  const status: PostStatus = STATUS_VALUES.includes(input.status ?? 'draft')
-    ? (input.status ?? 'draft')
-    : 'draft';
-  const slug = input.slug ? normalizeSlug(input.slug) : normalizeSlug(input.title);
-  const readTimeMinutes = Math.max(1, Math.round(input.readTimeMinutes ?? 5));
+  const now = new Date().toISOString()
+  const slug = input.slug ? normalizeSlug(input.slug) : normalizeSlug(input.title)
+  const readTimeMinutes = Math.max(1, Math.round(input.readTimeMinutes ?? 5))
 
   const newPost: BlogPost = {
     id: getNextId(),
     title: input.title,
     excerpt: input.excerpt,
     content: input.content,
-    date: input.date ?? now,
+    createdAt: input.createdAt ?? now,
     updatedAt: now,
     readTimeMinutes,
     readTime: buildReadTime(readTimeMinutes),
     category: input.category,
+    source: input.source,
     slug,
     tags: input.tags,
-    author: input.author,
-    originalUrl: input.originalUrl ?? `https://example.com/blog/${slug}`,
-    socialLinks: input.socialLinks,
-    image: input.image,
-    status,
-  };
+    sourceURL: input.sourceURL ?? `https://example.com/blog/${slug}`,
+    heroImage: input.heroImage,
+    externalID: input.externalID,
+    status: input.status ?? 'draft',
+  }
 
-  postStore = [newPost, ...postStore];
-  return newPost;
+  postStore = [newPost, ...postStore]
+  return newPost
 }
 
 export function updatePost(id: number, updates: Partial<UpsertPostInput>): BlogPost | undefined {
-  const existing = getPostById(id);
-  if (!existing) return undefined;
+  const existing = getPostById(id)
+  if (!existing) return undefined
 
-  const merged = {
-    ...existing,
-    ...updates,
-  } satisfies Partial<BlogPost>;
-
-  const status: PostStatus =
-    updates.status && STATUS_VALUES.includes(updates.status) ? updates.status : existing.status;
-  const readTimeMinutes = updates.readTimeMinutes ?? existing.readTimeMinutes;
-  const slug = updates.slug ? normalizeSlug(updates.slug) : existing.slug;
+  const readTimeMinutes = updates.readTimeMinutes ?? existing.readTimeMinutes
+  const slug = updates.slug ? normalizeSlug(updates.slug) : existing.slug
+  const normalizedReadTime = Math.max(1, Math.round(readTimeMinutes))
 
   const updatedPost: BlogPost = {
     ...existing,
-    ...merged,
-    status,
+    ...updates,
     slug,
-    readTimeMinutes: Math.max(1, Math.round(readTimeMinutes)),
-    readTime: buildReadTime(readTimeMinutes),
+    source: updates.source ?? existing.source,
+    readTimeMinutes: normalizedReadTime,
+    readTime: buildReadTime(normalizedReadTime),
     updatedAt: new Date().toISOString(),
     tags: updates.tags ?? existing.tags,
-    socialLinks: updates.socialLinks ?? existing.socialLinks,
-    image: updates.image ?? existing.image,
-  };
+    heroImage: updates.heroImage ?? existing.heroImage,
+    sourceURL: updates.sourceURL ?? existing.sourceURL,
+    externalID: updates.externalID ?? existing.externalID,
+    status: updates.status ?? existing.status,
+  }
 
-  postStore = postStore.map((post) => (post.id === id ? updatedPost : post));
-  return updatedPost;
+  postStore = postStore.map((post) => (post.id === id ? updatedPost : post))
+  return updatedPost
 }
 
 export function removePost(id: number): boolean {
-  const exists = postStore.some((post) => post.id === id);
-  if (!exists) return false;
-  postStore = postStore.filter((post) => post.id !== id);
-  return true;
+  const exists = postStore.some((post) => post.id === id)
+  if (!exists) return false
+  postStore = postStore.filter((post) => post.id !== id)
+  return true
 }
 
 export function resetPosts() {
-  postStore = [...initialPosts];
+  postStore = [...initialPosts]
 }
