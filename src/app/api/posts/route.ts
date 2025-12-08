@@ -1,6 +1,13 @@
 import { NextResponse } from "next/server"
 
-import { addPost, filterPosts, type PostStatus } from "@/data/posts"
+import { addPost, filterPosts, type PostSource, type PostStatus } from "@/data/posts"
+
+function parseSource(value: string | null): PostSource | undefined {
+  if (value === "blog" || value === "reddit" || value === "twitter" || value === "linkedin" || value === "patreon") {
+    return value
+  }
+  return undefined
+}
 
 function parseStatus(value: string | null): PostStatus | undefined {
   if (value === "draft" || value === "published") {
@@ -12,12 +19,15 @@ function parseStatus(value: string | null): PostStatus | undefined {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const tag = searchParams.get("tag") ?? undefined
-  const date = searchParams.get("date") ?? undefined
+  const createdAt = searchParams.get("createdAt") ?? undefined
   const readTimeParam = searchParams.get("readTimeMinutes")
   const readTimeMinutes = readTimeParam ? Number.parseInt(readTimeParam, 10) : undefined
-  const status = parseStatus(searchParams.get("status"))
+  const source = parseSource(searchParams.get("source"))
+  const statusParam = searchParams.get("status")
+  const status = parseStatus(statusParam)
+  const includeDrafts = statusParam === "all" || status === "draft"
 
-  const filtered = filterPosts({ tag, date, readTimeMinutes, status })
+  const filtered = filterPosts({ tag, createdAt, readTimeMinutes, source, status }, includeDrafts)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const summaries = filtered.map(({ content, ...summary }) => summary)
 
@@ -26,6 +36,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const body = await request.json()
+  const status = parseStatus(body.status) ?? 'draft'
 
   const newPost = addPost({
     title: body.title ?? "Untitled Post",
@@ -33,15 +44,16 @@ export async function POST(request: Request) {
     content: body.content ?? "",
     category: body.category ?? "General",
     tags: Array.isArray(body.tags) ? body.tags : [],
-    author: body.author ?? "Content Team",
     readTimeMinutes: Number.isFinite(body.readTimeMinutes)
       ? Number(body.readTimeMinutes)
       : Number.parseInt(body.readTimeMinutes ?? "5", 10) || 5,
-    date: body.date ?? undefined,
-    socialLinks: body.socialLinks,
-    status: parseStatus(body.status) ?? "draft",
+    createdAt: body.createdAt ?? undefined,
     slug: body.slug ?? undefined,
-    originalUrl: body.originalUrl ?? undefined,
+    source: parseSource(body.source) ?? "blog",
+    sourceURL: body.sourceURL ?? undefined,
+    heroImage: body.heroImage ?? undefined,
+    externalID: body.externalID ?? undefined,
+    status,
   })
 
   return NextResponse.json(newPost, { status: 201 })
