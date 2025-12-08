@@ -177,11 +177,21 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="space-y-1.5">
-              <Label htmlFor="category">Category</Label>
-              <Input
-                id="category"
-                type="text"
-                value={formState.category ?? ""}
+                <Label htmlFor="slug">Slug</Label>
+                <Input
+                  id="slug"
+                  type="text"
+                  value={formState.slug ?? ""}
+                  onChange={(event) => handleFieldChange("slug", event.target.value)}
+                  placeholder="Auto-generated from title when empty"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="category">Category</Label>
+                <Input
+                  id="category"
+                  type="text"
+                  value={formState.category ?? ""}
                   onChange={(event) => handleFieldChange("category", event.target.value)}
                   placeholder="e.g. Design, Development"
                 />

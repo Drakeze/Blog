@@ -60,7 +60,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
 
           <div className="ml-auto flex items-center gap-2">
             <Badge className={`${sourceColors[post.source]} px-3 py-1`}>{sourceLabels[post.source]}</Badge>
-            {post.sourceURL && (
+            {post.source !== "blog" && post.sourceURL && (
               <Button variant="outline" size="sm" asChild>
                 <a href={post.sourceURL} target="_blank" rel="noopener noreferrer">
                   <ExternalLink className="h-4 w-4 mr-2" />

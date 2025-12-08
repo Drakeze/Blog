@@ -24,3 +24,11 @@ export async function appendJsonRecord<T extends object>(fileName: string, recor
   await fs.writeFile(filePath, JSON.stringify(parsed, null, 2), 'utf8');
   return record;
 }
+
+export async function readJsonRecords<T = unknown>(fileName: string): Promise<T[]> {
+  const filePath = path.join(process.cwd(), 'data', fileName);
+  await ensureFile(filePath);
+  const raw = await fs.readFile(filePath, 'utf8');
+  if (!raw) return [];
+  return JSON.parse(raw) as T[];
+}

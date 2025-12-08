@@ -39,7 +39,7 @@ type UpsertPostInput = {
   status?: PostStatus
 }
 
-const initialPosts: BlogPost[] = [
+const seedPosts: BlogPost[] = [
   {
     id: 1,
     title: 'Getting Started with Next.js 15',
@@ -311,8 +311,6 @@ const initialPosts: BlogPost[] = [
   },
 ];
 
-let postStore: BlogPost[] = [...initialPosts];
-
 function normalizeSlug(title: string) {
   return title
     .toLowerCase()
@@ -321,10 +319,30 @@ function normalizeSlug(title: string) {
     .replace(/\s+/g, '-')
 }
 
-function buildReadTime(minutes?: number) {
-  if (!minutes || Number.isNaN(minutes)) return '5 min read'
-  return `${Math.max(1, Math.round(minutes))} min read`
+function normalizeReadTime(minutes?: number) {
+  if (!minutes || Number.isNaN(minutes)) return 5
+  return Math.max(1, Math.round(minutes))
 }
+
+function buildReadTime(minutes?: number) {
+  return `${normalizeReadTime(minutes)} min read`
+}
+
+function normalizePost(post: BlogPost): BlogPost {
+  const slug = post.slug ? normalizeSlug(post.slug) : normalizeSlug(post.title)
+  const readTimeMinutes = normalizeReadTime(post.readTimeMinutes)
+
+  return {
+    ...post,
+    slug,
+    readTimeMinutes,
+    readTime: buildReadTime(readTimeMinutes),
+    tags: post.tags ?? [],
+    status: post.status ?? 'draft',
+  }
+}
+
+let postStore: BlogPost[] = seedPosts.map(normalizePost)
 
 function getNextId() {
   return postStore.reduce((max, post) => Math.max(max, post.id), 0) + 1
@@ -349,9 +367,7 @@ export function getPostById(id: number): BlogPost | undefined {
 }
 
 export function getPostSummaries(limit?: number, includeDrafts = false): BlogPostSummary[] {
-  const summaries = getAllPosts(includeDrafts)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    .map(({ content, ...summary }) => summary)
+  const summaries = getAllPosts(includeDrafts).map(({ content, ...summary }) => summary)
   if (typeof limit === 'number') {
     return summaries.slice(0, limit)
   }
@@ -379,10 +395,13 @@ export function filterPosts(filters?: {
 
 export function addPost(input: UpsertPostInput): BlogPost {
   const now = new Date().toISOString()
-  const slug = input.slug ? normalizeSlug(input.slug) : normalizeSlug(input.title)
-  const readTimeMinutes = Math.max(1, Math.round(input.readTimeMinutes ?? 5))
+  const slug = input.slug?.trim()
+    ? normalizeSlug(input.slug)
+    : normalizeSlug(input.title)
+  const readTimeMinutes = normalizeReadTime(input.readTimeMinutes)
+  const source = input.source ?? 'blog'
 
-  const newPost: BlogPost = {
+  const newPost: BlogPost = normalizePost({
     id: getNextId(),
     title: input.title,
     excerpt: input.excerpt,
@@ -392,14 +411,14 @@ export function addPost(input: UpsertPostInput): BlogPost {
     readTimeMinutes,
     readTime: buildReadTime(readTimeMinutes),
     category: input.category,
-    source: input.source,
+    source,
     slug,
     tags: input.tags,
-    sourceURL: input.sourceURL ?? `https://example.com/blog/${slug}`,
+    sourceURL: input.sourceURL,
     heroImage: input.heroImage,
     externalID: input.externalID,
     status: input.status ?? 'draft',
-  }
+  })
 
   postStore = [newPost, ...postStore]
   return newPost
@@ -409,24 +428,24 @@ export function updatePost(id: number, updates: Partial<UpsertPostInput>): BlogP
   const existing = getPostById(id)
   if (!existing) return undefined
 
-  const readTimeMinutes = updates.readTimeMinutes ?? existing.readTimeMinutes
-  const slug = updates.slug ? normalizeSlug(updates.slug) : existing.slug
-  const normalizedReadTime = Math.max(1, Math.round(readTimeMinutes))
+  const readTimeMinutes = normalizeReadTime(updates.readTimeMinutes ?? existing.readTimeMinutes)
+  const slug = updates.slug?.trim() ? normalizeSlug(updates.slug) : existing.slug
+  const source = updates.source ?? existing.source
 
-  const updatedPost: BlogPost = {
+  const updatedPost: BlogPost = normalizePost({
     ...existing,
     ...updates,
     slug,
-    source: updates.source ?? existing.source,
-    readTimeMinutes: normalizedReadTime,
-    readTime: buildReadTime(normalizedReadTime),
+    source,
+    readTimeMinutes,
+    readTime: buildReadTime(readTimeMinutes),
     updatedAt: new Date().toISOString(),
     tags: updates.tags ?? existing.tags,
     heroImage: updates.heroImage ?? existing.heroImage,
     sourceURL: updates.sourceURL ?? existing.sourceURL,
     externalID: updates.externalID ?? existing.externalID,
     status: updates.status ?? existing.status,
-  }
+  })
 
   postStore = postStore.map((post) => (post.id === id ? updatedPost : post))
   return updatedPost
@@ -440,5 +459,5 @@ export function removePost(id: number): boolean {
 }
 
 export function resetPosts() {
-  postStore = [...initialPosts]
+  postStore = seedPosts.map(normalizePost)
 }
