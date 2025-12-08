@@ -2,22 +2,9 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Clock } from "lucide-react"
 
-type Source = "blog" | "reddit" | "twitter" | "linkedin" | "patreon"
+import type { BlogPostSummary } from "@/data/posts"
 
-interface BlogCardProps {
-  post: {
-    id: string
-    slug: string
-    title: string
-    excerpt: string
-    date: string
-    readTime: string
-    source: Source
-    image: string
-  }
-}
-
-const sourceColors: Record<Source, string> = {
+const sourceColors: Record<BlogPostSummary["source"], string> = {
   blog: "bg-foreground text-background hover:bg-foreground/90",
   reddit: "bg-[#FF4500] text-white hover:bg-[#FF4500]/90",
   twitter: "bg-[#1DA1F2] text-white hover:bg-[#1DA1F2]/90",
@@ -25,7 +12,7 @@ const sourceColors: Record<Source, string> = {
   patreon: "bg-[#FF424D] text-white hover:bg-[#FF424D]/90",
 }
 
-const sourceLabels: Record<Source, string> = {
+const sourceLabels: Record<BlogPostSummary["source"], string> = {
   blog: "Blog",
   reddit: "Reddit",
   twitter: "Twitter/X",
@@ -33,13 +20,13 @@ const sourceLabels: Record<Source, string> = {
   patreon: "Patreon",
 }
 
-export function BlogCard({ post }: BlogCardProps) {
+export function BlogCard({ post }: { post: BlogPostSummary & { heroImage?: string } }) {
   return (
     <Link href={`/blog/${post.slug}`} className="group">
       <article className="h-full bg-card border border-border rounded-2xl overflow-hidden transition-all hover:shadow-lg hover:border-foreground/20">
         <div className="aspect-[3/2] overflow-hidden bg-muted">
           <img
-            src={post.image || "/placeholder.svg"}
+            src={post.heroImage || "/placeholder.svg"}
             alt={post.title}
             className="w-full h-full object-cover transition-transform group-hover:scale-105"
           />
@@ -60,7 +47,7 @@ export function BlogCard({ post }: BlogCardProps) {
 
           <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3 text-pretty">{post.excerpt}</p>
 
-          <p className="text-sm text-muted-foreground">{post.date}</p>
+          <p className="text-sm text-muted-foreground">{new Date(post.createdAt).toLocaleDateString()}</p>
         </div>
       </article>
     </Link>

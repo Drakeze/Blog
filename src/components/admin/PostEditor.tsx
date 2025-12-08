@@ -7,11 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import type { BlogPost, PostStatus, SocialLinks } from "@/data/posts"
-
-import SocialBadgeInput from "./SocialBadgeInput"
+import type { BlogPost, PostSource } from "@/data/posts"
 
 const defaultPost: Partial<BlogPost> = {
   title: "",
@@ -19,10 +16,8 @@ const defaultPost: Partial<BlogPost> = {
   content: "",
   category: "General",
   tags: [],
-  author: "Content Team",
   readTimeMinutes: 5,
-  socialLinks: {},
-  status: "draft",
+  source: "blog",
 }
 
 type PostEditorProps = {
@@ -55,7 +50,7 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
     setFormState((prev) => ({ ...prev, [key]: value }))
   }
 
-  const submit = async (status: PostStatus) => {
+  const submit = async () => {
     setSaving(true)
     setError(null)
     try {
@@ -65,10 +60,13 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
         content: formState.content ?? "",
         category: formState.category ?? "General",
         tags: parsedTags,
-        author: formState.author ?? "Content Team",
         readTimeMinutes: formState.readTimeMinutes ?? 5,
-        socialLinks: (formState.socialLinks as SocialLinks) ?? {},
-        status,
+        source: (formState.source as PostSource) ?? "blog",
+        slug: formState.slug,
+        sourceURL: formState.sourceURL,
+        heroImage: formState.heroImage,
+        createdAt: formState.createdAt,
+        externalID: formState.externalID,
       }
 
       const url = mode === "edit" ? `/api/posts/${initialPost?.id}` : "/api/posts"
@@ -107,11 +105,8 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
             </CardDescription>
           </div>
           <div className="flex flex-wrap gap-2 text-sm">
-            <Button variant="outline" type="button" disabled={saving} onClick={() => void submit("draft")}>
-              Save Draft
-            </Button>
-            <Button type="button" disabled={saving} onClick={() => void submit("published")}>
-              Publish
+            <Button variant="outline" type="button" disabled={saving} onClick={() => void submit()}>
+              Save Post
             </Button>
             <Button
               type="button"
@@ -180,11 +175,11 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="space-y-1.5">
-                <Label htmlFor="category">Category</Label>
-                <Input
-                  id="category"
-                  type="text"
-                  value={formState.category ?? ""}
+              <Label htmlFor="category">Category</Label>
+              <Input
+                id="category"
+                type="text"
+                value={formState.category ?? ""}
                   onChange={(event) => handleFieldChange("category", event.target.value)}
                   placeholder="e.g. Design, Development"
                 />
@@ -200,16 +195,6 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="author">Author</Label>
-                <Input
-                  id="author"
-                  type="text"
-                  value={formState.author ?? ""}
-                  onChange={(event) => handleFieldChange("author", event.target.value)}
-                  placeholder="Author name"
-                />
-              </div>
-              <div className="space-y-1.5">
                 <Label htmlFor="readTime">Read time (minutes)</Label>
                 <Input
                   id="readTime"
@@ -220,29 +205,50 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="status">Status</Label>
-                <Select
-                  id="status"
-                  value={formState.status}
-                  onChange={(event) => handleFieldChange("status", event.target.value as PostStatus)}
+                <Label htmlFor="source">Source</Label>
+                <select
+                  id="source"
+                  value={formState.source}
+                  onChange={(event) => handleFieldChange("source", event.target.value as PostSource)}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2"
                 >
-                  <option value="draft">Draft</option>
-                  <option value="published">Published</option>
-                </Select>
+                  <option value="blog">Blog</option>
+                  <option value="reddit">Reddit</option>
+                  <option value="twitter">Twitter/X</option>
+                  <option value="linkedin">LinkedIn</option>
+                  <option value="patreon">Patreon</option>
+                </select>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Social badges</CardTitle>
-              <CardDescription>Optional links for badges on posts.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <SocialBadgeInput
-                value={(formState.socialLinks as SocialLinks) ?? {}}
-                onChange={(links) => handleFieldChange("socialLinks", links)}
-              />
+              <div className="space-y-1.5">
+                <Label htmlFor="sourceUrl">Source URL</Label>
+                <Input
+                  id="sourceUrl"
+                  type="url"
+                  value={formState.sourceURL ?? ""}
+                  onChange={(event) => handleFieldChange("sourceURL", event.target.value)}
+                  placeholder="https://example.com/original-post"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="heroImage">Hero image URL</Label>
+                <Input
+                  id="heroImage"
+                  type="url"
+                  value={formState.heroImage ?? ""}
+                  onChange={(event) => handleFieldChange("heroImage", event.target.value)}
+                  placeholder="/hero.jpg"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="externalId">External ID</Label>
+                <Input
+                  id="externalId"
+                  type="text"
+                  value={formState.externalID ?? ""}
+                  onChange={(event) => handleFieldChange("externalID", event.target.value)}
+                  placeholder="Reference ID for third-party links"
+                />
+              </div>
             </CardContent>
           </Card>
         </div>
