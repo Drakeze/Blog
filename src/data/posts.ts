@@ -1,5 +1,7 @@
 export type PostSource = 'blog' | 'reddit' | 'twitter' | 'linkedin' | 'patreon'
 
+export type PostStatus = 'draft' | 'published'
+
 export interface BlogPost {
   id: number
   title: string
@@ -16,6 +18,7 @@ export interface BlogPost {
   createdAt: string
   updatedAt: string
   externalID?: string
+  status: PostStatus
 }
 
 export type BlogPostSummary = Omit<BlogPost, 'content'>
@@ -33,6 +36,7 @@ type UpsertPostInput = {
   heroImage?: string
   createdAt?: string
   externalID?: string
+  status?: PostStatus
 }
 
 const initialPosts: BlogPost[] = [
@@ -80,6 +84,7 @@ const initialPosts: BlogPost[] = [
     tags: ['nextjs', 'react', 'tutorial'],
     sourceURL: 'https://yourblog.com/getting-started-nextjs-15',
     heroImage: '/modern-web-development.png',
+    status: 'published',
   },
   {
     id: 2,
@@ -124,6 +129,7 @@ const initialPosts: BlogPost[] = [
     tags: ['tailwind', 'css', 'design'],
     sourceURL: 'https://yourblog.com/mastering-tailwind-css',
     heroImage: '/design-system-components.png',
+    status: 'published',
   },
   {
     id: 3,
@@ -167,6 +173,7 @@ const initialPosts: BlogPost[] = [
     tags: ['react', 'architecture', 'development'],
     sourceURL: 'https://yourblog.com/scalable-react-applications',
     heroImage: '/ai-coding-assistant.jpg',
+    status: 'published',
   },
   {
     id: 4,
@@ -209,6 +216,7 @@ const initialPosts: BlogPost[] = [
     tags: ['typescript', 'javascript', 'development'],
     sourceURL: 'https://yourblog.com/typescript-best-practices-2024',
     heroImage: '/typescript-code.png',
+    status: 'published',
   },
   {
     id: 5,
@@ -250,6 +258,7 @@ const initialPosts: BlogPost[] = [
     tags: ['css', 'grid', 'layout'],
     sourceURL: 'https://yourblog.com/modern-css-grid-layouts',
     heroImage: '/modern-web-development-abstract.jpg',
+    status: 'published',
   },
   {
     id: 6,
@@ -298,6 +307,7 @@ const initialPosts: BlogPost[] = [
     tags: ['nodejs', 'express', 'api'],
     sourceURL: 'https://yourblog.com/api-design-nodejs-express',
     heroImage: '/website-performance-metrics.jpg',
+    status: 'published',
   },
 ];
 
@@ -320,22 +330,26 @@ function getNextId() {
   return postStore.reduce((max, post) => Math.max(max, post.id), 0) + 1
 }
 
-export function getAllPosts(): BlogPost[] {
-  return [...postStore].sort(
+export function getAllPosts(includeDrafts = false): BlogPost[] {
+  const visiblePosts = includeDrafts
+    ? [...postStore]
+    : postStore.filter((post) => post.status === 'published')
+
+  return visiblePosts.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   )
 }
 
-export function getPostBySlug(slug: string): BlogPost | undefined {
-  return postStore.find((post) => post.slug === slug)
+export function getPostBySlug(slug: string, includeDrafts = false): BlogPost | undefined {
+  return getAllPosts(includeDrafts).find((post) => post.slug === slug)
 }
 
 export function getPostById(id: number): BlogPost | undefined {
   return postStore.find((post) => post.id === id)
 }
 
-export function getPostSummaries(limit?: number): BlogPostSummary[] {
-  const summaries = getAllPosts()
+export function getPostSummaries(limit?: number, includeDrafts = false): BlogPostSummary[] {
+  const summaries = getAllPosts(includeDrafts)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     .map(({ content, ...summary }) => summary)
   if (typeof limit === 'number') {
@@ -349,15 +363,17 @@ export function filterPosts(filters?: {
   readTimeMinutes?: number
   createdAt?: string
   source?: PostSource
-}): BlogPost[] {
-  const { tag, readTimeMinutes, createdAt, source } = filters ?? {}
-  return getAllPosts().filter((post) => {
+  status?: PostStatus
+}, includeDrafts = false): BlogPost[] {
+  const { tag, readTimeMinutes, createdAt, source, status } = filters ?? {}
+  return getAllPosts(includeDrafts).filter((post) => {
     const tagMatch = tag ? post.tags.includes(tag) : true
     const readTimeMatch =
       typeof readTimeMinutes === 'number' ? post.readTimeMinutes <= readTimeMinutes : true
     const dateMatch = createdAt ? post.createdAt.startsWith(createdAt) : true
     const sourceMatch = source ? post.source === source : true
-    return tagMatch && readTimeMatch && dateMatch && sourceMatch
+    const statusMatch = status ? post.status === status : true
+    return tagMatch && readTimeMatch && dateMatch && sourceMatch && statusMatch
   })
 }
 
@@ -382,6 +398,7 @@ export function addPost(input: UpsertPostInput): BlogPost {
     sourceURL: input.sourceURL ?? `https://example.com/blog/${slug}`,
     heroImage: input.heroImage,
     externalID: input.externalID,
+    status: input.status ?? 'draft',
   }
 
   postStore = [newPost, ...postStore]
@@ -394,19 +411,21 @@ export function updatePost(id: number, updates: Partial<UpsertPostInput>): BlogP
 
   const readTimeMinutes = updates.readTimeMinutes ?? existing.readTimeMinutes
   const slug = updates.slug ? normalizeSlug(updates.slug) : existing.slug
+  const normalizedReadTime = Math.max(1, Math.round(readTimeMinutes))
 
   const updatedPost: BlogPost = {
     ...existing,
     ...updates,
     slug,
     source: updates.source ?? existing.source,
-    readTimeMinutes: Math.max(1, Math.round(readTimeMinutes)),
-    readTime: buildReadTime(readTimeMinutes),
+    readTimeMinutes: normalizedReadTime,
+    readTime: buildReadTime(normalizedReadTime),
     updatedAt: new Date().toISOString(),
     tags: updates.tags ?? existing.tags,
     heroImage: updates.heroImage ?? existing.heroImage,
     sourceURL: updates.sourceURL ?? existing.sourceURL,
     externalID: updates.externalID ?? existing.externalID,
+    status: updates.status ?? existing.status,
   }
 
   postStore = postStore.map((post) => (post.id === id ? updatedPost : post))

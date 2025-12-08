@@ -1,19 +1,5 @@
-import PostEditor from "@/components/admin/PostEditor"
-import { BlogFooter } from "@/components/blog-footer"
-import { BlogHeader } from "@/components/blog-header"
+import { redirect } from "next/navigation"
 
-export default function CreatePostPage() {
-  return (
-    <div className="min-h-screen bg-background">
-      <BlogHeader />
-      <main className="container mx-auto px-4 py-12 max-w-5xl space-y-6">
-        <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">Admin</p>
-          <h1 className="text-3xl font-serif font-bold">Create post</h1>
-        </div>
-        <PostEditor mode="create" />
-      </main>
-      <BlogFooter />
-    </div>
-  )
+export default function LegacyCreateRedirect() {
+  redirect("/admin/create")
 }

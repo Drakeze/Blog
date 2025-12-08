@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { getPostSummaries } from "@/data/posts"
 
 export default function AdminPostsPage() {
-  const posts = getPostSummaries()
+  const posts = getPostSummaries(undefined, true)
 
   return (
     <div className="min-h-screen bg-background">
@@ -20,7 +20,7 @@ export default function AdminPostsPage() {
             <h1 className="text-3xl font-serif font-bold">Posts</h1>
           </div>
           <Button asChild>
-            <Link href="/admin/posts/create">Create post</Link>
+            <Link href="/admin/create">Create post</Link>
           </Button>
         </div>
 

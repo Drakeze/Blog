@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server'
 
-import { removePost, updatePost } from '@/data/posts'
+import { removePost, updatePost, type PostStatus } from '@/data/posts'
+
+function parseStatus(value: unknown): PostStatus | undefined {
+  if (value === 'draft' || value === 'published') {
+    return value
+  }
+  return undefined
+}
 
 type RouteParams = { id: string }
 
@@ -15,7 +22,8 @@ export async function PUT(request: Request, { params }: RouteContext) {
   }
 
   const body = await request.json()
-  const updated = updatePost(postId, body)
+  const status = parseStatus(body?.status)
+  const updated = updatePost(postId, { ...body, status })
 
   if (!updated) {
     return NextResponse.json({ error: 'Post not found' }, { status: 404 })

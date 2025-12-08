@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import type { BlogPost, PostSource } from "@/data/posts"
+import type { BlogPost, PostSource, PostStatus } from "@/data/posts"
 
 const defaultPost: Partial<BlogPost> = {
   title: "",
@@ -18,6 +18,7 @@ const defaultPost: Partial<BlogPost> = {
   tags: [],
   readTimeMinutes: 5,
   source: "blog",
+  status: "draft",
 }
 
 type PostEditorProps = {
@@ -67,6 +68,7 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
         heroImage: formState.heroImage,
         createdAt: formState.createdAt,
         externalID: formState.externalID,
+        status: (formState.status as PostStatus) ?? "draft",
       }
 
       const url = mode === "edit" ? `/api/posts/${initialPost?.id}` : "/api/posts"
@@ -217,6 +219,18 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
                   <option value="twitter">Twitter/X</option>
                   <option value="linkedin">LinkedIn</option>
                   <option value="patreon">Patreon</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="status">Status</Label>
+                <select
+                  id="status"
+                  value={formState.status ?? "draft"}
+                  onChange={(event) => handleFieldChange("status", event.target.value as PostStatus)}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 capitalize"
+                >
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
                 </select>
               </div>
               <div className="space-y-1.5">

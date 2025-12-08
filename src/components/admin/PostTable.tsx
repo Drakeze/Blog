@@ -21,6 +21,8 @@ type FilterState = {
   source: string
   maxReadTime: string
   createdAt: string
+  search: string
+  sort: 'date-desc' | 'date-asc' | 'title-asc' | 'title-desc' | 'source'
 }
 
 export default function PostTable({ posts }: PostTableProps) {
@@ -29,6 +31,8 @@ export default function PostTable({ posts }: PostTableProps) {
     source: "all",
     maxReadTime: "0",
     createdAt: "",
+    search: "",
+    sort: "date-desc",
   })
   const [currentPage, setCurrentPage] = useState(1)
   const [error, setError] = useState<string | null>(null)
@@ -37,7 +41,8 @@ export default function PostTable({ posts }: PostTableProps) {
   const uniqueSources = useMemo(() => Array.from(new Set(posts.map((post) => post.source))), [posts])
 
   const filteredPosts = useMemo(() => {
-    return posts.filter((post) => {
+    const normalizedSearch = filters.search.trim().toLowerCase()
+    const filtered = posts.filter((post) => {
       const tagMatch = filters.tag === "all" ? true : post.tags.includes(filters.tag)
       const sourceMatch = filters.source === "all" ? true : post.source === filters.source
       const readTimeMatch =
@@ -45,7 +50,29 @@ export default function PostTable({ posts }: PostTableProps) {
           ? post.readTimeMinutes <= Number(filters.maxReadTime)
           : true
       const dateMatch = filters.createdAt ? post.createdAt.startsWith(filters.createdAt) : true
-      return tagMatch && sourceMatch && readTimeMatch && dateMatch
+      const searchMatch =
+        normalizedSearch.length === 0 ||
+        post.title.toLowerCase().includes(normalizedSearch) ||
+        post.excerpt.toLowerCase().includes(normalizedSearch) ||
+        post.tags.some((tag) => tag.toLowerCase().includes(normalizedSearch))
+
+      return tagMatch && sourceMatch && readTimeMatch && dateMatch && searchMatch
+    })
+
+    return [...filtered].sort((a, b) => {
+      switch (filters.sort) {
+        case "title-asc":
+          return a.title.localeCompare(b.title)
+        case "title-desc":
+          return b.title.localeCompare(a.title)
+        case "source":
+          return a.source.localeCompare(b.source)
+        case "date-asc":
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        case "date-desc":
+        default:
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      }
     })
   }, [filters, posts])
 
@@ -53,7 +80,10 @@ export default function PostTable({ posts }: PostTableProps) {
   const startIndex = (currentPage - 1) * PAGE_SIZE
   const pagedPosts = filteredPosts.slice(startIndex, startIndex + PAGE_SIZE)
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: number, title: string) => {
+    const confirmed = window.confirm(`Delete "${title}"? This cannot be undone.`)
+    if (!confirmed) return
+
     setError(null)
     try {
       const response = await fetch(`/api/posts/${id}`, { method: "DELETE" })
@@ -74,6 +104,16 @@ export default function PostTable({ posts }: PostTableProps) {
           <CardDescription>Filter by tag, source, read time, or date.</CardDescription>
         </div>
         <div className="flex flex-wrap gap-3 text-sm">
+          <Input
+            type="search"
+            value={filters.search}
+            onChange={(event) => {
+              setCurrentPage(1)
+              setFilters((prev) => ({ ...prev, search: event.target.value }))
+            }}
+            placeholder="Search title or tags"
+            className="w-48"
+          />
           <select
             value={filters.tag}
             onChange={(event) => {
@@ -124,6 +164,20 @@ export default function PostTable({ posts }: PostTableProps) {
             }}
             className="min-w-[170px]"
           />
+          <select
+            value={filters.sort}
+            onChange={(event) => {
+              setCurrentPage(1)
+              setFilters((prev) => ({ ...prev, sort: event.target.value as FilterState["sort"] }))
+            }}
+            className="min-w-[160px] rounded-md border border-border bg-background px-3 py-2 text-sm"
+          >
+            <option value="date-desc">Newest first</option>
+            <option value="date-asc">Oldest first</option>
+            <option value="title-asc">Title A-Z</option>
+            <option value="title-desc">Title Z-A</option>
+            <option value="source">Source</option>
+          </select>
         </div>
       </CardHeader>
 
@@ -137,6 +191,7 @@ export default function PostTable({ posts }: PostTableProps) {
               <th className="px-6 py-3">Tags</th>
               <th className="px-6 py-3">Source</th>
               <th className="px-6 py-3">Read</th>
+              <th className="px-6 py-3">Status</th>
               <th className="px-6 py-3">Date</th>
               <th className="px-6 py-3">Actions</th>
             </tr>
@@ -156,18 +211,19 @@ export default function PostTable({ posts }: PostTableProps) {
                 </td>
                 <td className="px-6 py-4 capitalize text-muted-foreground">{post.source}</td>
                 <td className="px-6 py-4 text-muted-foreground">{post.readTime}</td>
+                <td className="px-6 py-4 capitalize text-muted-foreground">{post.status}</td>
                 <td className="px-6 py-4 text-muted-foreground">{new Date(post.createdAt).toLocaleDateString()}</td>
                 <td className="px-6 py-4">
                   <div className="flex flex-wrap gap-2 text-xs font-semibold">
                     <Button asChild variant="outline" size="sm">
-                      <Link href={`/admin/posts/${post.id}/edit`}>Edit</Link>
+                      <Link href={`/admin/edit/${post.id}`}>Edit</Link>
                     </Button>
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
                       className="text-destructive hover:bg-destructive/10"
-                      onClick={() => void handleDelete(post.id)}
+                      onClick={() => void handleDelete(post.id, post.title)}
                     >
                       Delete
                     </Button>
