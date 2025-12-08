@@ -2,47 +2,43 @@
 
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useState } from "react"
+import type { PostSource } from "@/data/posts"
 
-type FilterType = "all" | "blog" | "reddit" | "twitter" | "linkedin" | "patreon"
+type BlogFiltersProps = {
+  sources: (PostSource | "all")[]
+  tags: string[]
+  activeSource: PostSource | "all"
+  activeTag: string
+  onSourceChange: (source: PostSource | "all") => void
+  onTagChange: (tag: string) => void
+}
 
-export function BlogFilters() {
-  const [activeFilter, setActiveFilter] = useState<FilterType>("all")
-
-  const filters: { value: FilterType; label: string }[] = [
-    { value: "all", label: "All" },
-    { value: "blog", label: "Blog" },
-    { value: "reddit", label: "Reddit" },
-    { value: "twitter", label: "Twitter/X" },
-    { value: "linkedin", label: "LinkedIn" },
-    { value: "patreon", label: "Patreon" },
-  ]
-
+export function BlogFilters({ sources, tags, activeSource, activeTag, onSourceChange, onTagChange }: BlogFiltersProps) {
   return (
     <div className="mb-12 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
       <div className="flex flex-wrap gap-2">
-        {filters.map((filter) => (
+        {sources.map((source) => (
           <Button
-            key={filter.value}
-            variant={activeFilter === filter.value ? "default" : "outline"}
-            onClick={() => setActiveFilter(filter.value)}
-            className="rounded-full"
+            key={source}
+            variant={activeSource === source ? "default" : "outline"}
+            onClick={() => onSourceChange(source)}
+            className="rounded-full capitalize"
           >
-            {filter.label}
+            {source === "all" ? "All" : source === "twitter" ? "Twitter/X" : source}
           </Button>
         ))}
       </div>
 
-      <Select defaultValue="all">
-        <SelectTrigger className="w-[180px]">
+      <Select value={activeTag} onValueChange={onTagChange}>
+        <SelectTrigger className="w-[200px]">
           <SelectValue placeholder="Filter by tag" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All tags</SelectItem>
-          <SelectItem value="web-dev">Web Development</SelectItem>
-          <SelectItem value="design">Design</SelectItem>
-          <SelectItem value="ai">AI & ML</SelectItem>
-          <SelectItem value="career">Career</SelectItem>
+          {tags.map((tag) => (
+            <SelectItem key={tag} value={tag} className="capitalize">
+              {tag === "all" ? "All tags" : tag}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>

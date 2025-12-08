@@ -4,12 +4,11 @@ import Link from "next/link"
 import { useMemo, useState } from "react"
 
 import { Badge } from "@/components/ui/badge"
-import { Button, buttonStyles } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Pagination } from "@/components/ui/pagination"
-import { Select } from "@/components/ui/select"
-import type { BlogPostSummary, PostStatus } from "@/data/posts"
+import type { BlogPostSummary } from "@/data/posts"
 
 const PAGE_SIZE = 5
 
@@ -19,33 +18,34 @@ type PostTableProps = {
 
 type FilterState = {
   tag: string
-  status: PostStatus | "all"
+  source: string
   maxReadTime: string
-  date: string
+  createdAt: string
 }
 
 export default function PostTable({ posts }: PostTableProps) {
   const [filters, setFilters] = useState<FilterState>({
     tag: "all",
-    status: "all",
+    source: "all",
     maxReadTime: "0",
-    date: "",
+    createdAt: "",
   })
   const [currentPage, setCurrentPage] = useState(1)
   const [error, setError] = useState<string | null>(null)
 
   const uniqueTags = useMemo(() => Array.from(new Set(posts.flatMap((post) => post.tags))), [posts])
+  const uniqueSources = useMemo(() => Array.from(new Set(posts.map((post) => post.source))), [posts])
 
   const filteredPosts = useMemo(() => {
     return posts.filter((post) => {
       const tagMatch = filters.tag === "all" ? true : post.tags.includes(filters.tag)
-      const statusMatch = filters.status === "all" ? true : post.status === filters.status
+      const sourceMatch = filters.source === "all" ? true : post.source === filters.source
       const readTimeMatch =
         filters.maxReadTime && Number(filters.maxReadTime) > 0
           ? post.readTimeMinutes <= Number(filters.maxReadTime)
           : true
-      const dateMatch = filters.date ? post.date.startsWith(filters.date) : true
-      return tagMatch && statusMatch && readTimeMatch && dateMatch
+      const dateMatch = filters.createdAt ? post.createdAt.startsWith(filters.createdAt) : true
+      return tagMatch && sourceMatch && readTimeMatch && dateMatch
     })
   }, [filters, posts])
 
@@ -71,16 +71,16 @@ export default function PostTable({ posts }: PostTableProps) {
       <CardHeader className="gap-3 md:flex-row md:items-center md:justify-between">
         <div className="space-y-1">
           <CardTitle>Posts</CardTitle>
-          <CardDescription>Filter by tag, publish status, read time, or date.</CardDescription>
+          <CardDescription>Filter by tag, source, read time, or date.</CardDescription>
         </div>
         <div className="flex flex-wrap gap-3 text-sm">
-          <Select
+          <select
             value={filters.tag}
             onChange={(event) => {
               setCurrentPage(1)
               setFilters((prev) => ({ ...prev, tag: event.target.value }))
             }}
-            className="min-w-[150px]"
+            className="min-w-[150px] rounded-md border border-border bg-background px-3 py-2 text-sm"
           >
             <option value="all">All tags</option>
             {uniqueTags.map((tag) => (
@@ -88,20 +88,22 @@ export default function PostTable({ posts }: PostTableProps) {
                 {tag}
               </option>
             ))}
-          </Select>
-          <Select
-            value={filters.status}
+          </select>
+          <select
+            value={filters.source}
             onChange={(event) => {
               setCurrentPage(1)
-              const value = event.target.value as PostStatus | "all"
-              setFilters((prev) => ({ ...prev, status: value }))
+              setFilters((prev) => ({ ...prev, source: event.target.value }))
             }}
-            className="min-w-[150px]"
+            className="min-w-[150px] rounded-md border border-border bg-background px-3 py-2 text-sm capitalize"
           >
-            <option value="all">All statuses</option>
-            <option value="published">Published</option>
-            <option value="draft">Drafts</option>
-          </Select>
+            <option value="all">All sources</option>
+            {uniqueSources.map((source) => (
+              <option key={source} value={source} className="capitalize">
+                {source}
+              </option>
+            ))}
+          </select>
           <Input
             type="number"
             min={0}
@@ -115,10 +117,10 @@ export default function PostTable({ posts }: PostTableProps) {
           />
           <Input
             type="date"
-            value={filters.date}
+            value={filters.createdAt}
             onChange={(event) => {
               setCurrentPage(1)
-              setFilters((prev) => ({ ...prev, date: event.target.value }))
+              setFilters((prev) => ({ ...prev, createdAt: event.target.value }))
             }}
             className="min-w-[170px]"
           />
@@ -133,7 +135,7 @@ export default function PostTable({ posts }: PostTableProps) {
             <tr>
               <th className="px-6 py-3">Title</th>
               <th className="px-6 py-3">Tags</th>
-              <th className="px-6 py-3">Status</th>
+              <th className="px-6 py-3">Source</th>
               <th className="px-6 py-3">Read</th>
               <th className="px-6 py-3">Date</th>
               <th className="px-6 py-3">Actions</th>
@@ -152,21 +154,14 @@ export default function PostTable({ posts }: PostTableProps) {
                     ))}
                   </div>
                 </td>
-                <td className="px-6 py-4">
-                  <Badge tone={post.status === "published" ? "default" : "outline"}>
-                    {post.status === "published" ? "Published" : "Draft"}
-                  </Badge>
-                </td>
+                <td className="px-6 py-4 capitalize text-muted-foreground">{post.source}</td>
                 <td className="px-6 py-4 text-muted-foreground">{post.readTime}</td>
-                <td className="px-6 py-4 text-muted-foreground">{new Date(post.date).toLocaleDateString()}</td>
+                <td className="px-6 py-4 text-muted-foreground">{new Date(post.createdAt).toLocaleDateString()}</td>
                 <td className="px-6 py-4">
                   <div className="flex flex-wrap gap-2 text-xs font-semibold">
-                    <Link
-                      href={`/admin/posts/${post.id}/edit`}
-                      className={buttonStyles("outline", "sm")}
-                    >
-                      Edit
-                    </Link>
+                    <Button asChild variant="outline" size="sm">
+                      <Link href={`/admin/posts/${post.id}/edit`}>Edit</Link>
+                    </Button>
                     <Button
                       type="button"
                       variant="ghost"

@@ -1,9 +1,11 @@
 import { BlogHeader } from "@/components/blog-header"
 import { BlogFooter } from "@/components/blog-footer"
-import { BlogFilters } from "@/components/blog-filters"
-import { BlogGrid } from "@/components/blog-grid"
+import { BlogCollection } from "@/components/blog-collection"
+import { getPostSummaries } from "@/data/posts"
 
 export default function BlogPage() {
+  const posts = getPostSummaries()
+
   return (
     <div className="min-h-screen bg-background">
       <BlogHeader />
@@ -16,8 +18,7 @@ export default function BlogPage() {
       </div>
 
       <main className="container mx-auto px-4 py-12 max-w-7xl">
-        <BlogFilters />
-        <BlogGrid />
+        <BlogCollection posts={posts} enablePagination pageSize={9} />
       </main>
 
       <BlogFooter />
