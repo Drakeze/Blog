@@ -37,64 +37,66 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
     <div className="min-h-screen bg-background">
       <BlogHeader />
 
-      <article className="container mx-auto px-4 py-16 max-w-3xl">
+      <article className="mx-auto max-w-4xl px-4 py-16 md:px-6 md:py-20">
         {post.heroImage && (
-          <div className="mb-12 -mx-4 sm:mx-0">
+          <div className="mb-12 overflow-hidden rounded-3xl border border-border bg-muted shadow-sm">
             <img
               src={post.heroImage || "/placeholder.svg"}
               alt={post.title}
-              className="w-full aspect-[2/1] object-cover rounded-none sm:rounded-2xl"
+              className="aspect-[2/1] w-full object-cover"
             />
           </div>
         )}
 
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold mb-6 text-balance leading-tight">
-          {post.title}
-        </h1>
+        <div className="space-y-6">
+          <h1 className="text-balance leading-tight">{post.title}</h1>
 
-        <div className="flex flex-wrap items-center gap-4 mb-8 pb-8 border-b border-border">
-          <div className="space-y-1">
-            <p className="font-medium">{new Date(post.createdAt).toLocaleDateString()}</p>
-            <p className="text-sm text-muted-foreground">{post.readTime}</p>
-          </div>
+          <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-card/60 p-4 shadow-sm">
+            <div className="space-y-1 text-sm md:text-base">
+              <p className="font-semibold tracking-tight">{new Date(post.createdAt).toLocaleDateString()}</p>
+              <p className="text-muted-foreground">{post.readTime}</p>
+            </div>
 
-          <div className="ml-auto flex items-center gap-2">
-            <Badge className={`${sourceColors[post.source]} px-3 py-1`}>{sourceLabels[post.source]}</Badge>
-            {post.source !== "blog" && post.sourceURL && (
-              <Button variant="outline" size="sm" asChild>
-                <a href={post.sourceURL} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  View Original
-                </a>
-              </Button>
-            )}
+            <div className="ml-auto flex items-center gap-3">
+              <Badge className={`${sourceColors[post.source]} px-3 py-1.5 text-xs font-semibold tracking-tight shadow-sm`}>
+                {sourceLabels[post.source]}
+              </Badge>
+              {post.source !== "blog" && post.sourceURL && (
+                <Button variant="outline" size="sm" asChild className="rounded-full border-border px-4">
+                  <a href={post.sourceURL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                    <ExternalLink className="h-4 w-4" />
+                    View Original
+                  </a>
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
         <div
-          className="prose prose-lg prose-slate dark:prose-invert max-w-none
+          className="prose prose-lg prose-slate mt-10 max-w-none dark:prose-invert
             prose-headings:font-serif prose-headings:font-bold prose-headings:tracking-tight
-            prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6
-            prose-p:text-lg prose-p:leading-relaxed prose-p:mb-6
+            prose-h2:mt-12 prose-h2:mb-6
+            prose-p:leading-relaxed prose-p:mb-6 prose-li:leading-relaxed
             prose-a:text-primary prose-a:no-underline hover:prose-a:underline"
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
 
-        <div className="flex flex-wrap gap-2 mt-12 pt-8 border-t border-border">
+        <div className="mt-12 flex flex-wrap gap-2 rounded-2xl border border-border bg-card/50 p-4">
           {post.tags.map((tag) => (
-            <Badge key={tag} variant="secondary" className="px-3 py-1">
+            <Badge key={tag} variant="secondary" className="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
               {tag}
             </Badge>
           ))}
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border">
-          <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+        <div className="mt-12 rounded-2xl border border-border bg-card/70 p-6 shadow-sm">
+          <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold">
             <Share2 className="h-5 w-5" />
             Share this article
           </h3>
-          <div className="flex gap-3">
-            <Button variant="outline" size="sm" asChild>
+          <div className="flex flex-wrap gap-3">
+            <Button variant="outline" size="sm" asChild className="rounded-full px-4">
               <a
                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(postUrl)}`}
                 target="_blank"
@@ -103,7 +105,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
                 Twitter/X
               </a>
             </Button>
-            <Button variant="outline" size="sm" asChild>
+            <Button variant="outline" size="sm" asChild className="rounded-full px-4">
               <a
                 href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(postUrl)}`}
                 target="_blank"
@@ -112,7 +114,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
                 LinkedIn
               </a>
             </Button>
-            <Button variant="outline" size="sm" asChild>
+            <Button variant="outline" size="sm" asChild className="rounded-full px-4">
               <a
                 href={`https://www.reddit.com/submit?url=${encodeURIComponent(postUrl)}&title=${encodeURIComponent(post.title)}`}
                 target="_blank"

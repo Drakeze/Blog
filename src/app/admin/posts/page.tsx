@@ -13,13 +13,13 @@ export default function AdminPostsPage() {
     <div className="min-h-screen bg-background">
       <BlogHeader />
 
-      <main className="container mx-auto px-4 py-12 max-w-6xl space-y-8">
-        <div className="flex items-center justify-between gap-4">
+      <main className="mx-auto max-w-6xl space-y-8 px-4 py-12 md:px-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">
             <p className="text-sm text-muted-foreground">Admin</p>
-            <h1 className="text-3xl font-serif font-bold">Posts</h1>
+            <h1 className="text-3xl font-serif font-bold tracking-tight">Posts</h1>
           </div>
-          <Button asChild>
+          <Button asChild className="rounded-full">
             <Link href="/admin/create">Create post</Link>
           </Button>
         </div>

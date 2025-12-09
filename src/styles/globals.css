@@ -120,6 +120,22 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground text-base leading-relaxed antialiased;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl font-serif font-bold leading-tight tracking-tight;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl font-serif font-semibold leading-snug tracking-tight;
+  }
+
+  h3 {
+    @apply text-2xl font-serif font-semibold leading-snug tracking-tight;
+  }
+
+  h4 {
+    @apply text-xl font-serif font-semibold leading-snug tracking-tight;
   }
 }
