@@ -97,13 +97,13 @@ export default function PostTable({ posts }: PostTableProps) {
   }
 
   return (
-    <Card>
-      <CardHeader className="gap-3 md:flex-row md:items-center md:justify-between">
+    <Card className="shadow-sm">
+      <CardHeader className="gap-4 border-b border-border bg-card/50 md:flex-row md:items-center md:justify-between md:rounded-t-2xl">
         <div className="space-y-1">
-          <CardTitle>Posts</CardTitle>
+          <CardTitle className="text-xl">Posts</CardTitle>
           <CardDescription>Filter by tag, source, read time, or date.</CardDescription>
         </div>
-        <div className="flex flex-wrap gap-3 text-sm">
+        <div className="flex w-full flex-wrap gap-3 text-sm md:w-auto">
           <Input
             type="search"
             value={filters.search}
@@ -112,7 +112,7 @@ export default function PostTable({ posts }: PostTableProps) {
               setFilters((prev) => ({ ...prev, search: event.target.value }))
             }}
             placeholder="Search title or tags"
-            className="w-48"
+            className="h-10 w-full min-w-[200px] rounded-lg border-border bg-background/70 md:w-48"
           />
           <select
             value={filters.tag}
@@ -120,7 +120,7 @@ export default function PostTable({ posts }: PostTableProps) {
               setCurrentPage(1)
               setFilters((prev) => ({ ...prev, tag: event.target.value }))
             }}
-            className="min-w-[150px] rounded-md border border-border bg-background px-3 py-2 text-sm"
+            className="min-w-[150px] rounded-lg border border-border bg-background px-3 py-2 text-sm"
           >
             <option value="all">All tags</option>
             {uniqueTags.map((tag) => (
@@ -135,7 +135,7 @@ export default function PostTable({ posts }: PostTableProps) {
               setCurrentPage(1)
               setFilters((prev) => ({ ...prev, source: event.target.value }))
             }}
-            className="min-w-[150px] rounded-md border border-border bg-background px-3 py-2 text-sm capitalize"
+            className="min-w-[150px] rounded-lg border border-border bg-background px-3 py-2 text-sm capitalize"
           >
             <option value="all">All sources</option>
             {uniqueSources.map((source) => (
@@ -153,7 +153,7 @@ export default function PostTable({ posts }: PostTableProps) {
               setFilters((prev) => ({ ...prev, maxReadTime: event.target.value }))
             }}
             placeholder="Max read time"
-            className="w-36"
+            className="h-10 w-36 rounded-lg border-border bg-background/70"
           />
           <Input
             type="date"
@@ -162,7 +162,7 @@ export default function PostTable({ posts }: PostTableProps) {
               setCurrentPage(1)
               setFilters((prev) => ({ ...prev, createdAt: event.target.value }))
             }}
-            className="min-w-[170px]"
+            className="h-10 min-w-[170px] rounded-lg border-border bg-background/70"
           />
           <select
             value={filters.sort}
@@ -170,7 +170,7 @@ export default function PostTable({ posts }: PostTableProps) {
               setCurrentPage(1)
               setFilters((prev) => ({ ...prev, sort: event.target.value as FilterState["sort"] }))
             }}
-            className="min-w-[160px] rounded-md border border-border bg-background px-3 py-2 text-sm"
+            className="min-w-[160px] rounded-lg border border-border bg-background px-3 py-2 text-sm"
           >
             <option value="date-desc">Newest first</option>
             <option value="date-asc">Oldest first</option>
@@ -183,9 +183,9 @@ export default function PostTable({ posts }: PostTableProps) {
 
       {error && <p className="px-6 text-sm text-red-600">{error}</p>}
 
-      <CardContent className="overflow-x-auto px-0">
+      <CardContent className="overflow-hidden px-0">
         <table className="min-w-full divide-y divide-border text-sm">
-          <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
+          <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
               <th className="px-6 py-3">Title</th>
               <th className="px-6 py-3">Tags</th>
@@ -211,18 +211,29 @@ export default function PostTable({ posts }: PostTableProps) {
                 </td>
                 <td className="px-6 py-4 capitalize text-muted-foreground">{post.source}</td>
                 <td className="px-6 py-4 text-muted-foreground">{post.readTime}</td>
-                <td className="px-6 py-4 capitalize text-muted-foreground">{post.status}</td>
+                <td className="px-6 py-4 capitalize text-muted-foreground">
+                  <Badge
+                    variant={post.status === "published" ? "default" : "secondary"}
+                    className={
+                      post.status === "published"
+                        ? "rounded-full bg-emerald-500/15 text-emerald-700 shadow-none"
+                        : "rounded-full bg-muted text-foreground/80 shadow-none"
+                    }
+                  >
+                    {post.status}
+                  </Badge>
+                </td>
                 <td className="px-6 py-4 text-muted-foreground">{new Date(post.createdAt).toLocaleDateString()}</td>
                 <td className="px-6 py-4">
                   <div className="flex flex-wrap gap-2 text-xs font-semibold">
-                    <Button asChild variant="outline" size="sm">
+                    <Button asChild variant="outline" size="sm" className="rounded-full px-4">
                       <Link href={`/admin/edit/${post.id}`}>Edit</Link>
                     </Button>
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="text-destructive hover:bg-destructive/10"
+                      className="rounded-full text-destructive hover:bg-destructive/10"
                       onClick={() => void handleDelete(post.id, post.title)}
                     >
                       Delete

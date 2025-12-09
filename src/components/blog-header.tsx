@@ -31,20 +31,22 @@ export function BlogHeader() {
   }, [])
 
   return (
-    <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-xl font-serif font-bold">Thoughts</span>
+    <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+      <div className="mx-auto max-w-6xl px-4 md:px-6">
+        <div className="flex h-16 items-center justify-between gap-4">
+          <Link href="/" className="flex items-center gap-2 rounded-full px-3 py-1 transition-colors hover:bg-accent">
+            <span className="text-lg font-serif font-bold tracking-tight">Thoughts</span>
           </Link>
 
-          <nav className="flex items-center gap-6">
+          <nav className="flex flex-wrap items-center gap-3 md:gap-6 text-sm">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-sm font-medium transition-colors hover:text-foreground/80 ${
-                  isActive(item.href) ? "text-foreground" : "text-muted-foreground"
+                className={`rounded-full px-3 py-1 font-medium transition-colors ${
+                  isActive(item.href)
+                    ? "bg-foreground text-background shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
                 }`}
                 aria-current={isActive(item.href) ? "page" : undefined}
               >
@@ -56,7 +58,7 @@ export function BlogHeader() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setTheme(resolvedTheme === "light" ? "dark" : "light")}
-                className="h-9 w-9"
+                className="h-9 w-9 rounded-full border border-border/70 bg-background shadow-sm transition-all hover:-translate-y-0.5 hover:border-border"
               >
                 {resolvedTheme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
                 <span className="sr-only">Toggle theme</span>

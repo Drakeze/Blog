@@ -95,11 +95,11 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader className="gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div className="space-y-8">
+      <Card className="shadow-sm">
+        <CardHeader className="gap-4 rounded-2xl bg-card/50 lg:flex-row lg:items-center lg:justify-between">
           <div className="space-y-2">
-            <CardTitle className="text-2xl">
+            <CardTitle className="text-2xl font-semibold tracking-tight">
               {mode === "edit" ? `Editing: ${initialPost?.title}` : "New Post"}
             </CardTitle>
             <CardDescription>
@@ -107,14 +107,14 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
             </CardDescription>
           </div>
           <div className="flex flex-wrap gap-2 text-sm">
-            <Button variant="outline" type="button" disabled={saving} onClick={() => void submit()}>
+            <Button variant="outline" type="button" disabled={saving} onClick={() => void submit()} className="rounded-full px-4">
               Save Post
             </Button>
             <Button
               type="button"
               variant="ghost"
               onClick={() => setPreview((prev) => !prev)}
-              className="text-foreground"
+              className="rounded-full text-foreground"
             >
               {preview ? "Hide preview" : "Preview"}
             </Button>
@@ -125,8 +125,8 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
       {error && <p className="rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">{error}</p>}
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardContent className="space-y-5">
+        <Card className="lg:col-span-2 shadow-sm">
+          <CardContent className="space-y-6 md:p-8">
             <div className="space-y-2">
               <Label htmlFor="title">Title</Label>
               <Input
@@ -170,12 +170,12 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
         </Card>
 
         <div className="grid gap-6">
-          <Card>
-            <CardHeader>
+          <Card className="shadow-sm">
+            <CardHeader className="pb-4">
               <CardTitle className="text-base">Metadata</CardTitle>
               <CardDescription>Organize and label your post.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-3 md:space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="slug">Slug</Label>
                 <Input

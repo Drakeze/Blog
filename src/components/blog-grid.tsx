@@ -7,7 +7,7 @@ type BlogGridProps = {
 
 export function BlogGrid({ posts }: BlogGridProps) {
   return (
-    <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 lg:gap-10">
       {posts.map((post) => (
         <BlogCard key={post.id} post={post} />
       ))}

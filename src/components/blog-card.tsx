@@ -22,32 +22,34 @@ const sourceLabels: Record<BlogPostSummary["source"], string> = {
 
 export function BlogCard({ post }: { post: BlogPostSummary & { heroImage?: string } }) {
   return (
-    <Link href={`/blog/${post.slug}`} className="group">
-      <article className="h-full bg-card border border-border rounded-2xl overflow-hidden transition-all hover:shadow-lg hover:border-foreground/20">
-        <div className="aspect-[3/2] overflow-hidden bg-muted">
+    <Link href={`/blog/${post.slug}`} className="group block h-full">
+      <article className="flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card/80 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+        <div className="aspect-[16/10] overflow-hidden bg-muted">
           <img
             src={post.heroImage || "/placeholder.svg"}
             alt={post.title}
-            className="w-full h-full object-cover transition-transform group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         </div>
 
-        <div className="p-6 space-y-4">
-          <div className="flex items-center justify-between gap-2">
-            <Badge className={`${sourceColors[post.source]} px-2 py-1 text-xs`}>{sourceLabels[post.source]}</Badge>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Clock className="h-3 w-3" />
+        <div className="flex h-full flex-col gap-4 p-6 sm:p-7">
+          <div className="flex items-start justify-between gap-3">
+            <Badge className={`${sourceColors[post.source]} px-3 py-1.5 text-[11px] font-semibold tracking-tight shadow-sm`}>{sourceLabels[post.source]}</Badge>
+            <div className="flex items-center gap-2 rounded-full bg-muted/60 px-3 py-1 text-xs font-medium text-muted-foreground">
+              <Clock className="h-3.5 w-3.5" />
               <span>{post.readTime}</span>
             </div>
           </div>
 
-          <h2 className="text-xl font-serif font-bold leading-tight group-hover:text-primary transition-colors text-balance">
+          <h2 className="text-xl font-serif font-bold leading-tight tracking-tight text-balance transition-colors group-hover:text-primary">
             {post.title}
           </h2>
 
-          <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3 text-pretty">{post.excerpt}</p>
+          <p className="text-sm leading-relaxed text-muted-foreground line-clamp-3 text-pretty">{post.excerpt}</p>
 
-          <p className="text-sm text-muted-foreground">{new Date(post.createdAt).toLocaleDateString()}</p>
+          <div className="mt-auto text-sm text-muted-foreground">
+            {new Date(post.createdAt).toLocaleDateString()}
+          </div>
         </div>
       </article>
     </Link>

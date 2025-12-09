@@ -4,6 +4,7 @@ import { useMemo, useState } from "react"
 
 import { BlogFilters } from "@/components/blog-filters"
 import { BlogGrid } from "@/components/blog-grid"
+import { Input } from "@/components/ui/input"
 import type { BlogPostSummary, PostSource } from "@/data/posts"
 
 const DEFAULT_PAGE_SIZE = 6
@@ -65,14 +66,14 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
   }
 
   return (
-    <div className="space-y-10">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="w-full md:w-1/2">
-          <input
+    <div className="space-y-12">
+      <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card/60 p-4 shadow-sm md:flex-row md:items-center md:justify-between">
+        <div className="w-full md:w-2/3 lg:w-1/2">
+          <Input
             value={searchTerm}
             onChange={(event) => handleSearchChange(event.target.value)}
             placeholder="Search posts by title, excerpt, or tag"
-            className="h-12 w-full rounded-lg border border-border bg-background px-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            className="h-12 rounded-full border-border bg-background/70 px-5 text-sm shadow-none"
           />
         </div>
       </div>
@@ -89,7 +90,7 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
       <BlogGrid posts={visiblePosts} />
 
       {enablePagination && totalPages > 1 && (
-        <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 text-sm">
+        <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card/70 p-4 text-sm shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div className="text-muted-foreground">
             Showing {startIndex + 1}-{Math.min(startIndex + pageSize, filteredPosts.length)} of {filteredPosts.length}
           </div>
@@ -98,7 +99,7 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
               type="button"
               disabled={page === 1}
               onClick={() => setPage((current) => Math.max(1, current - 1))}
-              className="rounded-lg border border-border px-3 py-2 text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-full border border-border bg-background px-4 py-2 text-foreground shadow-sm transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
             >
               Previous
             </button>
@@ -109,7 +110,7 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
               type="button"
               disabled={page === totalPages}
               onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
-              className="rounded-lg border border-border px-3 py-2 text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-full border border-border bg-background px-4 py-2 text-foreground shadow-sm transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
             >
               Next
             </button>
