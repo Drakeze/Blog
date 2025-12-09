@@ -67,8 +67,8 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
 
   return (
     <div className="space-y-12">
-      <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card/60 p-4 shadow-sm md:flex-row md:items-center md:justify-between">
-        <div className="w-full md:w-2/3 lg:w-1/2">
+      <div className="rounded-2xl border border-border bg-card/60 p-6 shadow-sm space-y-6">
+        <div className="w-full">
           <Input
             value={searchTerm}
             onChange={(event) => handleSearchChange(event.target.value)}
@@ -76,16 +76,16 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
             className="h-12 rounded-full border-border bg-background/70 px-5 text-sm shadow-none"
           />
         </div>
-      </div>
 
-      <BlogFilters
-        sources={sources}
-        tags={tags}
-        activeSource={activeSource}
-        activeTag={activeTag}
-        onSourceChange={handleSourceChange}
-        onTagChange={handleTagChange}
-      />
+        <BlogFilters
+          sources={sources}
+          tags={tags}
+          activeSource={activeSource}
+          activeTag={activeTag}
+          onSourceChange={handleSourceChange}
+          onTagChange={handleTagChange}
+        />
+      </div>
 
       <BlogGrid posts={visiblePosts} />
 

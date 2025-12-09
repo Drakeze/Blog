@@ -165,40 +165,9 @@ export default function SubscribePage() {
               </a>
             </Button>
           </div>
-
         </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-2xl border border-border bg-card/60 p-5 text-left shadow-sm">
-              <p className="mb-2 text-sm font-semibold text-muted-foreground">Socials</p>
-              <ul className="space-y-1 text-sm">
-                <li>
-                  <a className="text-primary hover:underline" href="https://twitter.com" target="_blank" rel="noreferrer">
-                    Twitter/X
-                  </a>
-                </li>
-                <li>
-                  <a className="text-primary hover:underline" href="https://linkedin.com" target="_blank" rel="noreferrer">
-                    LinkedIn
-                  </a>
-                </li>
-                <li>
-                  <a className="text-primary hover:underline" href="https://reddit.com" target="_blank" rel="noreferrer">
-                    Reddit
-                  </a>
-                </li>
-                <li>
-                  <a className="text-primary hover:underline" href="https://patreon.com" target="_blank" rel="noreferrer">
-                    Patreon
-                  </a>
-                </li>
-                <li>
-                  <a className="text-primary hover:underline" href="https://github.com" target="_blank" rel="noreferrer">
-                    GitHub
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div className="mt-12 text-center p-6 bg-primary/5 rounded-2xl border border-primary/10">
+
+        <div className="mt-12 rounded-2xl border border-primary/10 bg-primary/5 p-6 text-center">
           <p className="text-sm text-muted-foreground">
             Want more?{" "}
             <a href="https://patreon.com" className="text-primary hover:underline font-medium">
@@ -207,12 +176,9 @@ export default function SubscribePage() {
             for deeper insights and exclusive updates.
           </p>
         </div>
-          </div>
-        </div>
       </main>
 
       <BlogFooter />
-
     </div>
   )
 }
