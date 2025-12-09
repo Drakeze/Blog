@@ -51,7 +51,7 @@ export default function SubscribePage() {
 
       <main className="mx-auto max-w-4xl px-4 py-20 md:px-6">
         <div className="mb-12 text-center">
-          <h1 className="mb-3 text-balance">Subscribe for updates</h1>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4 text-balance">Subscribe for updates</h1>
           <p className="text-lg text-muted-foreground text-balance md:text-xl">
             Get notified when I publish new content across my platforms
           </p>
@@ -60,7 +60,9 @@ export default function SubscribePage() {
         <div className="mb-10 rounded-2xl border border-border bg-card/60 p-8 shadow-sm">
           <h2 className="mb-4 text-2xl font-semibold">About</h2>
           <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
-            My name is Zen. I share thoughts on engineering, learning, productivity, and building Soren Tech and Earth Plus.
+            I'm Zen — documenting my journey building Soren Tech, Earth Plus, and mastering full-stack engineering. This
+            blog collects my posts from Twitter, Reddit, LinkedIn, Patreon, and my personal writing into one place. If
+            you want more behind-the-scenes updates or want to support the work, Patreon is where everything connects.
           </p>
         </div>
 
@@ -163,15 +165,8 @@ export default function SubscribePage() {
               </a>
             </Button>
           </div>
+
         </div>
-
-        <div className="mt-12 space-y-6">
-          <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6 text-center shadow-sm">
-            <p className="text-sm text-muted-foreground">
-              For deeper content and behind-the-scenes development updates, join the Patreon.
-            </p>
-          </div>
-
           <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-2xl border border-border bg-card/60 p-5 text-left shadow-sm">
               <p className="mb-2 text-sm font-semibold text-muted-foreground">Socials</p>
@@ -203,18 +198,21 @@ export default function SubscribePage() {
                 </li>
               </ul>
             </div>
-
-            <div className="rounded-2xl border border-border bg-card/60 p-5 text-left shadow-sm">
-              <p className="mb-2 text-sm font-semibold text-muted-foreground">Why subscribe?</p>
-              <p className="text-sm text-foreground">
-                Stay updated on new posts across Blog, Reddit, Twitter, LinkedIn, and Patreon in a single digest.
-              </p>
-            </div>
+            <div className="mt-12 text-center p-6 bg-primary/5 rounded-2xl border border-primary/10">
+          <p className="text-sm text-muted-foreground">
+            Want more?{" "}
+            <a href="https://patreon.com" className="text-primary hover:underline font-medium">
+              Join the Patreon community
+            </a>{" "}
+            for deeper insights and exclusive updates.
+          </p>
+        </div>
           </div>
         </div>
       </main>
 
       <BlogFooter />
+
     </div>
   )
 }

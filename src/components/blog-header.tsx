@@ -35,7 +35,7 @@ export function BlogHeader() {
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <div className="flex h-16 items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2 rounded-full px-3 py-1 transition-colors hover:bg-accent">
-            <span className="text-lg font-serif font-bold tracking-tight">Thoughts</span>
+            <span className="text-lg font-serif font-bold tracking-tight">Thinking Outside The Box</span>
           </Link>
 
           <nav className="flex flex-wrap items-center gap-3 md:gap-6 text-sm">

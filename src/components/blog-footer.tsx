@@ -38,7 +38,7 @@ export function BlogFooter() {
             <h4 className="font-semibold mb-4">Connect</h4>
             <div className="flex gap-4">
               <a
-                href="https://github.com"
+                href="https://github.com/Drakeze"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground transition-colors"
@@ -47,7 +47,7 @@ export function BlogFooter() {
                 <span className="sr-only">GitHub</span>
               </a>
               <a
-                href="https://twitter.com"
+                href="https://x.com/SorenIdeas"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground transition-colors"
@@ -56,7 +56,7 @@ export function BlogFooter() {
                 <span className="sr-only">Twitter</span>
               </a>
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/in/anthonyshead/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground transition-colors"
