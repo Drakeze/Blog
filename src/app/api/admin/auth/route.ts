@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 
 import { ADMIN_COOKIE_NAME, adminCookieConfig, isAdminAuthorized } from "@/lib/auth"
+import { env } from "@/lib/env"
 
 export async function GET() {
   const authorized = isAdminAuthorized()
@@ -10,7 +11,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const body = await request.json()
   const { password } = body ?? {}
-  const expectedPassword = process.env.ADMIN_PASSWORD
+  const expectedPassword = env.ADMIN_PASSWORD
 
   if (!expectedPassword) {
     return NextResponse.json({ error: "Admin password is not configured." }, { status: 500 })

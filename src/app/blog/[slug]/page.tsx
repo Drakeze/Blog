@@ -1,11 +1,12 @@
 import { notFound } from "next/navigation"
+import { Share2, ExternalLink } from "lucide-react"
+
 import { BlogFooter } from "@/components/blog-footer"
 import { BlogHeader } from "@/components/blog-header"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Share2, ExternalLink } from "lucide-react"
-
 import { getPostBySlug } from "@/data/posts"
+import { publicEnv } from "@/lib/env"
 
 export default function BlogPostPage({ params }: { params: { slug: string } }) {
   const post = getPostBySlug(params.slug)
@@ -30,7 +31,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
     patreon: "Patreon",
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
+  const siteUrl = publicEnv.NEXT_PUBLIC_SITE_URL
   const postUrl = `${siteUrl}/blog/${post.slug}`
 
   return (
@@ -61,9 +62,9 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
               <Badge className={`${sourceColors[post.source]} px-3 py-1.5 text-xs font-semibold tracking-tight shadow-sm`}>
                 {sourceLabels[post.source]}
               </Badge>
-              {post.source !== "blog" && post.sourceURL && (
+              {post.source !== "blog" && post.externalUrl && (
                 <Button variant="outline" size="sm" asChild className="rounded-full border-border px-4">
-                  <a href={post.sourceURL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                  <a href={post.externalUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                     <ExternalLink className="h-4 w-4" />
                     View Original
                   </a>

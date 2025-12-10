@@ -1,10 +1,10 @@
 "use client"
 
-import Link from "next/link"
 import { useMemo, useState } from "react"
 
+import { AdminTableActions } from "@/components/admin/AdminTableActions"
+import { StatusBadge } from "@/components/admin/StatusBadge"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Pagination } from "@/components/ui/pagination"
@@ -79,22 +79,6 @@ export default function PostTable({ posts }: PostTableProps) {
   const totalPages = Math.max(1, Math.ceil(filteredPosts.length / PAGE_SIZE))
   const startIndex = (currentPage - 1) * PAGE_SIZE
   const pagedPosts = filteredPosts.slice(startIndex, startIndex + PAGE_SIZE)
-
-  const handleDelete = async (id: number, title: string) => {
-    const confirmed = window.confirm(`Delete "${title}"? This cannot be undone.`)
-    if (!confirmed) return
-
-    setError(null)
-    try {
-      const response = await fetch(`/api/posts/${id}`, { method: "DELETE" })
-      if (!response.ok) {
-        throw new Error("Unable to delete post")
-      }
-      window.location.reload()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete post")
-    }
-  }
 
   return (
     <Card className="shadow-sm">
@@ -212,33 +196,11 @@ export default function PostTable({ posts }: PostTableProps) {
                 <td className="px-6 py-4 capitalize text-muted-foreground">{post.source}</td>
                 <td className="px-6 py-4 text-muted-foreground">{post.readTime}</td>
                 <td className="px-6 py-4 capitalize text-muted-foreground">
-                  <Badge
-                    variant={post.status === "published" ? "default" : "secondary"}
-                    className={
-                      post.status === "published"
-                        ? "rounded-full bg-emerald-500/15 text-emerald-700 shadow-none"
-                        : "rounded-full bg-muted text-foreground/80 shadow-none"
-                    }
-                  >
-                    {post.status}
-                  </Badge>
+                  <StatusBadge status={post.status} />
                 </td>
                 <td className="px-6 py-4 text-muted-foreground">{new Date(post.createdAt).toLocaleDateString()}</td>
                 <td className="px-6 py-4">
-                  <div className="flex flex-wrap gap-2 text-xs font-semibold">
-                    <Button asChild variant="outline" size="sm" className="rounded-full px-4">
-                      <Link href={`/admin/edit/${post.id}`}>Edit</Link>
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="rounded-full text-destructive hover:bg-destructive/10"
-                      onClick={() => void handleDelete(post.id, post.title)}
-                    >
-                      Delete
-                    </Button>
-                  </div>
+                  <AdminTableActions postId={post.id} postTitle={post.title} onDeleteError={setError} />
                 </td>
               </tr>
             ))}

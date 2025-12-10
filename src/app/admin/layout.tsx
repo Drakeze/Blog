@@ -1,8 +1,9 @@
 import type { ReactNode } from "react"
 
+import { AdminLayout } from "@/components/admin/AdminLayout"
 import { requireAdmin } from "@/lib/auth"
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
+export default function AdminRootLayout({ children }: { children: ReactNode }) {
   requireAdmin()
-  return children
+  return <AdminLayout>{children}</AdminLayout>
 }

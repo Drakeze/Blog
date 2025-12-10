@@ -18,10 +18,10 @@ export interface BlogPost {
   source: PostSource
   slug: string
   heroImage?: string
-  sourceURL?: string
+  externalUrl?: string
   createdAt: string
   updatedAt: string
-  externalID?: string
+  externalId?: string
   status: PostStatus
 }
 
@@ -48,12 +48,12 @@ const createPostSchema = z
     tags: z.array(z.string().trim().min(1)).default([]),
     readTimeMinutes: z.number().int().positive().optional(),
     source: z.enum(postSources, { errorMap: () => ({ message: "Invalid source." }) }),
-    sourceURL: z.string().url().optional(),
+    externalUrl: z.string().url().optional(),
     heroImage: z.string().url().optional(),
     slug: z.string().trim().min(1, "Slug is required.").optional(),
     createdAt: z.string().datetime().optional(),
-    externalID: z.string().trim().optional(),
-    status: z.enum(postStatuses, { errorMap: () => ({ message: "Invalid status." }) }).optional(),
+    externalId: z.string().trim().optional(),
+    status: z.enum(postStatuses, { errorMap: () => ({ message: "Invalid status." }) }).default("draft"),
   })
   .strict()
 
@@ -105,7 +105,7 @@ const seedPosts: BlogPost[] = [
     source: "blog",
     slug: "getting-started-nextjs-15",
     tags: ["nextjs", "react", "tutorial"],
-    sourceURL: "https://yourblog.com/getting-started-nextjs-15",
+    externalUrl: "https://yourblog.com/getting-started-nextjs-15",
     heroImage: "/modern-web-development.png",
     status: "published",
   },
@@ -150,7 +150,7 @@ const seedPosts: BlogPost[] = [
     source: "linkedin",
     slug: "mastering-tailwind-css",
     tags: ["tailwind", "css", "design"],
-    sourceURL: "https://yourblog.com/mastering-tailwind-css",
+    externalUrl: "https://yourblog.com/mastering-tailwind-css",
     heroImage: "/design-system-components.png",
     status: "published",
   },
@@ -194,7 +194,7 @@ const seedPosts: BlogPost[] = [
     source: "blog",
     slug: "scalable-react-applications",
     tags: ["react", "architecture", "development"],
-    sourceURL: "https://yourblog.com/scalable-react-applications",
+    externalUrl: "https://yourblog.com/scalable-react-applications",
     heroImage: "/ai-coding-assistant.jpg",
     status: "published",
   },
@@ -237,7 +237,7 @@ const seedPosts: BlogPost[] = [
     source: "blog",
     slug: "typescript-best-practices-2024",
     tags: ["typescript", "javascript", "development"],
-    sourceURL: "https://yourblog.com/typescript-best-practices-2024",
+    externalUrl: "https://yourblog.com/typescript-best-practices-2024",
     heroImage: "/typescript-code.png",
     status: "published",
   },
@@ -279,7 +279,7 @@ const seedPosts: BlogPost[] = [
     source: "patreon",
     slug: "modern-css-grid-layouts",
     tags: ["css", "grid", "layout"],
-    sourceURL: "https://yourblog.com/modern-css-grid-layouts",
+    externalUrl: "https://yourblog.com/modern-css-grid-layouts",
     heroImage: "/modern-web-development-abstract.jpg",
     status: "published",
   },
@@ -328,7 +328,7 @@ const seedPosts: BlogPost[] = [
     source: "reddit",
     slug: "api-design-nodejs-express",
     tags: ["nodejs", "express", "api"],
-    sourceURL: "https://yourblog.com/api-design-nodejs-express",
+    externalUrl: "https://yourblog.com/api-design-nodejs-express",
     heroImage: "/website-performance-metrics.jpg",
     status: "published",
   },
@@ -474,9 +474,9 @@ export function addPost(input: unknown): BlogPost {
     source: parsed.source,
     slug,
     tags: sanitizeTags(parsed.tags),
-    sourceURL: parsed.sourceURL,
+    externalUrl: parsed.externalUrl,
     heroImage: parsed.heroImage,
-    externalID: parsed.externalID,
+    externalId: parsed.externalId,
     status: parsed.status ?? "draft",
   })
 
@@ -512,9 +512,9 @@ export function updatePost(id: number, updates: unknown): BlogPost | undefined {
     slug,
     readTimeMinutes,
     readTime: buildReadTime(readTimeMinutes),
-    sourceURL: parsed.sourceURL ?? existing.sourceURL,
+    externalUrl: parsed.externalUrl ?? existing.externalUrl,
     heroImage: parsed.heroImage ?? existing.heroImage,
-    externalID: parsed.externalID ?? existing.externalID,
+    externalId: parsed.externalId ?? existing.externalId,
     status: parsed.status ?? existing.status,
     updatedAt: new Date().toISOString(),
   })
