@@ -6,7 +6,7 @@ node_modules/
 # Bun
 .bun/
 
-# Next.js
+# Next.js build output
 .next/
 out/
 .next-env.d.ts
@@ -18,25 +18,38 @@ yarn-error.log*
 pnpm-debug.log*
 bun-debug.log*
 
-# Env files
+# Environment files (REAL SECRETS — DO NOT COMMIT)
 .env
-.env.*.local
+.env.local
+.env.development
+.env.development.local
+.env.production
+.env.production.local
+.env.test
+.env.test.local
 
-# OS
+# NOTE: .env.example is NOT ignored (it MUST remain in repo)
+# Make sure .env.example contains ONLY placeholder values.
+
+# OS files
 .DS_Store
 Thumbs.db
 
-# Build output
+# Build artifacts
 build/
 dist/
 coverage/
 
-# Vercel
-.vercel
+# Vercel deployment config
+.vercel/
 
-# Typescript
+# TypeScript build files
 *.tsbuildinfo
 
-# Editor
+# Editor / IDE
 .vscode/
 *.swp
+
+# Optional: VS Code settings override
+!.vscode/settings.json
+!.vscode/extensions.json

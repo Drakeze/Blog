@@ -15,12 +15,12 @@ export const adminCookieConfig = {
   maxAge: ADMIN_COOKIE_MAX_AGE,
 }
 
-export function isAdminAuthorized() {
-  return cookies().get(ADMIN_COOKIE_NAME)?.value === "true"
+export async function isAdminAuthorized() {
+  const cookieStore = await cookies()
+  return cookieStore.get(ADMIN_COOKIE_NAME)?.value === "true"
 }
-
-export function requireAdmin() {
-  if (!isAdminAuthorized()) {
+export async function requireAdmin() {
+  if (!(await isAdminAuthorized())) {
     redirect("/")
   }
 
