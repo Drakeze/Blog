@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Github, Twitter, Linkedin } from "lucide-react"
+import { Github, Twitter, Linkedin, Heart } from "lucide-react"
 
 export function BlogFooter() {
   return (
@@ -47,6 +47,15 @@ export function BlogFooter() {
                 <span className="sr-only">GitHub</span>
               </a>
               <a
+                href="https://github.com/DrakezeWind"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Github className="h-5 w-5" />
+                <span className="sr-only">GitHub</span>
+              </a>
+              <a
                 href="https://x.com/SorenIdeas"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -63,6 +72,15 @@ export function BlogFooter() {
               >
                 <Linkedin className="h-5 w-5" />
                 <span className="sr-only">LinkedIn</span>
+              </a>
+              <a
+                href="https://www.patreon.com/SorenTech"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Heart className="h-5 w-5" />
+                <span className="sr-only">Patreon</span>
               </a>
             </div>
           </div>
