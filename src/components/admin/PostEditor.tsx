@@ -64,10 +64,10 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
         readTimeMinutes: formState.readTimeMinutes ?? 5,
         source: (formState.source as PostSource) ?? "blog",
         slug: formState.slug,
-        sourceURL: formState.sourceURL,
+        externalUrl: formState.externalUrl,
         heroImage: formState.heroImage,
         createdAt: formState.createdAt,
-        externalID: formState.externalID,
+        externalId: formState.externalId,
         status: (formState.status as PostStatus) ?? "draft",
       }
 
@@ -244,12 +244,12 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
                 </select>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="sourceUrl">Source URL</Label>
+                <Label htmlFor="externalUrl">External URL</Label>
                 <Input
-                  id="sourceUrl"
+                  id="externalUrl"
                   type="url"
-                  value={formState.sourceURL ?? ""}
-                  onChange={(event) => handleFieldChange("sourceURL", event.target.value)}
+                  value={formState.externalUrl ?? ""}
+                  onChange={(event) => handleFieldChange("externalUrl", event.target.value)}
                   placeholder="https://example.com/original-post"
                 />
               </div>
@@ -268,8 +268,8 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
                 <Input
                   id="externalId"
                   type="text"
-                  value={formState.externalID ?? ""}
-                  onChange={(event) => handleFieldChange("externalID", event.target.value)}
+                  value={formState.externalId ?? ""}
+                  onChange={(event) => handleFieldChange("externalId", event.target.value)}
                   placeholder="Reference ID for third-party links"
                 />
               </div>
