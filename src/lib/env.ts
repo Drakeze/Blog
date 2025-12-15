@@ -41,4 +41,42 @@ export const publicEnv = {
   NEXT_PUBLIC_TWITTER_URL: env.NEXT_PUBLIC_TWITTER_URL,
 }
 
+type PlatformConfig<TKeys extends Record<string, string | undefined>> = {
+  enabled: boolean
+  missingKeys: string[]
+  keys: TKeys
+}
+
+function buildPlatformConfig<TKeys extends Record<string, string | undefined>>(keys: TKeys): PlatformConfig<TKeys> {
+  const missingKeys = Object.entries(keys)
+    .filter(([, value]) => !value)
+    .map(([key]) => key)
+
+  return {
+    enabled: missingKeys.length === 0,
+    missingKeys,
+    keys,
+  }
+}
+
+export const socialConfig = {
+  reddit: buildPlatformConfig({
+    clientId: env.REDDIT_CLIENT_ID,
+    clientSecret: env.REDDIT_CLIENT_SECRET,
+    userAgent: env.REDDIT_USER_AGENT,
+  }),
+  linkedin: buildPlatformConfig({
+    accessToken: env.LINKEDIN_ACCESS_TOKEN,
+  }),
+  patreon: buildPlatformConfig({
+    accessToken: env.PATREON_ACCESS_TOKEN,
+    campaignId: env.PATREON_CAMPAIGN_ID,
+  }),
+  twitter: buildPlatformConfig({
+    bearerToken: env.TWITTER_BEARER_TOKEN,
+  }),
+}
+
+export type SocialPlatform = keyof typeof socialConfig
+
 export type Env = typeof env
