@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum PostSource {
+  blog
+  reddit
+  linkedin
+  patreon
+  twitter
+}
+
+enum PostStatus {
+  draft
+  published
+}
+
+model Post {
+  id              String     @id @default(auto()) @map("_id") @db.ObjectId
+  slug            String     @unique
+  title           String
+  excerpt         String
+  content         String
+  source          PostSource
+  externalId      String?
+  externalUrl     String?
+  heroImage       String?
+  category        String?
+  tags            String[]
+  status          PostStatus
+  readTime        String
+  readTimeMinutes Int
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@unique([source, externalId])
+  @@index([status, createdAt])
+}
