@@ -4,13 +4,14 @@ import { BackButton } from "@/components/admin/BackButton"
 import PostEditor from "@/components/admin/PostEditor"
 import { getPostById } from "@/data/posts"
 
-export default function EditPostPage({ params }: { params: { id: string } }) {
-  const postId = Number(params.id)
-  if (!Number.isFinite(postId)) {
+export default async function EditPostPage({ params }: { params: { id: string } }) {
+  const postId = params.id
+
+  if (!/^[a-f0-9]{24}$/i.test(postId)) {
     notFound()
   }
 
-  const post = getPostById(postId)
+  const post = await getPostById(postId)
   if (!post) {
     notFound()
   }

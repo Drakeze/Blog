@@ -1,28 +1,22 @@
+import { Prisma, type Post, PostSource as PrismaPostSource, PostStatus as PrismaPostStatus } from "@prisma/client"
 import { z } from "zod"
 
-export const postSources = ["blog", "reddit", "twitter", "linkedin", "patreon"] as const
-export type PostSource = (typeof postSources)[number]
+import { prisma } from "@/lib/prisma"
 
-export const postStatuses = ["draft", "published"] as const
-export type PostStatus = (typeof postStatuses)[number]
+export type PostSource = PrismaPostSource
 
-export interface BlogPost {
-  id: number
-  title: string
-  excerpt: string
-  content: string
-  readTime: string
-  readTimeMinutes: number
-  tags: string[]
-  category: string
-  source: PostSource
-  slug: string
-  heroImage?: string
-  externalUrl?: string
+export type PostStatus = PrismaPostStatus
+
+export const postSources = Object.values(PrismaPostSource) as PostSource[]
+export const postStatuses = Object.values(PrismaPostStatus) as PostStatus[]
+
+export type BlogPost = Omit<Post, "createdAt" | "updatedAt" | "externalId" | "externalUrl" | "heroImage" | "category"> & {
   createdAt: string
   updatedAt: string
-  externalId?: string
-  status: PostStatus
+  category: string
+  externalId?: string | null
+  externalUrl?: string | null
+  heroImage?: string | null
 }
 
 export type BlogPostSummary = Omit<BlogPost, "content">
@@ -44,16 +38,18 @@ const createPostSchema = z
     title: z.string().trim().min(1, "Title is required."),
     excerpt: z.string().trim().min(1, "Excerpt is required."),
     content: z.string().trim().min(1, "Content is required."),
-    category: z.string().trim().min(1, "Category is required."),
+    category: z.string().trim().min(1, "Category is required.").default("General"),
     tags: z.array(z.string().trim().min(1)).default([]),
     readTimeMinutes: z.number().int().positive().optional(),
-    source: z.enum(postSources, { errorMap: () => ({ message: "Invalid source." }) }),
+    source: z.nativeEnum(PrismaPostSource, { errorMap: () => ({ message: "Invalid source." }) }),
     externalUrl: z.string().url().optional(),
     heroImage: z.string().url().optional(),
     slug: z.string().trim().min(1, "Slug is required.").optional(),
     createdAt: z.string().datetime().optional(),
     externalId: z.string().trim().optional(),
-    status: z.enum(postStatuses, { errorMap: () => ({ message: "Invalid status." }) }).default("draft"),
+    status: z.nativeEnum(PrismaPostStatus, { errorMap: () => ({ message: "Invalid status." }) }).default(
+      PrismaPostStatus.draft,
+    ),
   })
   .strict()
 
@@ -61,278 +57,6 @@ const updatePostSchema = createPostSchema.partial().strict()
 
 export type CreatePostInput = z.infer<typeof createPostSchema>
 export type UpdatePostInput = z.infer<typeof updatePostSchema>
-
-const seedPosts: BlogPost[] = [
-  {
-    id: 1,
-    title: "Getting Started with Next.js 15",
-    excerpt:
-      "Learn how to build modern web applications with the latest features in Next.js 15, including improved performance and developer experience.",
-    content: `
-      <h2>Introduction</h2>
-      <p>Next.js 15 brings exciting new features and improvements that make building modern web applications even more enjoyable. In this comprehensive guide, we'll explore the key features and how to get started.</p>
-
-      <h2>What's New in Next.js 15</h2>
-      <p>The latest version of Next.js introduces several groundbreaking features:</p>
-      <ul>
-        <li><strong>Improved Performance:</strong> Faster build times and optimized runtime performance</li>
-        <li><strong>Enhanced Developer Experience:</strong> Better error messages and debugging tools</li>
-        <li><strong>New App Router Features:</strong> More flexible routing and layout options</li>
-        <li><strong>Server Components:</strong> Better server-side rendering capabilities</li>
-      </ul>
-
-      <h2>Getting Started</h2>
-      <p>To create a new Next.js 15 project, run the following command:</p>
-      <pre><code>npx create-next-app@latest my-app --typescript --tailwind --eslint</code></pre>
-
-      <h2>Key Features to Explore</h2>
-      <p>Once you have your project set up, here are some key areas to focus on:</p>
-      <ol>
-        <li>Understanding the App Router</li>
-        <li>Working with Server and Client Components</li>
-        <li>Implementing dynamic routing</li>
-        <li>Optimizing performance with built-in features</li>
-      </ol>
-
-      <h2>Conclusion</h2>
-      <p>Next.js 15 continues to push the boundaries of what's possible with React applications. Whether you're building a simple blog or a complex web application, Next.js provides the tools and performance you need.</p>
-    `,
-    createdAt: "2024-01-15T00:00:00.000Z",
-    updatedAt: "2024-01-18T00:00:00.000Z",
-    readTime: "5 min read",
-    readTimeMinutes: 5,
-    category: "Tutorial",
-    source: "blog",
-    slug: "getting-started-nextjs-15",
-    tags: ["nextjs", "react", "tutorial"],
-    externalUrl: "https://yourblog.com/getting-started-nextjs-15",
-    heroImage: "/modern-web-development.png",
-    status: "published",
-  },
-  {
-    id: 2,
-    title: "Mastering Tailwind CSS for Modern UI",
-    excerpt:
-      "Discover advanced Tailwind CSS techniques to create beautiful, responsive user interfaces with utility-first CSS framework.",
-    content: `
-      <h2>Why Tailwind CSS?</h2>
-      <p>Tailwind CSS has revolutionized how we approach styling in modern web development. Its utility-first approach allows for rapid prototyping and consistent design systems.</p>
-
-      <h2>Advanced Techniques</h2>
-      <p>Let's explore some advanced Tailwind CSS techniques that will elevate your UI development:</p>
-
-      <h3>Custom Color Palettes</h3>
-      <p>Creating custom color palettes in Tailwind allows you to maintain brand consistency across your application.</p>
-
-      <h3>Responsive Design Patterns</h3>
-      <p>Tailwind's responsive utilities make it easy to create designs that work across all device sizes:</p>
-      <ul>
-        <li>Mobile-first approach</li>
-        <li>Breakpoint-specific utilities</li>
-        <li>Container queries</li>
-      </ul>
-
-      <h3>Component Composition</h3>
-      <p>Learn how to compose reusable components while maintaining the utility-first philosophy.</p>
-
-      <h2>Best Practices</h2>
-      <ol>
-        <li>Use semantic class names for complex components</li>
-        <li>Leverage Tailwind's configuration for consistency</li>
-        <li>Optimize for production with purging</li>
-      </ol>
-    `,
-    createdAt: "2024-01-10T00:00:00.000Z",
-    updatedAt: "2024-01-12T00:00:00.000Z",
-    readTime: "8 min read",
-    readTimeMinutes: 8,
-    category: "Design",
-    source: "linkedin",
-    slug: "mastering-tailwind-css",
-    tags: ["tailwind", "css", "design"],
-    externalUrl: "https://yourblog.com/mastering-tailwind-css",
-    heroImage: "/design-system-components.png",
-    status: "published",
-  },
-  {
-    id: 3,
-    title: "Building Scalable React Applications",
-    excerpt:
-      "Best practices and patterns for building large-scale React applications that are maintainable and performant.",
-    content: `
-      <h2>Architecture Principles</h2>
-      <p>Building scalable React applications requires careful consideration of architecture from the start. Here are the key principles to follow:</p>
-
-      <h3>Component Organization</h3>
-      <p>Organize your components in a logical hierarchy that promotes reusability and maintainability.</p>
-
-      <h3>State Management</h3>
-      <p>Choose the right state management solution for your application's complexity:</p>
-      <ul>
-        <li>Local state for simple components</li>
-        <li>Context API for shared state</li>
-        <li>Redux or Zustand for complex applications</li>
-      </ul>
-
-      <h2>Performance Optimization</h2>
-      <p>Performance is crucial for user experience. Key optimization techniques include:</p>
-      <ol>
-        <li>Code splitting and lazy loading</li>
-        <li>Memoization with React.memo and useMemo</li>
-        <li>Virtual scrolling for large lists</li>
-        <li>Image optimization</li>
-      </ol>
-
-      <h2>Testing Strategy</h2>
-      <p>A comprehensive testing strategy ensures your application remains reliable as it grows.</p>
-    `,
-    createdAt: "2024-01-05T00:00:00.000Z",
-    updatedAt: "2024-01-07T00:00:00.000Z",
-    readTime: "12 min read",
-    readTimeMinutes: 12,
-    category: "Development",
-    source: "blog",
-    slug: "scalable-react-applications",
-    tags: ["react", "architecture", "development"],
-    externalUrl: "https://yourblog.com/scalable-react-applications",
-    heroImage: "/ai-coding-assistant.jpg",
-    status: "published",
-  },
-  {
-    id: 4,
-    title: "TypeScript Best Practices in 2024",
-    excerpt:
-      "Essential TypeScript patterns and practices that every developer should know for writing better, more maintainable code.",
-    content: `
-      <h2>Modern TypeScript Features</h2>
-      <p>TypeScript continues to evolve with new features that improve developer experience and code safety.</p>
-
-      <h3>Advanced Type Patterns</h3>
-      <p>Master these advanced TypeScript patterns:</p>
-      <ul>
-        <li>Conditional types</li>
-        <li>Mapped types</li>
-        <li>Template literal types</li>
-        <li>Utility types</li>
-      </ul>
-
-      <h2>Configuration Best Practices</h2>
-      <p>Proper TypeScript configuration is essential for a good development experience:</p>
-      <pre><code>{
-  "compilerOptions": {
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true
-  }
-}</code></pre>
-
-      <h2>Error Handling</h2>
-      <p>TypeScript's type system can help you handle errors more effectively and catch issues at compile time.</p>
-    `,
-    createdAt: "2024-01-01T00:00:00.000Z",
-    updatedAt: "2024-01-02T00:00:00.000Z",
-    readTime: "10 min read",
-    readTimeMinutes: 10,
-    category: "Development",
-    source: "blog",
-    slug: "typescript-best-practices-2024",
-    tags: ["typescript", "javascript", "development"],
-    externalUrl: "https://yourblog.com/typescript-best-practices-2024",
-    heroImage: "/typescript-code.png",
-    status: "published",
-  },
-  {
-    id: 5,
-    title: "Modern CSS Grid Layouts",
-    excerpt:
-      "Master CSS Grid to create complex, responsive layouts with ease. Learn the fundamentals and advanced techniques.",
-    content: `
-      <h2>CSS Grid Fundamentals</h2>
-      <p>CSS Grid is a powerful layout system that allows you to create complex, responsive layouts with ease.</p>
-
-      <h3>Grid Container Properties</h3>
-      <p>Understanding the key properties of grid containers:</p>
-      <ul>
-        <li>display: grid</li>
-        <li>grid-template-columns</li>
-        <li>grid-template-rows</li>
-        <li>gap</li>
-      </ul>
-
-      <h2>Advanced Grid Techniques</h2>
-      <p>Take your grid skills to the next level with these advanced techniques:</p>
-
-      <h3>Named Grid Lines</h3>
-      <p>Use named grid lines to create more semantic and maintainable layouts.</p>
-
-      <h3>Grid Areas</h3>
-      <p>Define grid areas for complex layouts that are easy to understand and modify.</p>
-
-      <h2>Responsive Grid Patterns</h2>
-      <p>Create responsive layouts that adapt to different screen sizes without media queries.</p>
-    `,
-    createdAt: "2023-12-28T00:00:00.000Z",
-    updatedAt: "2023-12-28T00:00:00.000Z",
-    readTime: "7 min read",
-    readTimeMinutes: 7,
-    category: "Design",
-    source: "patreon",
-    slug: "modern-css-grid-layouts",
-    tags: ["css", "grid", "layout"],
-    externalUrl: "https://yourblog.com/modern-css-grid-layouts",
-    heroImage: "/modern-web-development-abstract.jpg",
-    status: "published",
-  },
-  {
-    id: 6,
-    title: "API Design with Node.js and Express",
-    excerpt:
-      "Learn how to design and build robust RESTful APIs using Node.js and Express with best practices and security considerations.",
-    content: `
-      <h2>RESTful API Design Principles</h2>
-      <p>Building robust APIs requires following established design principles and best practices.</p>
-
-      <h3>Resource-Based URLs</h3>
-      <p>Design your API endpoints around resources rather than actions:</p>
-      <ul>
-        <li>GET /api/users - Get all users</li>
-        <li>GET /api/users/:id - Get specific user</li>
-        <li>POST /api/users - Create new user</li>
-        <li>PUT /api/users/:id - Update user</li>
-        <li>DELETE /api/users/:id - Delete user</li>
-      </ul>
-
-      <h2>Express.js Best Practices</h2>
-      <p>Key practices for building maintainable Express applications:</p>
-      <ol>
-        <li>Use middleware for cross-cutting concerns</li>
-        <li>Implement proper error handling</li>
-        <li>Structure your application with routers</li>
-        <li>Use environment variables for configuration</li>
-      </ol>
-
-      <h2>Security Considerations</h2>
-      <p>Security should be built into your API from the ground up:</p>
-      <ul>
-        <li>Input validation and sanitization</li>
-        <li>Authentication and authorization</li>
-        <li>Rate limiting</li>
-        <li>CORS configuration</li>
-      </ul>
-    `,
-    createdAt: "2023-12-20T00:00:00.000Z",
-    updatedAt: "2023-12-22T00:00:00.000Z",
-    readTime: "15 min read",
-    readTimeMinutes: 15,
-    category: "Backend",
-    source: "reddit",
-    slug: "api-design-nodejs-express",
-    tags: ["nodejs", "express", "api"],
-    externalUrl: "https://yourblog.com/api-design-nodejs-express",
-    heroImage: "/website-performance-metrics.jpg",
-    status: "published",
-  },
-]
 
 function normalizeSlug(raw: string) {
   const slug = raw
@@ -374,63 +98,81 @@ function estimateReadTime(content: string, overrideMinutes?: number) {
   return normalizeReadTime(Math.ceil(words / WORDS_PER_MINUTE))
 }
 
-function normalizePost(post: BlogPost): BlogPost {
-  const slug = normalizeSlug(post.slug)
-  const readTimeMinutes = normalizeReadTime(post.readTimeMinutes)
-  const tags = sanitizeTags(post.tags)
-  const status: PostStatus = postStatuses.includes(post.status) ? post.status : "draft"
-
+function toBlogPost(post: Post): BlogPost {
   return {
     ...post,
-    slug,
-    tags,
-    readTimeMinutes,
-    readTime: buildReadTime(readTimeMinutes),
-    status,
+    createdAt: post.createdAt.toISOString(),
+    updatedAt: post.updatedAt.toISOString(),
+    externalId: post.externalId ?? undefined,
+    externalUrl: post.externalUrl ?? undefined,
+    heroImage: post.heroImage ?? undefined,
+    category: post.category ?? "General",
   }
 }
 
-let postStore: BlogPost[] = seedPosts.map(normalizePost)
+async function ensureUniqueSlug(slug: string, currentId?: string) {
+  const existing = await prisma.post.findFirst({
+    where: {
+      slug,
+      NOT: currentId ? { id: currentId } : undefined,
+    },
+  })
 
-function getNextId() {
-  return postStore.reduce((max, post) => Math.max(max, post.id), 0) + 1
-}
-
-function ensureUniqueSlug(slug: string, currentId?: number) {
-  const duplicate = postStore.find((post) => post.slug === slug && post.id !== currentId)
-  if (duplicate) {
+  if (existing) {
     throw new PostValidationError("Slug already exists.", 409)
   }
 }
 
-export function getAllPosts(includeDrafts = false): BlogPost[] {
-  const visiblePosts = includeDrafts
-    ? [...postStore]
-    : postStore.filter((post) => post.status === "published")
+export async function getAllPosts(includeDrafts = false): Promise<BlogPost[]> {
+  const posts = await prisma.post.findMany({
+    where: includeDrafts
+      ? {}
+      : {
+          status: PrismaPostStatus.published,
+        },
+    orderBy: { createdAt: "desc" },
+  })
 
-  return visiblePosts.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  )
+  return posts.map(toBlogPost)
 }
 
-export function getPostBySlug(slug: string, includeDrafts = false): BlogPost | undefined {
+export async function getPostBySlug(slug: string, includeDrafts = false): Promise<BlogPost | undefined> {
   const normalizedSlug = normalizeSlug(slug)
-  return getAllPosts(includeDrafts).find((post) => post.slug === normalizedSlug)
+  const post = await prisma.post.findFirst({
+    where: {
+      slug: normalizedSlug,
+      ...(includeDrafts ? {} : { status: PrismaPostStatus.published }),
+    },
+  })
+
+  return post ? toBlogPost(post) : undefined
 }
 
-export function getPostById(id: number): BlogPost | undefined {
-  return postStore.find((post) => post.id === id)
+export async function getPostById(id: string): Promise<BlogPost | undefined> {
+  const post = await prisma.post.findUnique({
+    where: { id },
+  })
+  return post ? toBlogPost(post) : undefined
 }
 
-export function getPostSummaries(limit?: number, includeDrafts = false): BlogPostSummary[] {
-  const summaries = getAllPosts(includeDrafts).map(({ content, ...summary }) => summary)
-  if (typeof limit === "number") {
-    return summaries.slice(0, limit)
-  }
-  return summaries
+export async function getPostSummaries(limit?: number, includeDrafts = false): Promise<BlogPostSummary[]> {
+  const posts = await prisma.post.findMany({
+    where: includeDrafts
+      ? {}
+      : {
+          status: PrismaPostStatus.published,
+        },
+    orderBy: { createdAt: "desc" },
+    take: typeof limit === "number" ? limit : undefined,
+  })
+
+  return posts.map((post) => {
+    const { content: _content, ...rest } = toBlogPost(post)
+    return rest
+  })
 }
 
-export function filterPosts(
+export async function filterPosts(
   filters?: {
     tag?: string
     readTimeMinutes?: number
@@ -439,97 +181,188 @@ export function filterPosts(
     status?: PostStatus
   },
   includeDrafts = false,
-): BlogPost[] {
+): Promise<BlogPost[]> {
   const { tag, readTimeMinutes, createdAt, source, status } = filters ?? {}
-  return getAllPosts(includeDrafts).filter((post) => {
-    const tagMatch = tag ? post.tags.includes(tag) : true
-    const readTimeMatch =
-      typeof readTimeMinutes === "number" ? post.readTimeMinutes <= readTimeMinutes : true
-    const dateMatch = createdAt ? post.createdAt.startsWith(createdAt) : true
-    const sourceMatch = source ? post.source === source : true
-    const statusMatch = status ? post.status === status : true
-    return tagMatch && readTimeMatch && dateMatch && sourceMatch && statusMatch
+
+  const where: Prisma.PostWhereInput = {
+    ...(includeDrafts ? {} : { status: PrismaPostStatus.published }),
+  }
+
+  if (tag) {
+    where.tags = { has: tag }
+  }
+
+  if (typeof readTimeMinutes === "number") {
+    where.readTimeMinutes = { lte: readTimeMinutes }
+  }
+
+  if (createdAt) {
+    const start = new Date(createdAt)
+    if (!Number.isNaN(start.getTime())) {
+      const end = new Date(start)
+      end.setDate(end.getDate() + 1)
+      where.createdAt = { gte: start, lt: end }
+    }
+  }
+
+  if (source) {
+    where.source = source
+  }
+
+  if (status) {
+    where.status = status
+  }
+
+  const posts = await prisma.post.findMany({
+    where,
+    orderBy: { createdAt: "desc" },
   })
+
+  return posts.map(toBlogPost)
 }
 
-export function addPost(input: unknown): BlogPost {
+export async function addPost(input: unknown): Promise<BlogPost> {
   const parsed = createPostSchema.parse(input)
-  const now = new Date().toISOString()
+  const now = new Date()
 
   const slug = normalizeSlug(parsed.slug ?? parsed.title)
-  ensureUniqueSlug(slug)
+  await ensureUniqueSlug(slug)
 
   const readTimeMinutes = estimateReadTime(parsed.content, parsed.readTimeMinutes)
+  const tags = sanitizeTags(parsed.tags)
+  const externalId = parsed.externalId?.trim() || slug
 
-  const newPost: BlogPost = normalizePost({
-    id: getNextId(),
-    title: parsed.title.trim(),
-    excerpt: parsed.excerpt.trim(),
-    content: parsed.content,
-    createdAt: parsed.createdAt ?? now,
-    updatedAt: now,
-    readTimeMinutes,
-    readTime: buildReadTime(readTimeMinutes),
-    category: parsed.category.trim(),
-    source: parsed.source,
-    slug,
-    tags: sanitizeTags(parsed.tags),
-    externalUrl: parsed.externalUrl,
-    heroImage: parsed.heroImage,
-    externalId: parsed.externalId,
-    status: parsed.status ?? "draft",
+  const created = await prisma.post.create({
+    data: {
+      title: parsed.title.trim(),
+      excerpt: parsed.excerpt.trim(),
+      content: parsed.content.trim(),
+      createdAt: parsed.createdAt ? new Date(parsed.createdAt) : now,
+      readTimeMinutes,
+      readTime: buildReadTime(readTimeMinutes),
+      category: parsed.category.trim(),
+      source: parsed.source,
+      slug,
+      tags,
+      externalUrl: parsed.externalUrl,
+      heroImage: parsed.heroImage,
+      externalId,
+      status: parsed.status ?? PrismaPostStatus.draft,
+    },
   })
 
-  postStore = [newPost, ...postStore]
-  return newPost
+  return toBlogPost(created)
 }
 
-export function updatePost(id: number, updates: unknown): BlogPost | undefined {
-  const existing = getPostById(id)
+export async function updatePost(id: string, updates: unknown): Promise<BlogPost | undefined> {
+  const existing = await prisma.post.findUnique({ where: { id } })
   if (!existing) return undefined
 
   const parsed = updatePostSchema.parse(updates ?? {})
 
   const title = parsed.title?.trim() ?? existing.title
   const excerpt = parsed.excerpt?.trim() ?? existing.excerpt
-  const content = parsed.content ?? existing.content
-  const category = parsed.category?.trim() ?? existing.category
+  const content = parsed.content?.trim() ?? existing.content
+  const category = parsed.category?.trim() ?? existing.category ?? "General"
   const tags = parsed.tags ? sanitizeTags(parsed.tags) : existing.tags
   const source = parsed.source ?? existing.source
   const slug = normalizeSlug(parsed.slug ?? existing.slug ?? title)
-  ensureUniqueSlug(slug, id)
+  await ensureUniqueSlug(slug, id)
 
   const readTimeMinutes = estimateReadTime(content, parsed.readTimeMinutes ?? existing.readTimeMinutes)
 
-  const updatedPost: BlogPost = normalizePost({
-    ...existing,
-    title,
-    excerpt,
-    content,
-    category,
-    tags,
-    source,
-    slug,
-    readTimeMinutes,
-    readTime: buildReadTime(readTimeMinutes),
-    externalUrl: parsed.externalUrl ?? existing.externalUrl,
-    heroImage: parsed.heroImage ?? existing.heroImage,
-    externalId: parsed.externalId ?? existing.externalId,
-    status: parsed.status ?? existing.status,
-    updatedAt: new Date().toISOString(),
+  const updated = await prisma.post.update({
+    where: { id },
+    data: {
+      title,
+      excerpt,
+      content,
+      category,
+      tags,
+      source,
+      slug,
+      readTimeMinutes,
+      readTime: buildReadTime(readTimeMinutes),
+      externalUrl: parsed.externalUrl ?? existing.externalUrl,
+      heroImage: parsed.heroImage ?? existing.heroImage,
+      externalId: parsed.externalId ?? existing.externalId ?? slug,
+      status: parsed.status ?? existing.status,
+    },
   })
 
-  postStore = postStore.map((post) => (post.id === id ? updatedPost : post))
-  return updatedPost
+  return toBlogPost(updated)
 }
 
-export function removePost(id: number): boolean {
-  const exists = postStore.some((post) => post.id === id)
-  if (!exists) return false
-  postStore = postStore.filter((post) => post.id !== id)
-  return true
+export async function removePost(id: string): Promise<boolean> {
+  try {
+    await prisma.post.delete({ where: { id } })
+    return true
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
+      return false
+    }
+    throw error
+  }
 }
 
-export function resetPosts() {
-  postStore = seedPosts.map(normalizePost)
+export async function upsertExternalPost(input: unknown): Promise<BlogPost> {
+  const parsed = createPostSchema.parse(input)
+  const externalId = parsed.externalId?.trim()
+
+  if (!externalId) {
+    throw new PostValidationError("External ID is required for external posts.", 422)
+  }
+
+  const slug = normalizeSlug(parsed.slug ?? parsed.title)
+  const readTimeMinutes = estimateReadTime(parsed.content, parsed.readTimeMinutes)
+  const tags = sanitizeTags(parsed.tags)
+
+  const existing = await prisma.post.findUnique({
+    where: {
+      source_externalId: {
+        source: parsed.source,
+        externalId,
+      },
+    },
+  })
+
+  await ensureUniqueSlug(slug, existing?.id)
+
+  const post = existing
+    ? await prisma.post.update({
+        where: { id: existing.id },
+        data: {
+          title: parsed.title.trim(),
+          excerpt: parsed.excerpt.trim(),
+          content: parsed.content.trim(),
+          category: parsed.category.trim(),
+          tags,
+          slug,
+          readTimeMinutes,
+          readTime: buildReadTime(readTimeMinutes),
+          externalUrl: parsed.externalUrl ?? existing.externalUrl,
+          heroImage: parsed.heroImage ?? existing.heroImage,
+          status: parsed.status ?? existing.status,
+        },
+      })
+    : await prisma.post.create({
+        data: {
+          title: parsed.title.trim(),
+          excerpt: parsed.excerpt.trim(),
+          content: parsed.content.trim(),
+          category: parsed.category.trim(),
+          tags,
+          slug,
+          readTimeMinutes,
+          readTime: buildReadTime(readTimeMinutes),
+          source: parsed.source,
+          externalId,
+          externalUrl: parsed.externalUrl,
+          heroImage: parsed.heroImage,
+          status: parsed.status ?? PrismaPostStatus.published,
+          createdAt: parsed.createdAt ? new Date(parsed.createdAt) : new Date(),
+        },
+      })
+
+  return toBlogPost(post)
 }

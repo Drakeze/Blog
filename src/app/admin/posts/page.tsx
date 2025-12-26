@@ -4,8 +4,8 @@ import PostTable from "@/components/admin/PostTable"
 import { Button } from "@/components/ui/button"
 import { getPostSummaries } from "@/data/posts"
 
-export default function AdminPostsPage() {
-  const posts = getPostSummaries(undefined, true)
+export default async function AdminPostsPage() {
+  const posts = await getPostSummaries(undefined, true)
 
   return (
     <div className="space-y-8">

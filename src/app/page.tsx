@@ -4,8 +4,8 @@ import { BlogFooter } from "@/components/blog-footer"
 import { BlogCard } from "@/components/blog-card"
 import { getPostSummaries } from "@/data/posts"
 
-export default function HomePage() {
-  const recentPosts = getPostSummaries(3)
+export default async function HomePage() {
+  const recentPosts = await getPostSummaries(3)
 
   return (
     <div className="min-h-screen bg-background">

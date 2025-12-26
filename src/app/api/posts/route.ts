@@ -1,22 +1,17 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 
-import {
-  addPost,
-  filterPosts,
-  postSources,
-  postStatuses,
-  PostValidationError,
-  type PostStatus,
-} from "@/data/posts"
+import { Prisma } from "@prisma/client"
+
+import { addPost, filterPosts, PostValidationError, type PostStatus } from "@/data/posts"
 
 const querySchema = z
   .object({
     tag: z.string().trim().optional(),
     createdAt: z.string().trim().optional(),
     readTimeMinutes: z.coerce.number().int().positive().optional(),
-    source: z.enum(postSources).optional(),
-    status: z.union([z.enum(postStatuses), z.literal("all")]).optional(),
+    source: z.nativeEnum(Prisma.PostSource).optional(),
+    status: z.union([z.nativeEnum(Prisma.PostStatus), z.literal("all")]).optional(),
   })
   .strict()
 
@@ -42,8 +37,8 @@ export async function GET(request: Request) {
   }
 
   const { status, ...filters } = parsed.data
-  const includeDrafts = status === "all" || status === "draft"
-  const filtered = filterPosts(
+  const includeDrafts = status === "all" || status === Prisma.PostStatus.draft
+  const filtered = await filterPosts(
     {
       ...filters,
       status: status && status !== "all" ? (status as PostStatus) : undefined,
@@ -58,7 +53,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const newPost = addPost(body)
+    const newPost = await addPost(body)
     return NextResponse.json(newPost, { status: 201 })
   } catch (error) {
     return formatError(error)

@@ -1,8 +1,8 @@
 import {
-  addPost,
   PostValidationError,
   type BlogPost,
   type PostSource,
+  upsertExternalPost,
 } from "@/data/posts"
 
 import { fetchLinkedInPosts } from "./linkedin"
@@ -12,7 +12,7 @@ import { fetchTwitterPosts } from "./twitter"
 import { normalizeExternalPost } from "./utils"
 import type { PlatformFetchResult, PlatformImportReport } from "./types"
 
-function handleImportForPlatform(result: PlatformFetchResult) {
+async function handleImportForPlatform(result: PlatformFetchResult) {
   if (!result.enabled) {
     return {
       imported: [] as BlogPost[],
@@ -34,7 +34,7 @@ function handleImportForPlatform(result: PlatformFetchResult) {
   for (const payload of result.posts) {
     try {
       const normalized = normalizeExternalPost(payload)
-      const post = addPost(normalized)
+      const post = await upsertExternalPost(normalized)
       imported.push(post)
     } catch (error) {
       if (error instanceof PostValidationError) {
@@ -72,7 +72,7 @@ export async function importExternalPosts() {
 
   for (const fetcher of fetchers) {
     const result = await fetcher()
-    const { imported: platformPosts, report } = handleImportForPlatform(result)
+    const { imported: platformPosts, report } = await handleImportForPlatform(result)
     imported.push(...platformPosts)
     summary.push(report)
   }

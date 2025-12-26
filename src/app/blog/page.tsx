@@ -3,8 +3,8 @@ import { BlogFooter } from "@/components/blog-footer"
 import { BlogCollection } from "@/components/blog-collection"
 import { getPostSummaries } from "@/data/posts"
 
-export default function BlogPage() {
-  const posts = getPostSummaries()
+export default async function BlogPage() {
+  const posts = await getPostSummaries()
 
   return (
     <div className="min-h-screen bg-background">

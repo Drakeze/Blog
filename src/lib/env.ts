@@ -4,6 +4,7 @@ const serverSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   ADMIN_PASSWORD: z.string().min(1, "ADMIN_PASSWORD is required").default("admin"),
   AUTH_SECRET: z.string().min(1, "AUTH_SECRET is required").default("development-secret"),
+  DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   PATREON_ACCESS_TOKEN: z.string().optional(),
   PATREON_CAMPAIGN_ID: z.string().optional(),
   REDDIT_CLIENT_ID: z.string().optional(),
