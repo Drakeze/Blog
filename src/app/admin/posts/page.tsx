@@ -4,6 +4,9 @@ import PostTable from "@/components/admin/PostTable"
 import { Button } from "@/components/ui/button"
 import { getPostSummaries } from "@/data/posts"
 
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
+
 export default async function AdminPostsPage() {
   const posts = await getPostSummaries(undefined, true)
 

@@ -1,7 +1,7 @@
 import { Prisma, type Post, PostSource as PrismaPostSource, PostStatus as PrismaPostStatus } from "@prisma/client"
 import { z } from "zod"
 
-import { prisma } from "@/lib/prisma"
+import { getPrismaClient } from "@/lib/prisma"
 
 export type PostSource = PrismaPostSource
 
@@ -111,6 +111,7 @@ function toBlogPost(post: Post): BlogPost {
 }
 
 async function ensureUniqueSlug(slug: string, currentId?: string) {
+  const prisma = getPrismaClient()
   const existing = await prisma.post.findFirst({
     where: {
       slug,
@@ -124,6 +125,7 @@ async function ensureUniqueSlug(slug: string, currentId?: string) {
 }
 
 export async function getAllPosts(includeDrafts = false): Promise<BlogPost[]> {
+  const prisma = getPrismaClient()
   const posts = await prisma.post.findMany({
     where: includeDrafts
       ? {}
@@ -138,6 +140,7 @@ export async function getAllPosts(includeDrafts = false): Promise<BlogPost[]> {
 
 export async function getPostBySlug(slug: string, includeDrafts = false): Promise<BlogPost | undefined> {
   const normalizedSlug = normalizeSlug(slug)
+  const prisma = getPrismaClient()
   const post = await prisma.post.findFirst({
     where: {
       slug: normalizedSlug,
@@ -149,6 +152,7 @@ export async function getPostBySlug(slug: string, includeDrafts = false): Promis
 }
 
 export async function getPostById(id: string): Promise<BlogPost | undefined> {
+  const prisma = getPrismaClient()
   const post = await prisma.post.findUnique({
     where: { id },
   })
@@ -156,6 +160,7 @@ export async function getPostById(id: string): Promise<BlogPost | undefined> {
 }
 
 export async function getPostSummaries(limit?: number, includeDrafts = false): Promise<BlogPostSummary[]> {
+  const prisma = getPrismaClient()
   const posts = await prisma.post.findMany({
     where: includeDrafts
       ? {}
@@ -213,6 +218,7 @@ export async function filterPosts(
     where.status = status
   }
 
+  const prisma = getPrismaClient()
   const posts = await prisma.post.findMany({
     where,
     orderBy: { createdAt: "desc" },
@@ -232,6 +238,7 @@ export async function addPost(input: unknown): Promise<BlogPost> {
   const tags = sanitizeTags(parsed.tags)
   const externalId = parsed.externalId?.trim() || slug
 
+  const prisma = getPrismaClient()
   const created = await prisma.post.create({
     data: {
       title: parsed.title.trim(),
@@ -255,6 +262,7 @@ export async function addPost(input: unknown): Promise<BlogPost> {
 }
 
 export async function updatePost(id: string, updates: unknown): Promise<BlogPost | undefined> {
+  const prisma = getPrismaClient()
   const existing = await prisma.post.findUnique({ where: { id } })
   if (!existing) return undefined
 
@@ -295,6 +303,7 @@ export async function updatePost(id: string, updates: unknown): Promise<BlogPost
 
 export async function removePost(id: string): Promise<boolean> {
   try {
+    const prisma = getPrismaClient()
     await prisma.post.delete({ where: { id } })
     return true
   } catch (error) {
@@ -317,6 +326,7 @@ export async function upsertExternalPost(input: unknown): Promise<BlogPost> {
   const readTimeMinutes = estimateReadTime(parsed.content, parsed.readTimeMinutes)
   const tags = sanitizeTags(parsed.tags)
 
+  const prisma = getPrismaClient()
   const existing = await prisma.post.findUnique({
     where: {
       source_externalId: {

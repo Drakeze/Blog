@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button"
 import { getPostBySlug } from "@/data/posts"
 import { publicEnv } from "@/lib/env"
 
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
+
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
   const post = await getPostBySlug(params.slug)
 

@@ -4,6 +4,9 @@ import { BlogFooter } from "@/components/blog-footer"
 import { BlogCard } from "@/components/blog-card"
 import { getPostSummaries } from "@/data/posts"
 
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
+
 export default async function HomePage() {
   const recentPosts = await getPostSummaries(3)
 

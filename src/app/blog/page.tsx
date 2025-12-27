@@ -3,6 +3,9 @@ import { BlogFooter } from "@/components/blog-footer"
 import { BlogCollection } from "@/components/blog-collection"
 import { getPostSummaries } from "@/data/posts"
 
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
+
 export default async function BlogPage() {
   const posts = await getPostSummaries()
 
