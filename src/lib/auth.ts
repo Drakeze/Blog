@@ -26,3 +26,13 @@ export async function requireAdmin() {
 
   return true
 }
+
+export async function requireAdminRequest(request: Request) {
+  const cookieHeader = request.headers.get("cookie") ?? ""
+  const isAuthorized = cookieHeader
+    .split(/;\s*/)
+    .map((part) => part.split("="))
+    .some(([name, value]) => name === ADMIN_COOKIE_NAME && value === "true")
+
+  return { authorized: isAuthorized }
+}

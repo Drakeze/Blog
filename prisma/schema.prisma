@@ -20,6 +20,14 @@ enum PostStatus {
   published
 }
 
+model Subscriber {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  source    String?
+}
+
 model Post {
   id              String     @id @default(auto()) @map("_id") @db.ObjectId
   slug            String     @unique
