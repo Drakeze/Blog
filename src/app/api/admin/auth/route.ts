@@ -4,7 +4,7 @@ import { ADMIN_COOKIE_NAME, adminCookieConfig, isAdminAuthorized } from "@/lib/a
 import { env } from "@/lib/env"
 
 export async function GET() {
-  const authorized = isAdminAuthorized()
+  const authorized = await isAdminAuthorized()
   return NextResponse.json({ authorized })
 }
 

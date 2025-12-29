@@ -4,6 +4,7 @@ import { z } from "zod"
 import { Prisma } from "@prisma/client"
 
 import { addPost, filterPosts, PostValidationError, type PostStatus } from "@/data/posts"
+import { requireAdminRequest } from "@/lib/auth"
 
 const querySchema = z
   .object({
@@ -51,6 +52,11 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const authResult = await requireAdminRequest(request)
+  if (!authResult.authorized) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   try {
     const body = await request.json()
     const newPost = await addPost(body)

@@ -2,7 +2,7 @@ import { z } from "zod"
 
 const serverSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  ADMIN_PASSWORD: z.string().min(1, "ADMIN_PASSWORD is required").default("admin"),
+  ADMIN_PASSWORD: z.string().min(12, "ADMIN_PASSWORD must be at least 12 characters"),
   AUTH_SECRET: z.string().min(1, "AUTH_SECRET is required").default("development-secret"),
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   PATREON_ACCESS_TOKEN: z.string().optional(),
