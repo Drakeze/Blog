@@ -1,0 +1,240 @@
+{
+  "info": {
+    "name": "Next.js + Prisma + MongoDB - Local Testing",
+    "description": "Local development testing collection for Next.js + Prisma + MongoDB API. This collection validates infrastructure, database connectivity, and mock integration endpoints. All requests use localhost and do not require real API tokens.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/health"
+          },
+          "response": [
+            {
+              "name": "Health Check",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/health"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "cookie": [],
+              "body": "{\n  \"status\": \"ok\",\n  \"timestamp\": \"2024-01-15T10:30:00.000Z\",\n  \"database\": \"connected\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Database",
+      "item": [
+        {
+          "name": "Create Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Post\",\n  \"content\": \"This is a test post for MongoDB validation\",\n  \"author\": \"Test User\",\n  \"published\": false\n}"
+            },
+            "url": "{{baseUrl}}/api/posts"
+          },
+          "response": [
+            {
+              "name": "Create Post",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Test Post\",\n  \"content\": \"This is a test post for MongoDB validation\",\n  \"author\": \"Test User\",\n  \"published\": false\n}"
+                },
+                "url": "{{baseUrl}}/api/posts"
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "cookie": [],
+              "body": "{\n  \"id\": \"507f1f77bcf86cd799439011\",\n  \"title\": \"Test Post\",\n  \"content\": \"This is a test post for MongoDB validation\",\n  \"author\": \"Test User\",\n  \"published\": false,\n  \"createdAt\": \"2024-01-15T10:30:00.000Z\",\n  \"updatedAt\": \"2024-01-15T10:30:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Posts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/posts"
+          },
+          "response": [
+            {
+              "name": "Get All Posts",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/posts"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "cookie": [],
+              "body": "{\n  \"posts\": [\n    {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"title\": \"Test Post\",\n      \"content\": \"This is a test post for MongoDB validation\",\n      \"author\": \"Test User\",\n      \"published\": false,\n      \"createdAt\": \"2024-01-15T10:30:00.000Z\"\n    }\n  ],\n  \"count\": 1\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mock Integrations",
+      "item": [
+        {
+          "name": "LinkedIn Integration (Mock)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"share\",\n  \"content\": {\n    \"title\": \"My Blog Post\",\n    \"description\": \"Check out my latest article\",\n    \"url\": \"https://myblog.com/post/123\"\n  },\n  \"mockMode\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/integrations/linkedin"
+          },
+          "response": [
+            {
+              "name": "LinkedIn Integration (Mock)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"action\": \"share\",\n  \"content\": {\n    \"title\": \"My Blog Post\",\n    \"description\": \"Check out my latest article\",\n    \"url\": \"https://myblog.com/post/123\"\n  },\n  \"mockMode\": true\n}"
+                },
+                "url": "{{baseUrl}}/api/integrations/linkedin"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"LinkedIn payload validated successfully\",\n  \"mockMode\": true,\n  \"validated\": {\n    \"action\": \"share\",\n    \"content\": {\n      \"title\": \"My Blog Post\",\n      \"description\": \"Check out my latest article\",\n      \"url\": \"https://myblog.com/post/123\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Reddit Integration (Mock)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subreddit\": \"webdev\",\n  \"title\": \"My Blog Post\",\n  \"url\": \"https://myblog.com/post/123\",\n  \"mockMode\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/integrations/reddit"
+          },
+          "response": [
+            {
+              "name": "Reddit Integration (Mock)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"subreddit\": \"webdev\",\n  \"title\": \"My Blog Post\",\n  \"url\": \"https://myblog.com/post/123\",\n  \"mockMode\": true\n}"
+                },
+                "url": "{{baseUrl}}/api/integrations/reddit"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Reddit payload validated successfully\",\n  \"mockMode\": true,\n  \"validated\": {\n    \"subreddit\": \"webdev\",\n    \"title\": \"My Blog Post\",\n    \"url\": \"https://myblog.com/post/123\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Patreon Integration (Mock)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"create_post\",\n  \"content\": {\n    \"title\": \"Exclusive Content\",\n    \"body\": \"This is exclusive content for patrons\",\n    \"tier\": \"premium\"\n  },\n  \"mockMode\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/integrations/patreon"
+          },
+          "response": [
+            {
+              "name": "Patreon Integration (Mock)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"action\": \"create_post\",\n  \"content\": {\n    \"title\": \"Exclusive Content\",\n    \"body\": \"This is exclusive content for patrons\",\n    \"tier\": \"premium\"\n  },\n  \"mockMode\": true\n}"
+                },
+                "url": "{{baseUrl}}/api/integrations/patreon"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Patreon payload validated successfully\",\n  \"mockMode\": true,\n  \"validated\": {\n    \"action\": \"create_post\",\n    \"content\": {\n      \"title\": \"Exclusive Content\",\n      \"body\": \"This is exclusive content for patrons\",\n      \"tier\": \"premium\"\n    }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
