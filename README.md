@@ -1,123 +1,186 @@
-# Blog Application
+# 📝 Blog Platform
 
-A modern blog application built with Next.js 15, TypeScript, and Tailwind CSS.
+A full-stack blog platform built with **Next.js**, designed to aggregate and manage content from multiple external platforms while demonstrating modern frontend architecture, API integration, and production-ready workflows.
 
-## Prerequisites
+---
 
-Before running this application, make sure you have the following installed:
+## 📌 Overview
 
-- [Node.js](https://nodejs.org/) (version 18 or higher)
-- [Bun](https://bun.com/package-manager) (package manager)
+This Blog Platform serves as a centralized system for managing and displaying content sourced from multiple external services.
 
-## Getting Started
+It was built as part of my professional portfolio to demonstrate how I approach:
 
-1. **Clone the repository** (if not already done):
+- Content-driven application design  
+- Multi-source API integration  
+- Scalable frontend architecture  
+- Deployment-ready workflows  
 
-   ```bash
-   git clone <your-repository-url>
-   cd blog
-   ```
+The focus is on **clean data flow, maintainability, and real-world integration patterns**.
 
-2. **Install dependencies**:
+---
 
-   ```bash
-   bun install
-   ```
+## ✨ Key Features
 
-3. **Run the development server**:
+- Multi-platform content aggregation  
+- External API integrations  
+- Modern, responsive UI  
+- Environment-based configuration  
+- Deployed production build  
 
-   ```bash
-   bun dev
-   ```
+---
 
-4. **Open your browser** and navigate to:
-   - [http://localhost:3000](http://localhost:3000)
+## 🌐 External Data Sources
 
-## Available Scripts
+This application integrates with multiple external platforms:
 
-- `bun dev` - Starts the development server with Turbopack
-- `bun build` - Builds the application for production
-- `bun start` - Starts the production server
-- `bun lint` - Runs ESLint to check for code issues (fails on warnings)
-- `bun lint:fix` - Auto-fixes lint issues where possible
-- `bun format` / `bun format:check` - Formats code with Prettier or checks formatting
-- `bun type-check` - Runs TypeScript checks without emitting files
-- `bun validate` - Runs lint, format check, and type-check together
-- `bun ci` - Runs lint, type-check, tests, and build in CI order
+- **Patreon API** — membership-based and gated content  
+- **LinkedIn API** — professional and long-form updates  
+- **Reddit API** — community-driven discussions and posts  
 
-## Automation & Quality Gates
+These platforms require careful handling of authentication, rate limits, and data normalization.
 
-- **Husky hooks**: run `bun run prepare` (or `bunx husky install`) after installing dependencies to enable git hooks.
-  - `pre-commit`: lint-staged formatting, ESLint, Prettier check, and type-check.
-  - `pre-push`: runs tests and a production build.
-- **Commitlint**: enforces Conventional Commits locally and in CI.
-- **CI workflow**: `.github/workflows/ci.yml` runs lint, type-check, test, and build on pushes and pull requests using Bun.
+---
 
-## Project Structure
+## 🧠 Development Approach
 
-```
-blog/
-├── src/
-│   ├── app/
-│   │   ├── about/          # About page
-│   │   ├── blog/           # Blog listing and individual posts
-│   │   ├── contact/        # Contact page
-│   │   ├── globals.css     # Global styles
-│   │   ├── layout.tsx      # Root layout
-│   │   └── page.tsx        # Homepage
-│   └── components/
-│       ├── Header.tsx      # Navigation header
-│       └── Footer.tsx      # Site footer
-├── public/                 # Static assets
-└── package.json           # Dependencies and scripts
-```
+This project follows a **tool-assisted, developer-led workflow**.
 
-## Features
+### UI Exploration & Mockups
+- Layout inspiration and design exploration performed using **v0.dev**
+- Used to establish a consistent visual direction and component structure
+- Final UI implementation and integration completed manually  
 
-- 📱 Responsive design
-- 🔍 Blog search and filtering
-- 📄 Dynamic blog post pages
-- 📧 Contact form
-- 🎨 Modern UI with Tailwind CSS
-- ⚡ Fast development with Turbopack
+🔗 [v0.dev](https://v0.dev)
 
-## Tech Stack
+### AI-Assisted Review & Baseline Validation
+- Codex was used for code review, refactoring suggestions, and baseline checks
+- Application logic, data flow, and architectural decisions were reviewed and validated by me  
 
-- **Framework**: Next.js 15
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Linting**: ESLint
+### API Validation & Integration
+- External API endpoints were tested and verified using **Postman**
+- Authentication flows and response structures were validated prior to integration
+- Each platform is handled through isolated integration logic
+- Data normalization and consumption logic were implemented manually  
 
-## Development
+AI and tooling were used to **accelerate development and improve quality**, not replace engineering judgment.
 
-The application uses Next.js App Router and includes:
+---
 
-- Homepage with hero section and featured posts
-- Blog listing page with search and pagination
-- Individual blog post pages with dynamic routing
-- About and Contact pages
-- Responsive navigation and footer
+## 🧰 Tech Stack
 
-## Deployment
+### Frontend
+- Next.js  
+- TypeScript  
+- Tailwind CSS  
 
-This application can be deployed on platforms like:
+### APIs
+- Patreon API  
+- LinkedIn API  
+- Reddit API  
 
-- [Vercel](https://vercel.com/) (recommended for Next.js)
-- [Netlify](https://netlify.com/)
-- [Railway](https://railway.app/)
-- Any platform that supports Node.js
+---
 
-For production deployment, run:
+> ## 🧰 Tooling & Infrastructure
+> 
+> **Runtime & Tooling**
+> - Bun (runtime & package management)
+> - Postman (API testing & validation)
+> - Codex (code review and optimization support)
+> 
+> **Infrastructure**
+> - Vercel (deployment)
 
-```bash
-bun build
-bun start
-```
+---
 
-## Contributing
+> ## ▶️ Running the Project Locally
+> 
+> This project uses **Bun** as the runtime and package manager.
+> 
+> **Install Dependencies**
+> ```bash
+> bun install
+> ```
+> 
+> **Start Development Server**
+> ```bash
+> bun dev
+> ```
+> 
+> **Build for Production**
+> ```bash
+> bun run build
+> ```
+> 
+> **Start Production Server**
+> ```bash
+> bun start
+> ```
 
-Feel free to submit issues and enhancement requests!
+Environment variables are used to manage API credentials and configuration when running the project locally.
 
-## License
+---
 
-This project is open source and available under the [MIT License](LICENSE).
+## 🔄 How the Application Works
+
+- Content is retrieved from external APIs (Patreon, LinkedIn, Reddit)  
+- Each platform is handled through isolated integration logic  
+- Data is normalized before being passed to UI components  
+- Components consume structured content consistently  
+- Environment variables manage authentication and configuration  
+- The application is deployed with production-safe defaults  
+
+---
+
+## 📍 Current Status
+
+- Core content aggregation implemented  
+- Fully deployed and accessible  
+- Actively maintained  
+
+---
+
+## 🧭 Planned Improvements
+
+Future iterations may include:
+
+- Backend persistence for cached content  
+- Expanded content filtering and categorization  
+- Additional platform integrations  
+- Analytics and engagement tracking  
+
+These enhancements are **planned but not yet implemented**.
+
+---
+
+## 🤖 AI Usage Disclosure
+
+Portions of this project were developed with AI assistance, including code review, refactoring suggestions, and baseline validation.
+
+All architectural decisions, integrations, and final implementations were reviewed, modified, and approved by the author.
+
+AI was used as a productivity tool—not a substitute for engineering skill.
+
+---
+
+## 🎯 What This Project Demonstrates
+
+- Multi-platform API integration  
+- Content-focused application architecture  
+- Clean data flow and normalization strategies  
+- Production deployment workflows  
+- Responsible and transparent AI-assisted development  
+
+---
+
+## 🔗 Related Projects
+
+This application is part of a broader portfolio that includes:
+- A personal developer portfolio site  
+- A cryptocurrency tracking application  
+- A planned analytics/dashboard project  
+
+---
+
+## 👤 Author
+
+Built and maintained as part of an ongoing professional development journey.
