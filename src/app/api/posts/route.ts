@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 
-import { Prisma } from "@prisma/client"
-
 import { addPost, filterPosts, PostValidationError, type PostStatus } from "@/data/posts"
 
 export const runtime = "nodejs"

@@ -1,7 +1,6 @@
-import { Prisma, type Post, PostSource as PrismaPostSource, PostStatus as PrismaPostStatus } from "@prisma/client"
+import { Prisma, PostSource as PrismaPostSource, PostStatus as PrismaPostStatus, type Post } from "@prisma/client"
 import { z } from "zod"
 
-import { prisma } from "@/lib/prisma"
 
 export type PostSource = PrismaPostSource
 
