@@ -18,14 +18,14 @@ function formatError(error: unknown) {
 
 type RouteParams = { id: string }
 
-type RouteContext = { params: RouteParams }
+type RouteContext = { params: Promise<RouteParams> }
 
 function isValidObjectId(id: string) {
   return /^[a-f0-9]{24}$/i.test(id)
 }
 
-export async function PUT(request: Request, { params }: RouteContext) {
-  const { id } = params
+export async function PUT(request: Request, context: RouteContext) {
+  const { id } = await context.params
   if (!isValidObjectId(id)) {
     return NextResponse.json({ error: "Invalid post id" }, { status: 400 })
   }
@@ -44,8 +44,8 @@ export async function PUT(request: Request, { params }: RouteContext) {
   }
 }
 
-export async function DELETE(_request: Request, { params }: RouteContext) {
-  const { id } = params
+export async function DELETE(_request: Request, context: RouteContext) {
+  const { id } = await context.params
   if (!isValidObjectId(id)) {
     return NextResponse.json({ error: "Invalid post id" }, { status: 400 })
   }

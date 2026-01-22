@@ -63,14 +63,14 @@ const postUpdateSchema = postInputSchema.partial()
 
 export async function getAllPosts(includeDrafts = false): Promise<BlogPost[]> {
   const collection = await getPostsCollection()
-  const filter = includeDrafts ? {} : { status: "published" }
+  const filter = includeDrafts ? {} : { status: "published" as const }
   const docs = await collection.find(filter).sort({ createdAt: -1 }).toArray()
   return docs.map(documentToPost)
 }
 
 export async function getPostBySlug(slug: string, includeDrafts = false): Promise<BlogPost | undefined> {
   const collection = await getPostsCollection()
-  const filter = includeDrafts ? { slug } : { slug, status: "published" }
+  const filter = includeDrafts ? { slug } : { slug, status: "published" as const }
   const doc = await collection.findOne(filter)
   return doc ? documentToPost(doc) : undefined
 }
@@ -86,7 +86,7 @@ export async function getPostById(id: string): Promise<BlogPost | undefined> {
 
 export async function getPostSummaries(limit?: number, includeDrafts = false): Promise<BlogPostSummary[]> {
   const collection = await getPostsCollection()
-  const filter = includeDrafts ? {} : { status: "published" }
+  const filter = includeDrafts ? {} : { status: "published" as const }
   const projection = { content: 0 }
   let query = collection.find(filter, { projection }).sort({ createdAt: -1 })
   if (limit) {
@@ -94,6 +94,7 @@ export async function getPostSummaries(limit?: number, includeDrafts = false): P
   }
   const docs = await query.toArray()
   return docs.map((doc) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { content, ...post } = documentToPost(doc as unknown as BlogPostDocument)
     return post
   })

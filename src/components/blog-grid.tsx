@@ -2,7 +2,7 @@ import { BlogCard } from "@/components/blog-card"
 import type { BlogPostSummary } from "@/data/posts"
 
 type BlogGridProps = {
-  posts: Array<BlogPostSummary & { heroImage?: string }>
+  posts: BlogPostSummary[]
 }
 
 export function BlogGrid({ posts }: BlogGridProps) {

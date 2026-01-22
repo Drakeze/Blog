@@ -20,13 +20,13 @@ const sourceLabels: Record<BlogPostSummary["source"], string> = {
   patreon: "Patreon",
 }
 
-export function BlogCard({ post }: { post: BlogPostSummary & { heroImage?: string } }) {
+export function BlogCard({ post }: { post: BlogPostSummary }) {
   return (
     <Link href={`/blog/${post.slug}`} className="group block h-full">
       <article className="flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card/80 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
         <div className="aspect-[16/10] overflow-hidden bg-muted">
           <img
-            src={post.heroImage || "/placeholder.svg"}
+            src={post.heroImage ?? "/placeholder.svg"}
             alt={post.title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />

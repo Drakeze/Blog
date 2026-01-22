@@ -7,7 +7,6 @@ import { StatusBadge } from "@/components/admin/StatusBadge"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Pagination } from "@/components/ui/pagination"
 import type { BlogPostSummary } from "@/data/posts"
 
 const PAGE_SIZE = 5
@@ -187,7 +186,7 @@ export default function PostTable({ posts }: PostTableProps) {
                 <td className="px-6 py-4 text-muted-foreground">
                   <div className="flex flex-wrap gap-2">
                     {post.tags.map((tag) => (
-                      <Badge key={tag} tone="muted">
+                      <Badge key={tag} variant="secondary">
                         {tag}
                       </Badge>
                     ))}
@@ -208,11 +207,31 @@ export default function PostTable({ posts }: PostTableProps) {
         </table>
       </CardContent>
 
-      <CardFooter>
+      <CardFooter className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
           Showing {startIndex + 1}-{Math.min(startIndex + PAGE_SIZE, filteredPosts.length)} of {filteredPosts.length}
         </p>
-        <Pagination page={currentPage} totalPages={totalPages} onChange={setCurrentPage} />
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+            className="rounded-md border border-border bg-background px-3 py-1.5 text-sm transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span className="text-sm text-muted-foreground">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            type="button"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+            className="rounded-md border border-border bg-background px-3 py-1.5 text-sm transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       </CardFooter>
     </Card>
   )

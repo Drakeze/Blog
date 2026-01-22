@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 
-import { addPost, filterPosts, type PostStatus,PostValidationError } from "@/data/posts"
+import { addPost, filterPosts, type PostSource, type PostStatus, PostValidationError } from "@/data/posts"
 import { requireAdminRequest } from "@/lib/auth"
 
 export const runtime = "nodejs"
@@ -38,15 +38,17 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: parsed.error.message }, { status: 400 })
   }
 
-  const { status, ...filters } = parsed.data
+  const { status, source, ...filters } = parsed.data
   const includeDrafts = status === "all" || status === "draft"
   const filtered = await filterPosts(
     {
       ...filters,
+      source: source as PostSource | undefined,
       status: status && status !== "all" ? (status as PostStatus) : undefined,
     },
     includeDrafts,
   )
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const summaries = filtered.map(({ content, ...summary }) => summary)
 
   return NextResponse.json(summaries)

@@ -10,7 +10,7 @@ import type { BlogPostSummary, PostSource } from "@/data/posts"
 const DEFAULT_PAGE_SIZE = 6
 
 type BlogCollectionProps = {
-  posts: Array<BlogPostSummary & { heroImage?: string }>
+  posts: BlogPostSummary[]
   enablePagination?: boolean
   pageSize?: number
 }
@@ -26,7 +26,10 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
     [posts]
   )
 
-  const sources = useMemo(() => ["all", ...Array.from(new Set(posts.map((post) => post.source)))], [posts])
+  const sources = useMemo(
+    () => ["all" as const, ...Array.from(new Set(posts.map((post) => post.source)))] as (PostSource | "all")[],
+    [posts]
+  )
 
   const filteredPosts = useMemo(() => {
     const normalizedSearch = searchTerm.toLowerCase().trim()
