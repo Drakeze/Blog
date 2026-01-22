@@ -1,19 +1,32 @@
-import { Prisma, type Post, PostSource as PrismaPostSource, PostStatus as PrismaPostStatus } from "@prisma/client"
+import { ObjectId } from "mongodb"
 import { z } from "zod"
+import {
+  getPostsCollection,
+  documentToPost,
+  generateSlug,
+  type BlogPostDocument,
+} from "@/models/BlogPost"
 
-import { prisma } from "@/lib/prisma"
+export type PostSource = "blog" | "reddit" | "twitter" | "linkedin" | "patreon"
+export type PostStatus = "draft" | "published"
 
-export type PostSource = PrismaPostSource
+export const postSources: PostSource[] = ["blog", "reddit", "twitter", "linkedin", "patreon"]
+export const postStatuses: PostStatus[] = ["draft", "published"]
 
-export type PostStatus = PrismaPostStatus
-
-export const postSources = Object.values(PrismaPostSource) as PostSource[]
-export const postStatuses = Object.values(PrismaPostStatus) as PostStatus[]
-
-export type BlogPost = Omit<Post, "createdAt" | "updatedAt" | "externalId" | "externalUrl" | "heroImage" | "category"> & {
+export type BlogPost = {
+  id: string
+  title: string
+  excerpt: string
+  content: string
+  category: string
+  tags: string[]
+  readTimeMinutes: number
+  readTime: string
+  source: PostSource
+  status: PostStatus
+  slug: string
   createdAt: string
   updatedAt: string
-  category: string
   externalId?: string | null
   externalUrl?: string | null
   heroImage?: string | null
@@ -30,145 +43,58 @@ export class PostValidationError extends Error {
   }
 }
 
-const WORDS_PER_MINUTE = 200
-const SLUG_INVALID_ERROR = "Slug cannot be empty after normalization."
+const postInputSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  excerpt: z.string().min(1, "Excerpt is required"),
+  content: z.string().min(1, "Content is required"),
+  category: z.string().default("General"),
+  tags: z.array(z.string()).default([]),
+  readTimeMinutes: z.number().int().positive().default(5),
+  source: z.enum(["blog", "reddit", "twitter", "linkedin", "patreon"]).default("blog"),
+  status: z.enum(["draft", "published"]).default("draft"),
+  slug: z.string().optional(),
+  externalId: z.string().optional(),
+  externalUrl: z.string().url().optional(),
+  heroImage: z.string().url().optional(),
+})
 
-const createPostSchema = z
-  .object({
-    title: z.string().trim().min(1, "Title is required."),
-    excerpt: z.string().trim().min(1, "Excerpt is required."),
-    content: z.string().trim().min(1, "Content is required."),
-    category: z.string().trim().min(1, "Category is required.").default("General"),
-    tags: z.array(z.string().trim().min(1)).default([]),
-    readTimeMinutes: z.number().int().positive().optional(),
-    source: z.nativeEnum(PrismaPostSource, { errorMap: () => ({ message: "Invalid source." }) }),
-    externalUrl: z.string().url().optional(),
-    heroImage: z.string().url().optional(),
-    slug: z.string().trim().min(1, "Slug is required.").optional(),
-    createdAt: z.string().datetime().optional(),
-    externalId: z.string().trim().optional(),
-    status: z.nativeEnum(PrismaPostStatus, { errorMap: () => ({ message: "Invalid status." }) }).default(
-      PrismaPostStatus.draft,
-    ),
-  })
-  .strict()
-
-const updatePostSchema = createPostSchema.partial().strict()
-
-export type CreatePostInput = z.infer<typeof createPostSchema>
-export type UpdatePostInput = z.infer<typeof updatePostSchema>
-
-function normalizeSlug(raw: string) {
-  const slug = raw
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-")
-
-  if (!slug) {
-    throw new PostValidationError(SLUG_INVALID_ERROR)
-  }
-
-  return slug
-}
-
-function normalizeReadTime(minutes?: number) {
-  if (!minutes || Number.isNaN(minutes)) return 5
-  return Math.max(1, Math.round(minutes))
-}
-
-function buildReadTime(minutes: number) {
-  return `${normalizeReadTime(minutes)} min read`
-}
-
-function sanitizeTags(tags?: string[]) {
-  return (tags ?? [])
-    .map((tag) => tag.trim())
-    .filter((tag) => tag.length > 0)
-}
-
-function estimateReadTime(content: string, overrideMinutes?: number) {
-  if (overrideMinutes && Number.isFinite(overrideMinutes) && overrideMinutes > 0) {
-    return normalizeReadTime(overrideMinutes)
-  }
-
-  const words = content.trim().split(/\s+/).filter(Boolean).length
-  if (words === 0) return 1
-
-  return normalizeReadTime(Math.ceil(words / WORDS_PER_MINUTE))
-}
-
-function toBlogPost(post: Post): BlogPost {
-  return {
-    ...post,
-    createdAt: post.createdAt.toISOString(),
-    updatedAt: post.updatedAt.toISOString(),
-    externalId: post.externalId ?? undefined,
-    externalUrl: post.externalUrl ?? undefined,
-    heroImage: post.heroImage ?? undefined,
-    category: post.category ?? "General",
-  }
-}
-
-async function ensureUniqueSlug(slug: string, currentId?: string) {
-  const existing = await prisma.post.findFirst({
-    where: {
-      slug,
-      NOT: currentId ? { id: currentId } : undefined,
-    },
-  })
-
-  if (existing) {
-    throw new PostValidationError("Slug already exists.", 409)
-  }
-}
+const postUpdateSchema = postInputSchema.partial()
 
 export async function getAllPosts(includeDrafts = false): Promise<BlogPost[]> {
-  const posts = await prisma.post.findMany({
-    where: includeDrafts
-      ? {}
-      : {
-          status: PrismaPostStatus.published,
-        },
-    orderBy: { createdAt: "desc" },
-  })
-
-  return posts.map(toBlogPost)
+  const collection = await getPostsCollection()
+  const filter = includeDrafts ? {} : { status: "published" }
+  const docs = await collection.find(filter).sort({ createdAt: -1 }).toArray()
+  return docs.map(documentToPost)
 }
 
 export async function getPostBySlug(slug: string, includeDrafts = false): Promise<BlogPost | undefined> {
-  const normalizedSlug = normalizeSlug(slug)
-  const post = await prisma.post.findFirst({
-    where: {
-      slug: normalizedSlug,
-      ...(includeDrafts ? {} : { status: PrismaPostStatus.published }),
-    },
-  })
-
-  return post ? toBlogPost(post) : undefined
+  const collection = await getPostsCollection()
+  const filter = includeDrafts ? { slug } : { slug, status: "published" }
+  const doc = await collection.findOne(filter)
+  return doc ? documentToPost(doc) : undefined
 }
 
 export async function getPostById(id: string): Promise<BlogPost | undefined> {
-  const post = await prisma.post.findUnique({
-    where: { id },
-  })
-  return post ? toBlogPost(post) : undefined
+  if (!ObjectId.isValid(id)) {
+    return undefined
+  }
+  const collection = await getPostsCollection()
+  const doc = await collection.findOne({ _id: new ObjectId(id) })
+  return doc ? documentToPost(doc) : undefined
 }
 
 export async function getPostSummaries(limit?: number, includeDrafts = false): Promise<BlogPostSummary[]> {
-  const posts = await prisma.post.findMany({
-    where: includeDrafts
-      ? {}
-      : {
-          status: PrismaPostStatus.published,
-        },
-    orderBy: { createdAt: "desc" },
-    take: typeof limit === "number" ? limit : undefined,
-  })
-
-  return posts.map((post) => {
-    const { content: _content, ...rest } = toBlogPost(post)
-    return rest
+  const collection = await getPostsCollection()
+  const filter = includeDrafts ? {} : { status: "published" }
+  const projection = { content: 0 }
+  let query = collection.find(filter, { projection }).sort({ createdAt: -1 })
+  if (limit) {
+    query = query.limit(limit)
+  }
+  const docs = await query.toArray()
+  return docs.map((doc) => {
+    const { content, ...post } = documentToPost(doc as unknown as BlogPostDocument)
+    return post
   })
 }
 
@@ -182,187 +108,161 @@ export async function filterPosts(
   },
   includeDrafts = false,
 ): Promise<BlogPost[]> {
-  const { tag, readTimeMinutes, createdAt, source, status } = filters ?? {}
+  const collection = await getPostsCollection()
+  const query: Record<string, unknown> = {}
 
-  const where: Prisma.PostWhereInput = {
-    ...(includeDrafts ? {} : { status: PrismaPostStatus.published }),
+  if (!includeDrafts && !filters?.status) {
+    query.status = "published"
   }
 
-  if (tag) {
-    where.tags = { has: tag }
+  if (filters?.status) {
+    query.status = filters.status
   }
 
-  if (typeof readTimeMinutes === "number") {
-    where.readTimeMinutes = { lte: readTimeMinutes }
+  if (filters?.tag) {
+    query.tags = filters.tag
   }
 
-  if (createdAt) {
-    const start = new Date(createdAt)
-    if (!Number.isNaN(start.getTime())) {
-      const end = new Date(start)
-      end.setDate(end.getDate() + 1)
-      where.createdAt = { gte: start, lt: end }
-    }
+  if (filters?.readTimeMinutes) {
+    query.readTimeMinutes = filters.readTimeMinutes
   }
 
-  if (source) {
-    where.source = source
+  if (filters?.source) {
+    query.source = filters.source
   }
 
-  if (status) {
-    where.status = status
+  if (filters?.createdAt) {
+    query.createdAt = { $gte: new Date(filters.createdAt) }
   }
 
-  const posts = await prisma.post.findMany({
-    where,
-    orderBy: { createdAt: "desc" },
-  })
-
-  return posts.map(toBlogPost)
+  const docs = await collection.find(query).sort({ createdAt: -1 }).toArray()
+  return docs.map(documentToPost)
 }
 
 export async function addPost(input: unknown): Promise<BlogPost> {
-  const parsed = createPostSchema.parse(input)
+  const parsed = postInputSchema.safeParse(input)
+  if (!parsed.success) {
+    throw new PostValidationError(parsed.error.errors[0].message, 400)
+  }
+
+  const data = parsed.data
+  const collection = await getPostsCollection()
   const now = new Date()
 
-  const slug = normalizeSlug(parsed.slug ?? parsed.title)
-  await ensureUniqueSlug(slug)
+  const doc: BlogPostDocument = {
+    title: data.title,
+    excerpt: data.excerpt,
+    content: data.content,
+    category: data.category,
+    tags: data.tags,
+    readTimeMinutes: data.readTimeMinutes,
+    source: data.source,
+    status: data.status,
+    slug: data.slug || generateSlug(data.title),
+    externalId: data.externalId || null,
+    externalUrl: data.externalUrl || null,
+    heroImage: data.heroImage || null,
+    createdAt: now,
+    updatedAt: now,
+  }
 
-  const readTimeMinutes = estimateReadTime(parsed.content, parsed.readTimeMinutes)
-  const tags = sanitizeTags(parsed.tags)
-  const externalId = parsed.externalId?.trim() || slug
-
-  const created = await prisma.post.create({
-    data: {
-      title: parsed.title.trim(),
-      excerpt: parsed.excerpt.trim(),
-      content: parsed.content.trim(),
-      createdAt: parsed.createdAt ? new Date(parsed.createdAt) : now,
-      readTimeMinutes,
-      readTime: buildReadTime(readTimeMinutes),
-      category: parsed.category.trim(),
-      source: parsed.source,
-      slug,
-      tags,
-      externalUrl: parsed.externalUrl,
-      heroImage: parsed.heroImage,
-      externalId,
-      status: parsed.status ?? PrismaPostStatus.draft,
-    },
-  })
-
-  return toBlogPost(created)
-}
-
-export async function updatePost(id: string, updates: unknown): Promise<BlogPost | undefined> {
-  const existing = await prisma.post.findUnique({ where: { id } })
-  if (!existing) return undefined
-
-  const parsed = updatePostSchema.parse(updates ?? {})
-
-  const title = parsed.title?.trim() ?? existing.title
-  const excerpt = parsed.excerpt?.trim() ?? existing.excerpt
-  const content = parsed.content?.trim() ?? existing.content
-  const category = parsed.category?.trim() ?? existing.category ?? "General"
-  const tags = parsed.tags ? sanitizeTags(parsed.tags) : existing.tags
-  const source = parsed.source ?? existing.source
-  const slug = normalizeSlug(parsed.slug ?? existing.slug ?? title)
-  await ensureUniqueSlug(slug, id)
-
-  const readTimeMinutes = estimateReadTime(content, parsed.readTimeMinutes ?? existing.readTimeMinutes)
-
-  const updated = await prisma.post.update({
-    where: { id },
-    data: {
-      title,
-      excerpt,
-      content,
-      category,
-      tags,
-      source,
-      slug,
-      readTimeMinutes,
-      readTime: buildReadTime(readTimeMinutes),
-      externalUrl: parsed.externalUrl ?? existing.externalUrl,
-      heroImage: parsed.heroImage ?? existing.heroImage,
-      externalId: parsed.externalId ?? existing.externalId ?? slug,
-      status: parsed.status ?? existing.status,
-    },
-  })
-
-  return toBlogPost(updated)
-}
-
-export async function removePost(id: string): Promise<boolean> {
   try {
-    await prisma.post.delete({ where: { id } })
-    return true
+    const result = await collection.insertOne(doc)
+    const inserted = await collection.findOne({ _id: result.insertedId })
+    if (!inserted) {
+      throw new PostValidationError("Failed to retrieve created post", 500)
+    }
+    return documentToPost(inserted)
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
-      return false
+    if (error instanceof Error && "code" in error && error.code === 11000) {
+      throw new PostValidationError("A post with this slug already exists", 409)
     }
     throw error
   }
 }
 
-export async function upsertExternalPost(input: unknown): Promise<BlogPost> {
-  const parsed = createPostSchema.parse(input)
-  const externalId = parsed.externalId?.trim()
-
-  if (!externalId) {
-    throw new PostValidationError("External ID is required for external posts.", 422)
+export async function updatePost(id: string, updates: unknown): Promise<BlogPost | undefined> {
+  if (!ObjectId.isValid(id)) {
+    return undefined
   }
 
-  const slug = normalizeSlug(parsed.slug ?? parsed.title)
-  const readTimeMinutes = estimateReadTime(parsed.content, parsed.readTimeMinutes)
-  const tags = sanitizeTags(parsed.tags)
+  const parsed = postUpdateSchema.safeParse(updates)
+  if (!parsed.success) {
+    throw new PostValidationError(parsed.error.errors[0].message, 400)
+  }
 
-  const existing = await prisma.post.findUnique({
-    where: {
-      source_externalId: {
-        source: parsed.source,
-        externalId,
-      },
-    },
-  })
+  const data = parsed.data
+  const collection = await getPostsCollection()
+  const updateDoc: Partial<BlogPostDocument> = {
+    ...data,
+    updatedAt: new Date(),
+  }
 
-  await ensureUniqueSlug(slug, existing?.id)
+  try {
+    const result = await collection.findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $set: updateDoc },
+      { returnDocument: "after" },
+    )
 
-  const post = existing
-    ? await prisma.post.update({
-        where: { id: existing.id },
-        data: {
-          title: parsed.title.trim(),
-          excerpt: parsed.excerpt.trim(),
-          content: parsed.content.trim(),
-          category: parsed.category.trim(),
-          tags,
-          slug,
-          readTimeMinutes,
-          readTime: buildReadTime(readTimeMinutes),
-          externalUrl: parsed.externalUrl ?? existing.externalUrl,
-          heroImage: parsed.heroImage ?? existing.heroImage,
-          status: parsed.status ?? existing.status,
-        },
-      })
-    : await prisma.post.create({
-        data: {
-          title: parsed.title.trim(),
-          excerpt: parsed.excerpt.trim(),
-          content: parsed.content.trim(),
-          category: parsed.category.trim(),
-          tags,
-          slug,
-          readTimeMinutes,
-          readTime: buildReadTime(readTimeMinutes),
-          source: parsed.source,
-          externalId,
-          externalUrl: parsed.externalUrl,
-          heroImage: parsed.heroImage,
-          status: parsed.status ?? PrismaPostStatus.published,
-          createdAt: parsed.createdAt ? new Date(parsed.createdAt) : new Date(),
-        },
-      })
+    return result ? documentToPost(result) : undefined
+  } catch (error) {
+    if (error instanceof Error && "code" in error && error.code === 11000) {
+      throw new PostValidationError("A post with this slug already exists", 409)
+    }
+    throw error
+  }
+}
 
-  return toBlogPost(post)
+export async function removePost(id: string): Promise<boolean> {
+  if (!ObjectId.isValid(id)) {
+    return false
+  }
+  const collection = await getPostsCollection()
+  const result = await collection.deleteOne({ _id: new ObjectId(id) })
+  return result.deletedCount > 0
+}
+
+export async function upsertExternalPost(input: unknown): Promise<BlogPost> {
+  const parsed = postInputSchema.safeParse(input)
+  if (!parsed.success) {
+    throw new PostValidationError(parsed.error.errors[0].message, 400)
+  }
+
+  const data = parsed.data
+  if (!data.externalId || !data.source || data.source === "blog") {
+    throw new PostValidationError("externalId and valid source are required for external posts", 400)
+  }
+
+  const collection = await getPostsCollection()
+  const now = new Date()
+
+  const doc: BlogPostDocument = {
+    title: data.title,
+    excerpt: data.excerpt,
+    content: data.content,
+    category: data.category,
+    tags: data.tags,
+    readTimeMinutes: data.readTimeMinutes,
+    source: data.source,
+    status: data.status,
+    slug: data.slug || generateSlug(data.title, data.externalId),
+    externalId: data.externalId,
+    externalUrl: data.externalUrl || null,
+    heroImage: data.heroImage || null,
+    createdAt: now,
+    updatedAt: now,
+  }
+
+  const result = await collection.findOneAndUpdate(
+    { externalId: data.externalId, source: data.source },
+    { $set: { ...doc, updatedAt: now }, $setOnInsert: { createdAt: now } },
+    { upsert: true, returnDocument: "after" },
+  )
+
+  if (!result) {
+    throw new PostValidationError("Failed to upsert external post", 500)
+  }
+
+  return documentToPost(result)
 }

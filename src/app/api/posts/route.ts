@@ -1,18 +1,19 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 
-import { Prisma } from "@prisma/client"
-
 import { addPost, filterPosts, PostValidationError, type PostStatus } from "@/data/posts"
 import { requireAdminRequest } from "@/lib/auth"
+
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
 
 const querySchema = z
   .object({
     tag: z.string().trim().optional(),
     createdAt: z.string().trim().optional(),
     readTimeMinutes: z.coerce.number().int().positive().optional(),
-    source: z.nativeEnum(Prisma.PostSource).optional(),
-    status: z.union([z.nativeEnum(Prisma.PostStatus), z.literal("all")]).optional(),
+    source: z.string().trim().optional(),
+    status: z.string().trim().optional(),
   })
   .strict()
 
@@ -38,7 +39,7 @@ export async function GET(request: Request) {
   }
 
   const { status, ...filters } = parsed.data
-  const includeDrafts = status === "all" || status === Prisma.PostStatus.draft
+  const includeDrafts = status === "all" || status === "draft"
   const filtered = await filterPosts(
     {
       ...filters,

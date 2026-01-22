@@ -60,9 +60,7 @@ export default function SubscribePage() {
         <div className="mb-10 rounded-2xl border border-border bg-card/60 p-8 shadow-sm">
           <h2 className="mb-4 text-2xl font-semibold">About</h2>
           <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
-            I'm Zen — documenting my journey building Soren Tech, Earth Plus, and mastering full-stack engineering. This
-            blog collects my posts from Twitter, Reddit, LinkedIn, Patreon, and my personal writing into one place. If
-            you want more behind-the-scenes updates or want to support the work, Patreon is where everything connects.
+          I'm Zen, documenting my journey building Soren Tech, Earth Plus, and mastering full-stack engineering. This blog collects my posts from Twitter, Reddit, LinkedIn, Patreon, and my personal writing into one place. If you want more behind-the-scenes updates or want to support the work, Patreon is where everything connects.
           </p>
         </div>
 
