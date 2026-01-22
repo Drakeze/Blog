@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
-import { syncLinkedInPosts } from "@/lib/social/linkedin"
+
 import { upsertExternalPost } from "@/data/posts"
+import { syncLinkedInPosts } from "@/lib/social/linkedin"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"

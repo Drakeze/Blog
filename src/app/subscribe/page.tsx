@@ -1,13 +1,13 @@
 "use client"
 
+import { Github, Linkedin, Twitter } from "lucide-react"
 import { useState } from "react"
 
-import { BlogHeader } from "@/components/blog-header"
 import { BlogFooter } from "@/components/blog-footer"
+import { BlogHeader } from "@/components/blog-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Github, Linkedin, Twitter } from "lucide-react"
 
 export default function SubscribePage() {
   const [name, setName] = useState("")
@@ -60,7 +60,7 @@ export default function SubscribePage() {
         <div className="mb-10 rounded-2xl border border-border bg-card/60 p-8 shadow-sm">
           <h2 className="mb-4 text-2xl font-semibold">About</h2>
           <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
-          I'm Zen, documenting my journey building Soren Tech, Earth Plus, and mastering full-stack engineering. This blog collects my posts from Twitter, Reddit, LinkedIn, Patreon, and my personal writing into one place. If you want more behind-the-scenes updates or want to support the work, Patreon is where everything connects.
+          I&apos;m Zen, documenting my journey building Soren Tech, Earth Plus, and mastering full-stack engineering. This blog collects my posts from Twitter, Reddit, LinkedIn, Patreon, and my personal writing into one place. If you want more behind-the-scenes updates or want to support the work, Patreon is where everything connects.
           </p>
         </div>
 
@@ -115,7 +115,7 @@ export default function SubscribePage() {
         </div>
 
         <div className="mt-12 text-center">
-          <p className="mb-4 text-muted-foreground">You'll receive updates from:</p>
+          <p className="mb-4 text-muted-foreground">You&apos;ll receive updates from:</p>
           <div className="flex flex-wrap justify-center gap-3">
             <div className="rounded-full border border-border bg-muted/60 px-4 py-2 text-sm">Personal Blog</div>
             <div className="rounded-full border border-border/60 bg-[#FF4500]/10 px-4 py-2 text-sm text-[#FF4500]">Reddit</div>

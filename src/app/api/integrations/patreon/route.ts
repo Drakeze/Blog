@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
-import { syncPatreonPosts } from "@/lib/social/patreon"
+
 import { upsertExternalPost } from "@/data/posts"
+import { syncPatreonPosts } from "@/lib/social/patreon"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"

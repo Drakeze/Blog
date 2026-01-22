@@ -1,6 +1,6 @@
-import { BlogHeader } from "@/components/blog-header"
-import { BlogFooter } from "@/components/blog-footer"
 import { BlogCollection } from "@/components/blog-collection"
+import { BlogFooter } from "@/components/blog-footer"
+import { BlogHeader } from "@/components/blog-header"
 import { getPostSummaries } from "@/data/posts"
 
 export const runtime = "nodejs"

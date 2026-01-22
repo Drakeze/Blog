@@ -1,16 +1,17 @@
 // src/lib/mongo.ts
-import { MongoClient, Db } from "mongodb";
+import { Db, MongoClient } from "mongodb"
 
-const MONGODB_URI = process.env.MONGODB_URI;
+// Support both MONGODB_URI (legacy) and DATABASE_URL (Prisma standard)
+const MONGODB_URI = process.env.MONGODB_URI || process.env.DATABASE_URL
 
 if (!MONGODB_URI) {
-  throw new Error("Missing MONGODB_URI environment variable");
+  throw new Error("Missing MONGODB_URI or DATABASE_URL environment variable")
 }
 
 // Global is used here to prevent creating multiple connections
 // during hot reloads in development.
 declare global {
-  // eslint-disable-next-line no-var
+   
   var _mongoClientPromise: Promise<MongoClient> | undefined;
 }
 

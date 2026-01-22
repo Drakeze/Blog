@@ -1,10 +1,11 @@
 import { ObjectId } from "mongodb"
 import { z } from "zod"
+
 import {
-  getPostsCollection,
+  type BlogPostDocument,
   documentToPost,
   generateSlug,
-  type BlogPostDocument,
+  getPostsCollection,
 } from "@/models/BlogPost"
 
 export type PostSource = "blog" | "reddit" | "twitter" | "linkedin" | "patreon"

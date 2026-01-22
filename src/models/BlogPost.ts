@@ -1,4 +1,5 @@
 import { Collection, Db, ObjectId } from "mongodb"
+
 import { getDb } from "@/lib/mongo"
 
 export interface BlogPostDocument {

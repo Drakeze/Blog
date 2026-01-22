@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
-import { syncRedditPosts } from "@/lib/social/reddit"
+
 import { upsertExternalPost } from "@/data/posts"
+import { syncRedditPosts } from "@/lib/social/reddit"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"

@@ -1,8 +1,10 @@
-import type React from "react"
+import "./globals.css"
+
+import { Analytics } from "@vercel/analytics/next"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
-import "./globals.css"
+import type React from "react"
+
 import { ThemeProvider } from "@/components/theme-provider"
 
 const _geist = Geist({ subsets: ["latin"] })

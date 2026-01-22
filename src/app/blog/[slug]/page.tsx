@@ -1,5 +1,5 @@
+import { ExternalLink,Share2 } from "lucide-react"
 import { notFound } from "next/navigation"
-import { Share2, ExternalLink } from "lucide-react"
 
 import { BlogFooter } from "@/components/blog-footer"
 import { BlogHeader } from "@/components/blog-header"

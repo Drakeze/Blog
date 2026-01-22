@@ -1,11 +1,12 @@
 "use client"
 
+import { Moon, Sun } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Moon, Sun } from "lucide-react"
-import { useEffect, useMemo, useState } from "react"
 import { useTheme } from "next-themes"
+import { useEffect, useMemo, useState } from "react"
+
+import { Button } from "@/components/ui/button"
 
 export function BlogHeader() {
   const { setTheme, resolvedTheme } = useTheme()

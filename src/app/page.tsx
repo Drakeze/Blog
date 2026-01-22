@@ -1,7 +1,7 @@
+import { BlogCard } from "@/components/blog-card"
+import { BlogFooter } from "@/components/blog-footer"
 import { BlogHeader } from "@/components/blog-header"
 import { BlogHero } from "@/components/blog-hero"
-import { BlogFooter } from "@/components/blog-footer"
-import { BlogCard } from "@/components/blog-card"
 import { getPostSummaries } from "@/data/posts"
 
 export const runtime = "nodejs"

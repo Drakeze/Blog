@@ -1,5 +1,5 @@
+import { Github, Heart,Linkedin, Twitter } from "lucide-react"
 import Link from "next/link"
-import { Github, Twitter, Linkedin, Heart } from "lucide-react"
 
 export function BlogFooter() {
   return (

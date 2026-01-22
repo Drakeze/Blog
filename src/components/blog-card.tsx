@@ -1,7 +1,7 @@
-import Link from "next/link"
-import { Badge } from "@/components/ui/badge"
 import { Clock } from "lucide-react"
+import Link from "next/link"
 
+import { Badge } from "@/components/ui/badge"
 import type { BlogPostSummary } from "@/data/posts"
 
 const sourceColors: Record<BlogPostSummary["source"], string> = {
