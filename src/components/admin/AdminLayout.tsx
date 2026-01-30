@@ -2,6 +2,7 @@ import Link from "next/link"
 import type { ReactNode } from "react"
 
 import { Button } from "@/components/ui/button"
+import { LogoutButton } from "@/components/admin/LogoutButton"
 
 export function AdminLayout({ children }: { children: ReactNode }) {
   return (
@@ -21,6 +22,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
             <Button asChild variant="ghost" size="sm" className="rounded-full px-3">
               <Link href="/admin/create">New Post</Link>
             </Button>
+            <LogoutButton />
           </nav>
         </div>
       </header>
