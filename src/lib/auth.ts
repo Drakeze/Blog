@@ -21,7 +21,7 @@ export async function isAdminAuthorized() {
 }
 export async function requireAdmin() {
   if (!(await isAdminAuthorized())) {
-    redirect("/")
+    redirect("/admin/login")
   }
 
   return true

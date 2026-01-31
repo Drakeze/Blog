@@ -1,7 +1,9 @@
 import { BackButton } from "@/components/admin/BackButton"
 import PostEditor from "@/components/admin/PostEditor"
+import { requireAdmin } from "@/lib/auth"
 
-export default function CreatePostPage() {
+export default async function CreatePostPage() {
+  await requireAdmin()
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">

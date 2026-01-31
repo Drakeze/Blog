@@ -2,12 +2,14 @@ import Link from "next/link"
 
 import PostTable from "@/components/admin/PostTable"
 import { Button } from "@/components/ui/button"
+import { requireAdmin } from "@/lib/auth"
 import { getPostSummaries } from "@/data/posts"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 export default async function AdminPostsPage() {
+  await requireAdmin()
   const posts = await getPostSummaries(undefined, true)
 
   return (

@@ -1,9 +1,12 @@
 import Link from "next/link"
 
+import { IntegrationSync } from "@/components/admin/IntegrationSync"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { requireAdmin } from "@/lib/auth"
 
-export default function AdminIndex() {
+export default async function AdminIndex() {
+  await requireAdmin()
   return (
     <div className="space-y-10">
       <div className="space-y-2">
@@ -36,6 +39,16 @@ export default function AdminIndex() {
             </Button>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <h2 className="text-2xl font-serif font-bold tracking-tight">Social Media Integrations</h2>
+          <p className="text-sm text-muted-foreground">
+            Sync content from external platforms to your blog.
+          </p>
+        </div>
+        <IntegrationSync />
       </div>
     </div>
   )

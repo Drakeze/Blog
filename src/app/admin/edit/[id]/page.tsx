@@ -2,9 +2,11 @@ import { notFound } from "next/navigation"
 
 import { BackButton } from "@/components/admin/BackButton"
 import PostEditor from "@/components/admin/PostEditor"
+import { requireAdmin } from "@/lib/auth"
 import { getPostById } from "@/data/posts"
 
 export default async function EditPostPage({ params }: { params: { id: string } }) {
+  await requireAdmin()
   const postId = params.id
 
   if (!/^[a-f0-9]{24}$/i.test(postId)) {
