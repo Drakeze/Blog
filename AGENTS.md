@@ -45,34 +45,34 @@ bunx prisma studio             # Open Prisma Studio to browse data
 This is a **content aggregation platform** that pulls posts from multiple external sources (Patreon, LinkedIn, Reddit, Twitter) and stores them in a MongoDB database alongside manually created blog posts.
 
 **Key architectural pattern**: Each external platform has:
-1. An integration module in `src/lib/social/[platform].ts` that handles API communication and data transformation
-2. A corresponding API route in `src/app/api/integrations/[platform]/route.ts` that triggers sync operations
-3. Platform-specific API credentials managed through `src/lib/env.ts` with a graceful degradation pattern (missing credentials disable the platform but don't break the app)
+1. An integration module in `lib/social/[platform].ts` that handles API communication and data transformation
+2. A corresponding API route in `app/api/integrations/[platform]/route.ts` that triggers sync operations
+3. Platform-specific API credentials managed through `lib/env.ts` with a graceful degradation pattern (missing credentials disable the platform but don't break the app)
 
-### Source Directory Structure
+### Directory Structure
 
-- **`src/app/`** — Next.js App Router pages and API routes
-  - `src/app/api/` — API endpoints for posts, integrations, admin auth, subscriptions, health checks
-  - `src/app/admin/` — Admin UI pages for creating/editing posts
-  - `src/app/blog/` — Public blog pages
+- **`app/`** — Next.js App Router pages and API routes
+  - `app/api/` — API endpoints for posts, integrations, admin auth, subscriptions, health checks
+  - `app/admin/` — Admin UI pages for creating/editing posts
+  - `app/blog/` — Public blog pages
   
-- **`src/lib/`** — Shared utilities and configuration
-  - `src/lib/social/` — External platform integrations (linkedin.ts, patreon.ts, reddit.ts, twitter.ts)
-  - `src/lib/env.ts` — Environment variable validation and social platform config management (uses Zod)
-  - `src/lib/auth.ts` — Simple cookie-based admin authentication
-  - `src/lib/mongo.ts` — MongoDB connection management
-  - `src/lib/prisma.ts` — Prisma client singleton
+- **`lib/`** — Shared utilities and configuration
+  - `lib/social/` — External platform integrations (linkedin.ts, patreon.ts, reddit.ts, twitter.ts)
+  - `lib/env.ts` — Environment variable validation and social platform config management (uses Zod)
+  - `lib/auth.ts` — Simple cookie-based admin authentication
+  - `lib/mongo.ts` — MongoDB connection management
+  - `lib/prisma.ts` — Prisma client singleton
   
-- **`src/data/`** — Data access layer
-  - `src/data/posts.ts` — CRUD operations for blog posts with filtering
-  - `src/data/subscribers.ts` — Email subscription management
+- **`data/`** — Data access layer
+  - `data/posts.ts` — CRUD operations for blog posts with filtering
+  - `data/subscribers.ts` — Email subscription management
   
-- **`src/models/`** — Data models and MongoDB collection management
-  - `src/models/BlogPost.ts` — BlogPost document interface and collection setup
+- **`models/`** — Data models and MongoDB collection management
+  - `models/BlogPost.ts` — BlogPost document interface and collection setup
   
-- **`src/components/`** — React components
-  - `src/components/ui/` — Shadcn/Radix UI components
-  - `src/components/admin/` — Admin-specific components
+- **`components/`** — React components
+  - `components/ui/` — Shadcn/Radix UI components
+  - `components/admin/` — Admin-specific components
 
 ### Database Schema (Prisma + MongoDB)
 
@@ -86,7 +86,7 @@ The schema defines two main models:
 
 ### Environment Variables & Configuration
 
-Environment variables are validated using Zod schemas in `src/lib/env.ts`. The app distinguishes between:
+Environment variables are validated using Zod schemas in `lib/env.ts`. The app distinguishes between:
 - **Server-only**: `DATABASE_URL`, `ADMIN_PASSWORD`, API tokens for external platforms
 - **Public** (NEXT_PUBLIC_*): Site URL and public profile links
 
@@ -106,7 +106,7 @@ A Postman collection is available at `postman/collections/` for testing API endp
 
 ## Path Aliases
 
-TypeScript path alias `@/*` maps to `src/*` (configured in tsconfig.json).
+TypeScript path alias `@/*` maps to the root directory `./*` (configured in tsconfig.json).
 
 ## Deployment
 
@@ -118,4 +118,4 @@ The application is deployed on Vercel (referenced in README).
 - **Type checking script is missing** from package.json but referenced in CI
 - ESLint uses flat config format (eslint.config.mjs)
 - The project uses Next.js 16.x with React 19.x
-- MongoDB is accessed both directly (via mongodb driver in src/models/) and through Prisma
+- MongoDB is accessed both directly (via mongodb driver in models/) and through Prisma
