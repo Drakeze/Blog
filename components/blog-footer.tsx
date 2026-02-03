@@ -3,7 +3,7 @@ import Link from "next/link"
 
 export function BlogFooter() {
   return (
-    <footer className="border-t border-border bg-muted/30 mt-24">
+    <footer className="border-t border-border bg-muted/40 mt-24">
       <div className="container mx-auto px-4 py-12">
         <div className="grid gap-8 md:grid-cols-3">
           <div>
@@ -17,18 +17,18 @@ export function BlogFooter() {
             <h4 className="font-semibold mb-4">Navigation</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/" className="text-muted-foreground hover:text-foreground hover:scale-105 transition-transform">
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/subscribe" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/subscribe" className="text-muted-foreground hover:text-foreground hover:scale-105 transition-transform">
                   Subscribe
                 </Link>
               </li>
               <li>
-                <Link href="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Admin
+                <Link href="/blog" className="text-muted-foreground hover:text-foreground hover:scale-105 transition-transform">
+                  Blog
                 </Link>
               </li>
             </ul>
@@ -41,7 +41,7 @@ export function BlogFooter() {
                 href="https://github.com/Drakeze"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-foreground hover:scale-105 transition-transform"
               >
                 <Github className="h-5 w-5" />
                 <span className="sr-only">GitHub</span>
@@ -50,7 +50,7 @@ export function BlogFooter() {
                 href="https://github.com/DrakezeWind"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-foreground hover:scale-105 transition-transform"
               >
                 <Github className="h-5 w-5" />
                 <span className="sr-only">GitHub</span>
@@ -59,7 +59,7 @@ export function BlogFooter() {
                 href="https://x.com/SorenIdeas"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-foreground hover:scale-105 transition-transform"
               >
                 <Twitter className="h-5 w-5" />
                 <span className="sr-only">Twitter</span>
@@ -68,7 +68,7 @@ export function BlogFooter() {
                 href="https://www.linkedin.com/in/anthonyshead/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-foreground hover:scale-105 transition-transform"
               >
                 <Linkedin className="h-5 w-5" />
                 <span className="sr-only">LinkedIn</span>
@@ -77,7 +77,7 @@ export function BlogFooter() {
                 href="https://www.patreon.com/SorenTech"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-foreground hover:scale-105 transition-transform"
               >
                 <Heart className="h-5 w-5" />
                 <span className="sr-only">Patreon</span>
@@ -87,7 +87,7 @@ export function BlogFooter() {
         </div>
 
         <div className="mt-8 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-          <p>© 2025 All rights reserved.</p>
+          <p>© {new Date().getFullYear()} All rights reserved.</p>
         </div>
       </div>
     </footer>

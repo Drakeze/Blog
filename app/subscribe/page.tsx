@@ -51,7 +51,7 @@ export default function SubscribePage() {
 
       <main className="mx-auto max-w-4xl px-4 py-20 md:px-6">
         <div className="mb-12 text-center">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4 text-balance">Subscribe for updates</h1>
+          <h1 className="mb-4 text-4xl font-semibold tracking-tight text-secondary md:text-6xl">Subscribe for updates</h1>
           <p className="text-lg text-muted-foreground text-balance md:text-xl">
             Get notified when I publish new content across my platforms
           </p>
