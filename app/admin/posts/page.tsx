@@ -1,16 +1,36 @@
+"use client"
+
 import Link from "next/link"
 
 import PostTable from "@/components/admin/PostTable"
 import { Button } from "@/components/ui/button"
-import { requireAdmin } from "@/lib/auth"
-import { getPostSummaries } from "@/data/posts"
+import { useQuery } from "@tanstack/react-query"
 
-export const runtime = "nodejs"
-export const dynamic = "force-dynamic"
+async function fetchAdminPosts() {
+  const res = await fetch("/api/posts", {
+    credentials: "include",
+  })
 
-export default async function AdminPostsPage() {
-  await requireAdmin()
-  const posts = await getPostSummaries(undefined, true)
+  if (!res.ok) {
+    throw new Error("Failed to fetch posts")
+  }
+
+  return res.json()
+}
+
+export default function AdminPostsPage() {
+  const { data: posts, status, error } = useQuery({
+    queryKey: ["admin-posts"],
+    queryFn: fetchAdminPosts,
+  })
+
+  if (status === "loading") {
+    return <p>Loading posts…</p>
+  }
+
+  if (status === "error") {
+    return <p>{(error as Error).message}</p>
+  }
 
   return (
     <div className="space-y-8">
@@ -24,7 +44,7 @@ export default async function AdminPostsPage() {
         </Button>
       </div>
 
-      <PostTable posts={posts} />
+      <PostTable posts={posts ?? []} />
     </div>
   )
 }

@@ -3,22 +3,29 @@ import { NextResponse } from "next/server"
 import { upsertExternalPost } from "@/data/posts"
 import { syncRedditPosts } from "@/lib/social/reddit"
 
+const REDDIT_USERNAME = process.env.REDDIT_USERNAME
+const DEFAULT_LIMIT = 25
+
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
-interface SyncRequest {
-  username: string
-  limit?: number
-  mockMode?: boolean
-}
-
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as SyncRequest
-    const { username, limit = 25, mockMode = false } = body
+    const body = await request.json().catch(() => ({}))
+    const { mockMode = false, limit = DEFAULT_LIMIT } = body as {
+      mockMode?: boolean
+      limit?: number
+    }
 
-    if (!username) {
-      return NextResponse.json({ error: "username is required" }, { status: 400 })
+    if (!REDDIT_USERNAME) {
+      return NextResponse.json(
+        {
+          enabled: false,
+          integration: "reddit",
+          error: "REDDIT_USERNAME not configured",
+        },
+        { status: 200 },
+      )
     }
 
     // Mock mode for testing without hitting Reddit API
@@ -27,12 +34,12 @@ export async function POST(request: Request) {
         success: true,
         message: "Reddit payload validated successfully",
         mockMode: true,
-        validated: { username, limit },
+        validated: { username: REDDIT_USERNAME, limit },
       })
     }
 
     // Fetch and sync Reddit posts
-    const posts = await syncRedditPosts(username, limit)
+    const posts = await syncRedditPosts(REDDIT_USERNAME, limit)
 
     const results = []
     for (const post of posts) {
@@ -52,10 +59,11 @@ export async function POST(request: Request) {
     const failureCount = results.filter((r) => !r.success).length
 
     return NextResponse.json({
-      success: true,
+      enabled: true,
+      integration: "reddit",
       synced: successCount,
       failed: failureCount,
-      results,
+      total: results.length,
     })
   } catch (error) {
     console.error("Reddit sync error:", error)
@@ -69,15 +77,14 @@ export async function POST(request: Request) {
 export async function GET() {
   return NextResponse.json({
     integration: "reddit",
-    status: "active",
-    description: "Sync Reddit posts to the blog database",
-    endpoints: {
+    enabled: Boolean(REDDIT_USERNAME),
+    description: "Server‑configured Reddit ingestion",
+    usage: {
       POST: {
-        description: "Sync posts from a Reddit user",
-        body: {
-          username: "string (required)",
-          limit: "number (optional, default: 25)",
-          mockMode: "boolean (optional, default: false)",
+        description: "Resync Reddit posts using server configuration",
+        optionalBody: {
+          limit: "number (optional)",
+          mockMode: "boolean (optional)",
         },
       },
     },
