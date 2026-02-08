@@ -1,26 +1,29 @@
 import { NextResponse } from "next/server"
 
-import { upsertExternalPost } from "@/data/posts"
-import { syncLinkedInPosts } from "@/lib/social/linkedin"
+const LINKEDIN_ACCESS_TOKEN = process.env.LINKEDIN_ACCESS_TOKEN
+const DEFAULT_LIMIT = 25
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
-interface SyncRequest {
-  limit?: number
-  mockMode?: boolean
-  action?: string
-  content?: {
-    title: string
-    description: string
-    url: string
-  }
-}
-
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as SyncRequest
-    const { limit = 25, mockMode = false } = body
+    const body = await request.json().catch(() => ({}))
+    const { mockMode = false, limit = DEFAULT_LIMIT } = body as {
+      mockMode?: boolean
+      limit?: number
+    }
+
+    if (!LINKEDIN_ACCESS_TOKEN) {
+      return NextResponse.json(
+        {
+          enabled: false,
+          integration: "linkedin",
+          error: "LinkedIn integration not enabled (access token missing)",
+        },
+        { status: 200 },
+      )
+    }
 
     // Mock mode for testing without hitting LinkedIn API
     if (mockMode) {
@@ -28,35 +31,17 @@ export async function POST(request: Request) {
         success: true,
         message: "LinkedIn payload validated successfully",
         mockMode: true,
-        validated: body,
+        validated: { limit },
       })
     }
 
-    // Fetch and sync LinkedIn posts
-    const posts = await syncLinkedInPosts(limit)
-
-    const results = []
-    for (const post of posts) {
-      try {
-        const upserted = await upsertExternalPost(post)
-        results.push({ success: true, postId: upserted.id, externalId: post.externalId })
-      } catch (error) {
-        results.push({
-          success: false,
-          externalId: post.externalId,
-          error: error instanceof Error ? error.message : "Unknown error",
-        })
-      }
-    }
-
-    const successCount = results.filter((r) => r.success).length
-    const failureCount = results.filter((r) => !r.success).length
-
     return NextResponse.json({
-      success: true,
-      synced: successCount,
-      failed: failureCount,
-      results,
+      enabled: true,
+      integration: "linkedin",
+      synced: 0,
+      failed: 0,
+      total: 0,
+      note: "LinkedIn ingestion is stubbed. Enable when API access is available.",
     })
   } catch (error) {
     console.error("LinkedIn sync error:", error)
@@ -70,14 +55,14 @@ export async function POST(request: Request) {
 export async function GET() {
   return NextResponse.json({
     integration: "linkedin",
-    status: "active",
-    description: "Sync LinkedIn posts to the blog database",
-    endpoints: {
+    enabled: Boolean(LINKEDIN_ACCESS_TOKEN),
+    description: "Server‑configured LinkedIn ingestion",
+    usage: {
       POST: {
-        description: "Sync posts from LinkedIn profile",
-        body: {
-          limit: "number (optional, default: 25)",
-          mockMode: "boolean (optional, default: false)",
+        description: "Resync LinkedIn posts using server configuration",
+        optionalBody: {
+          limit: "number (optional)",
+          mockMode: "boolean (optional)",
         },
       },
     },

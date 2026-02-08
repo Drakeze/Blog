@@ -13,6 +13,7 @@ enum PostSource {
   linkedin
   patreon
   twitter
+  dailydev
 }
 
 enum PostStatus {
