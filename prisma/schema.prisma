@@ -38,6 +38,7 @@ model Post {
   externalId      String?
   externalUrl     String?
   heroImage       String?
+  publishedAt     DateTime?
   category        String?
   tags            String[]
   status          PostStatus
@@ -48,4 +49,5 @@ model Post {
 
   @@unique([source, externalId])
   @@index([status, createdAt])
+  @@index([publishedAt, createdAt])
 }

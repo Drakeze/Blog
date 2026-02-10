@@ -8,15 +8,15 @@ export interface TransformedPost {
   tags: string[]
   readTimeMinutes: number
   publishedAt: Date
-  source: "twitter"
+  source: "dailydev"
   status: "published"
   externalId: string
   externalUrl: string
   heroImage?: string
 }
 
-export async function syncTwitterPosts(): Promise<TransformedPost[]> {
-  const config = socialConfig.twitter
+export async function syncDailyDevPosts(): Promise<TransformedPost[]> {
+  const config = socialConfig.dailydev
   if (!config.enabled) {
     return []
   }

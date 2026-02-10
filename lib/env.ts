@@ -10,8 +10,11 @@ const serverSchema = z.object({
   REDDIT_CLIENT_ID: z.string().optional(),
   REDDIT_CLIENT_SECRET: z.string().optional(),
   REDDIT_USER_AGENT: z.string().optional(),
+  REDDIT_USERNAME: z.string().optional(),
   LINKEDIN_ACCESS_TOKEN: z.string().optional(),
+  LINKEDIN_AUTHOR_ID: z.string().optional(),
   TWITTER_BEARER_TOKEN: z.string().optional(),
+  DAILYDEV_API_KEY: z.string().optional(),
 })
 
 const clientSchema = z.object({
@@ -19,6 +22,7 @@ const clientSchema = z.object({
   NEXT_PUBLIC_PATREON_URL: z.string().url().optional(),
   NEXT_PUBLIC_LINKEDIN_URL: z.string().url().optional(),
   NEXT_PUBLIC_TWITTER_URL: z.string().url().optional(),
+  NEXT_PUBLIC_DAILYDEV_URL: z.string().url().optional(),
 })
 
 const mergedSchema = serverSchema.merge(clientSchema)
@@ -40,6 +44,7 @@ export const publicEnv = {
   NEXT_PUBLIC_PATREON_URL: env.NEXT_PUBLIC_PATREON_URL,
   NEXT_PUBLIC_LINKEDIN_URL: env.NEXT_PUBLIC_LINKEDIN_URL,
   NEXT_PUBLIC_TWITTER_URL: env.NEXT_PUBLIC_TWITTER_URL,
+  NEXT_PUBLIC_DAILYDEV_URL: env.NEXT_PUBLIC_DAILYDEV_URL,
 }
 
 type PlatformConfig<TKeys extends Record<string, string | undefined>> = {
@@ -65,9 +70,11 @@ export const socialConfig = {
     clientId: env.REDDIT_CLIENT_ID,
     clientSecret: env.REDDIT_CLIENT_SECRET,
     userAgent: env.REDDIT_USER_AGENT,
+    username: env.REDDIT_USERNAME,
   }),
   linkedin: buildPlatformConfig({
     accessToken: env.LINKEDIN_ACCESS_TOKEN,
+    authorId: env.LINKEDIN_AUTHOR_ID,
   }),
   patreon: buildPlatformConfig({
     accessToken: env.PATREON_ACCESS_TOKEN,
@@ -75,6 +82,9 @@ export const socialConfig = {
   }),
   twitter: buildPlatformConfig({
     bearerToken: env.TWITTER_BEARER_TOKEN,
+  }),
+  dailydev: buildPlatformConfig({
+    apiKey: env.DAILYDEV_API_KEY,
   }),
 }
 

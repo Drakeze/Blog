@@ -1,14 +1,14 @@
 "use client"
 
+import type { Dispatch, SetStateAction } from "react"
 import { useState } from "react"
 import { RefreshCw } from "lucide-react"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 
-type Platform = "reddit" | "linkedin" | "patreon"
+type Platform = "reddit" | "linkedin" | "patreon" | "dailydev" | "twitter"
 
 interface SyncResult {
   success: boolean
@@ -18,66 +18,82 @@ interface SyncResult {
   error?: string
 }
 
-export function IntegrationSync() {
-  const [redditUsername, setRedditUsername] = useState("")
-  const [syncing, setSyncing] = useState<Platform | null>(null)
-  const [results, setResults] = useState<Record<Platform, SyncResult | null>>({
-    reddit: null,
-    linkedin: null,
-    patreon: null,
-  })
+type SyncResponse = {
+  enabled: boolean
+  integration?: Platform
+  synced?: number
+  failed?: number
+  total?: number
+  note?: string
+  error?: string
+}
 
-  const syncPlatform = async (platform: Platform, params?: Record<string, unknown>) => {
-    setSyncing(platform)
-    setResults((prev) => ({ ...prev, [platform]: null }))
+function useIntegrationMutation(
+  platform: Platform,
+  setResults: Dispatch<SetStateAction<Record<Platform, SyncResult | null>>>,
+) {
+  const queryClient = useQueryClient()
 
-    try {
+  return useMutation({
+    mutationFn: async () => {
       const response = await fetch(`/api/integrations/${platform}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(params || {}),
       })
 
-      const data = await response.json()
-
+      const data = (await response.json()) as SyncResponse
       if (!response.ok) {
-        setResults((prev) => ({
-          ...prev,
-          [platform]: { success: false, error: data.error || "Sync failed" },
-        }))
-      } else {
-        setResults((prev) => ({
-          ...prev,
-          [platform]: {
-            success: true,
-            synced: data.synced,
-            failed: data.failed,
-            message: data.message,
-          },
-        }))
+        throw new Error(data.error || "Sync failed")
       }
-    } catch (error) {
+      return data
+    },
+    onMutate: () => {
+      setResults((prev) => ({ ...prev, [platform]: null }))
+    },
+    onSuccess: (data) => {
+      if (!data.enabled) {
+        setResults((prev) => ({
+          ...prev,
+          [platform]: { success: false, error: "Integration is disabled." },
+        }))
+        return
+      }
+
+      setResults((prev) => ({
+        ...prev,
+        [platform]: {
+          success: true,
+          synced: data.synced,
+          failed: data.failed,
+          message: data.note,
+        },
+      }))
+
+      queryClient.invalidateQueries({ queryKey: ["admin-posts"] })
+    },
+    onError: (error) => {
       setResults((prev) => ({
         ...prev,
         [platform]: { success: false, error: error instanceof Error ? error.message : "Unknown error" },
       }))
-    } finally {
-      setSyncing(null)
-    }
-  }
+    },
+  })
+}
 
-  const handleRedditSync = () => {
-    if (!redditUsername.trim()) return
-    syncPlatform("reddit", { username: redditUsername, limit: 25 })
-  }
+export function IntegrationSync() {
+  const [results, setResults] = useState<Record<Platform, SyncResult | null>>({
+    reddit: null,
+    linkedin: null,
+    patreon: null,
+    dailydev: null,
+    twitter: null,
+  })
 
-  const handleLinkedInSync = () => {
-    syncPlatform("linkedin", { limit: 25 })
-  }
-
-  const handlePatreonSync = () => {
-    syncPlatform("patreon", { limit: 25 })
-  }
+  const redditMutation = useIntegrationMutation("reddit", setResults)
+  const linkedinMutation = useIntegrationMutation("linkedin", setResults)
+  const patreonMutation = useIntegrationMutation("patreon", setResults)
+  const dailydevMutation = useIntegrationMutation("dailydev", setResults)
+  const twitterMutation = useIntegrationMutation("twitter", setResults)
 
   return (
     <div className="space-y-6">
@@ -91,22 +107,12 @@ export function IntegrationSync() {
           <CardDescription>Sync posts from a Reddit user profile.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="reddit-username">Username</Label>
-            <Input
-              id="reddit-username"
-              placeholder="e.g. username"
-              value={redditUsername}
-              onChange={(e) => setRedditUsername(e.target.value)}
-              disabled={syncing === "reddit"}
-            />
-          </div>
           <Button
-            onClick={handleRedditSync}
-            disabled={!redditUsername.trim() || syncing === "reddit"}
+            onClick={() => redditMutation.mutate()}
+            disabled={redditMutation.isPending}
             className="w-full rounded-full"
           >
-            {syncing === "reddit" ? (
+            {redditMutation.isPending ? (
               <>
                 <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                 Syncing...
@@ -146,8 +152,12 @@ export function IntegrationSync() {
           <CardDescription>Sync posts from your LinkedIn profile.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button onClick={handleLinkedInSync} disabled={syncing === "linkedin"} className="w-full rounded-full">
-            {syncing === "linkedin" ? (
+          <Button
+            onClick={() => linkedinMutation.mutate()}
+            disabled={linkedinMutation.isPending}
+            className="w-full rounded-full"
+          >
+            {linkedinMutation.isPending ? (
               <>
                 <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                 Syncing...
@@ -187,8 +197,12 @@ export function IntegrationSync() {
           <CardDescription>Sync posts from your Patreon campaign.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button onClick={handlePatreonSync} disabled={syncing === "patreon"} className="w-full rounded-full">
-            {syncing === "patreon" ? (
+          <Button
+            onClick={() => patreonMutation.mutate()}
+            disabled={patreonMutation.isPending}
+            className="w-full rounded-full"
+          >
+            {patreonMutation.isPending ? (
               <>
                 <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                 Syncing...
@@ -212,6 +226,96 @@ export function IntegrationSync() {
                 </>
               ) : (
                 <>✗ {results.patreon.error}</>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Daily.dev */}
+      <Card className="shadow-sm">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-[#0B4CFF]" />
+            Daily.dev
+          </CardTitle>
+          <CardDescription>Stub integration for Daily.dev content.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button
+            onClick={() => dailydevMutation.mutate()}
+            disabled={dailydevMutation.isPending}
+            className="w-full rounded-full"
+          >
+            {dailydevMutation.isPending ? (
+              <>
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                Syncing...
+              </>
+            ) : (
+              "Sync Daily.dev Posts"
+            )}
+          </Button>
+          {results.dailydev && (
+            <div
+              className={`rounded-lg border p-3 text-sm ${
+                results.dailydev.success
+                  ? "border-green-500/20 bg-green-500/10 text-green-700 dark:text-green-400"
+                  : "border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400"
+              }`}
+            >
+              {results.dailydev.success ? (
+                <>
+                  ✓ Synced {results.dailydev.synced} post(s)
+                  {results.dailydev.failed ? ` • ${results.dailydev.failed} failed` : ""}
+                </>
+              ) : (
+                <>✗ {results.dailydev.error}</>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Twitter/X */}
+      <Card className="shadow-sm">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-[#1DA1F2]" />
+            Twitter/X
+          </CardTitle>
+          <CardDescription>Stub integration for future Twitter/X ingestion.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button
+            onClick={() => twitterMutation.mutate()}
+            disabled={twitterMutation.isPending}
+            className="w-full rounded-full"
+          >
+            {twitterMutation.isPending ? (
+              <>
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                Syncing...
+              </>
+            ) : (
+              "Sync Twitter/X Posts"
+            )}
+          </Button>
+          {results.twitter && (
+            <div
+              className={`rounded-lg border p-3 text-sm ${
+                results.twitter.success
+                  ? "border-green-500/20 bg-green-500/10 text-green-700 dark:text-green-400"
+                  : "border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400"
+              }`}
+            >
+              {results.twitter.success ? (
+                <>
+                  ✓ Synced {results.twitter.synced} post(s)
+                  {results.twitter.failed ? ` • ${results.twitter.failed} failed` : ""}
+                </>
+              ) : (
+                <>✗ {results.twitter.error}</>
               )}
             </div>
           )}
