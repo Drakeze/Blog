@@ -16,6 +16,7 @@ export interface BlogPostDocument {
   externalId?: string | null
   externalUrl?: string | null
   heroImage?: string | null
+  publishedAt?: Date
   createdAt: Date
   updatedAt: Date
 }
@@ -36,12 +37,16 @@ export async function getPostsCollection(): Promise<Collection<BlogPostDocument>
   await cachedCollection.createIndex({ status: 1 })
   await cachedCollection.createIndex({ tags: 1 })
   await cachedCollection.createIndex({ createdAt: -1 })
+  await cachedCollection.createIndex({ publishedAt: -1 })
   await cachedCollection.createIndex({ externalId: 1, source: 1 }, { unique: true, sparse: true })
+  await cachedCollection.updateMany({ publishedAt: { $exists: false } }, [{ $set: { publishedAt: "$createdAt" } }])
 
   return cachedCollection
 }
 
 export function documentToPost(doc: BlogPostDocument) {
+  const publishedAt = doc.publishedAt ?? doc.createdAt
+
   return {
     id: doc._id!.toString(),
     title: doc.title,
@@ -57,6 +62,7 @@ export function documentToPost(doc: BlogPostDocument) {
     externalId: doc.externalId || null,
     externalUrl: doc.externalUrl || null,
     heroImage: doc.heroImage || null,
+    publishedAt: publishedAt.toISOString(),
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   }

@@ -27,6 +27,7 @@ export interface TransformedPost {
   category: string
   tags: string[]
   readTimeMinutes: number
+  publishedAt: Date
   source: "reddit"
   status: "published"
   externalId: string
@@ -34,13 +35,16 @@ export interface TransformedPost {
   heroImage?: string
 }
 
-export async function fetchRedditPosts(username: string, limit = 25): Promise<RedditPost[]> {
+export async function fetchRedditPosts(limit = 25): Promise<RedditPost[]> {
   const config = socialConfig.reddit
   if (!config.enabled) {
-    throw new Error(`Reddit integration disabled. Missing: ${config.missingKeys.join(", ")}`)
+    return []
   }
 
-  const { clientId, clientSecret, userAgent } = config.keys
+  const { clientId, clientSecret, userAgent, username } = config.keys
+  if (!username) {
+    return []
+  }
   const auth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64")
 
   // Get access token
@@ -92,6 +96,7 @@ export function transformRedditPost(post: RedditPost): TransformedPost {
     category: "Reddit",
     tags: [post.subreddit, "reddit"],
     readTimeMinutes,
+    publishedAt: new Date(post.created_utc * 1000),
     source: "reddit",
     status: "published",
     externalId: post.id,
@@ -99,7 +104,7 @@ export function transformRedditPost(post: RedditPost): TransformedPost {
   }
 }
 
-export async function syncRedditPosts(username: string, limit = 25): Promise<TransformedPost[]> {
-  const posts = await fetchRedditPosts(username, limit)
+export async function syncRedditPosts(limit = 25): Promise<TransformedPost[]> {
+  const posts = await fetchRedditPosts(limit)
   return posts.map(transformRedditPost)
 }

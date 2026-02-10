@@ -22,6 +22,7 @@ export interface TransformedPost {
   category: string
   tags: string[]
   readTimeMinutes: number
+  publishedAt: Date
   source: "linkedin"
   status: "published"
   externalId: string
@@ -32,15 +33,18 @@ export interface TransformedPost {
 export async function fetchLinkedInPosts(limit = 25): Promise<LinkedInPost[]> {
   const config = socialConfig.linkedin
   if (!config.enabled) {
-    throw new Error(`LinkedIn integration disabled. Missing: ${config.missingKeys.join(", ")}`)
+    return []
   }
 
-  const { accessToken } = config.keys
+  const { accessToken, authorId } = config.keys
+  if (!authorId) {
+    return []
+  }
 
   // Note: LinkedIn API v2 requires specific permissions and setup
   // This is a simplified example - actual implementation may vary
   const response = await fetch(
-    `https://api.linkedin.com/v2/ugcPosts?q=authors&authors=List(urn:li:person:AUTHOR_ID)&count=${limit}`,
+    `https://api.linkedin.com/v2/ugcPosts?q=authors&authors=List(urn:li:person:${authorId})&count=${limit}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -71,6 +75,7 @@ export function transformLinkedInPost(post: LinkedInPost): TransformedPost {
     category: "LinkedIn",
     tags: ["linkedin", "professional"],
     readTimeMinutes,
+    publishedAt: new Date(post.created.time),
     source: "linkedin",
     status: "published",
     externalId: post.id,

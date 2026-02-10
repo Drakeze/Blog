@@ -25,6 +25,7 @@ export interface TransformedPost {
   category: string
   tags: string[]
   readTimeMinutes: number
+  publishedAt: Date
   source: "patreon"
   status: "published"
   externalId: string
@@ -35,7 +36,7 @@ export interface TransformedPost {
 export async function fetchPatreonPosts(limit = 25): Promise<PatreonPost[]> {
   const config = socialConfig.patreon
   if (!config.enabled) {
-    throw new Error(`Patreon integration disabled. Missing: ${config.missingKeys.join(", ")}`)
+    return []
   }
 
   const { accessToken, campaignId } = config.keys
@@ -71,6 +72,7 @@ export function transformPatreonPost(post: PatreonPost): TransformedPost {
     category: "Patreon",
     tags: ["patreon", "exclusive"],
     readTimeMinutes,
+    publishedAt: post.attributes.published_at ? new Date(post.attributes.published_at) : new Date(),
     source: "patreon",
     status: "published",
     externalId: post.id,

@@ -1,38 +1,31 @@
 import { NextResponse } from "next/server"
 
 import { upsertExternalPost } from "@/data/posts"
+import { socialConfig } from "@/lib/env"
 import { syncRedditPosts } from "@/lib/social/reddit"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
-interface SyncRequest {
-  username: string
-  limit?: number
-  mockMode?: boolean
-}
-
 export async function POST(request: Request) {
+  const config = socialConfig.reddit
+  if (!config.enabled) {
+    return NextResponse.json({ enabled: false })
+  }
+
+  let limit = 25
   try {
-    const body = (await request.json()) as SyncRequest
-    const { username, limit = 25, mockMode = false } = body
-
-    if (!username) {
-      return NextResponse.json({ error: "username is required" }, { status: 400 })
+    const body = (await request.json()) as { limit?: number }
+    if (typeof body.limit === "number") {
+      limit = body.limit
     }
+  } catch {
+    limit = 25
+  }
 
-    // Mock mode for testing without hitting Reddit API
-    if (mockMode) {
-      return NextResponse.json({
-        success: true,
-        message: "Reddit payload validated successfully",
-        mockMode: true,
-        validated: { username, limit },
-      })
-    }
-
+  try {
     // Fetch and sync Reddit posts
-    const posts = await syncRedditPosts(username, limit)
+    const posts = await syncRedditPosts(limit)
 
     const results = []
     for (const post of posts) {
@@ -52,9 +45,11 @@ export async function POST(request: Request) {
     const failureCount = results.filter((r) => !r.success).length
 
     return NextResponse.json({
-      success: true,
+      enabled: true,
+      integration: "reddit",
       synced: successCount,
       failed: failureCount,
+      total: posts.length,
       results,
     })
   } catch (error) {
@@ -67,19 +62,14 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
+  const config = socialConfig.reddit
+  if (!config.enabled) {
+    return NextResponse.json({ enabled: false })
+  }
+
   return NextResponse.json({
     integration: "reddit",
-    status: "active",
+    enabled: true,
     description: "Sync Reddit posts to the blog database",
-    endpoints: {
-      POST: {
-        description: "Sync posts from a Reddit user",
-        body: {
-          username: "string (required)",
-          limit: "number (optional, default: 25)",
-          mockMode: "boolean (optional, default: false)",
-        },
-      },
-    },
   })
 }

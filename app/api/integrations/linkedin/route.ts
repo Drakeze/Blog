@@ -1,37 +1,29 @@
 import { NextResponse } from "next/server"
 
 import { upsertExternalPost } from "@/data/posts"
+import { socialConfig } from "@/lib/env"
 import { syncLinkedInPosts } from "@/lib/social/linkedin"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
-interface SyncRequest {
-  limit?: number
-  mockMode?: boolean
-  action?: string
-  content?: {
-    title: string
-    description: string
-    url: string
-  }
-}
-
 export async function POST(request: Request) {
+  const config = socialConfig.linkedin
+  if (!config.enabled) {
+    return NextResponse.json({ enabled: false })
+  }
+
+  let limit = 25
   try {
-    const body = (await request.json()) as SyncRequest
-    const { limit = 25, mockMode = false } = body
-
-    // Mock mode for testing without hitting LinkedIn API
-    if (mockMode) {
-      return NextResponse.json({
-        success: true,
-        message: "LinkedIn payload validated successfully",
-        mockMode: true,
-        validated: body,
-      })
+    const body = (await request.json()) as { limit?: number }
+    if (typeof body.limit === "number") {
+      limit = body.limit
     }
+  } catch {
+    limit = 25
+  }
 
+  try {
     // Fetch and sync LinkedIn posts
     const posts = await syncLinkedInPosts(limit)
 
@@ -53,9 +45,11 @@ export async function POST(request: Request) {
     const failureCount = results.filter((r) => !r.success).length
 
     return NextResponse.json({
-      success: true,
+      enabled: true,
+      integration: "linkedin",
       synced: successCount,
       failed: failureCount,
+      total: posts.length,
       results,
     })
   } catch (error) {
@@ -68,18 +62,14 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
+  const config = socialConfig.linkedin
+  if (!config.enabled) {
+    return NextResponse.json({ enabled: false })
+  }
+
   return NextResponse.json({
     integration: "linkedin",
-    status: "active",
+    enabled: true,
     description: "Sync LinkedIn posts to the blog database",
-    endpoints: {
-      POST: {
-        description: "Sync posts from LinkedIn profile",
-        body: {
-          limit: "number (optional, default: 25)",
-          mockMode: "boolean (optional, default: false)",
-        },
-      },
-    },
   })
 }

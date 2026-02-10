@@ -26,6 +26,7 @@ export type BlogPost = {
   source: PostSource
   status: PostStatus
   slug: string
+  publishedAt: string
   createdAt: string
   updatedAt: string
   externalId?: string | null
@@ -51,6 +52,7 @@ const postInputSchema = z.object({
   category: z.string().default("General"),
   tags: z.array(z.string()).default([]),
   readTimeMinutes: z.number().int().positive().default(5),
+  publishedAt: z.coerce.date().optional(),
   source: z.enum(["blog", "reddit", "twitter", "linkedin", "patreon"]).default("blog"),
   status: z.enum(["draft", "published"]).default("draft"),
   slug: z.string().optional(),
@@ -64,7 +66,7 @@ const postUpdateSchema = postInputSchema.partial()
 export async function getAllPosts(includeDrafts = false): Promise<BlogPost[]> {
   const collection = await getPostsCollection()
   const filter = includeDrafts ? {} : { status: "published" as const }
-  const docs = await collection.find(filter).sort({ createdAt: -1 }).toArray()
+  const docs = await collection.find(filter).sort({ publishedAt: -1, createdAt: -1 }).toArray()
   return docs.map(documentToPost)
 }
 
@@ -88,7 +90,7 @@ export async function getPostSummaries(limit?: number, includeDrafts = false): P
   const collection = await getPostsCollection()
   const filter = includeDrafts ? {} : { status: "published" as const }
   const projection = { content: 0 }
-  let query = collection.find(filter, { projection }).sort({ createdAt: -1 })
+  let query = collection.find(filter, { projection }).sort({ publishedAt: -1, createdAt: -1 })
   if (limit) {
     query = query.limit(limit)
   }
@@ -137,7 +139,7 @@ export async function filterPosts(
     query.createdAt = { $gte: new Date(filters.createdAt) }
   }
 
-  const docs = await collection.find(query).sort({ createdAt: -1 }).toArray()
+  const docs = await collection.find(query).sort({ publishedAt: -1, createdAt: -1 }).toArray()
   return docs.map(documentToPost)
 }
 
@@ -158,6 +160,7 @@ export async function addPost(input: unknown): Promise<BlogPost> {
     category: data.category,
     tags: data.tags,
     readTimeMinutes: data.readTimeMinutes,
+    publishedAt: data.publishedAt ?? now,
     source: data.source,
     status: data.status,
     slug: data.slug || generateSlug(data.title),
@@ -246,6 +249,7 @@ export async function upsertExternalPost(input: unknown): Promise<BlogPost> {
     category: data.category,
     tags: data.tags,
     readTimeMinutes: data.readTimeMinutes,
+    publishedAt: data.publishedAt ?? now,
     source: data.source,
     status: data.status,
     slug: data.slug || generateSlug(data.title, data.externalId),
