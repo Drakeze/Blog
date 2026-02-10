@@ -1,14 +1,15 @@
 "use client"
 
-import type { Dispatch, SetStateAction } from "react"
-import { useState } from "react"
+import { useState, type Dispatch, type SetStateAction } from "react"
 import { RefreshCw } from "lucide-react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
-type Platform = "reddit" | "linkedin" | "patreon" | "dailydev" | "twitter"
+const PLATFORMS = ["reddit", "linkedin", "patreon", "dailydev", "twitter"] as const
+
+type Platform = (typeof PLATFORMS)[number]
 
 interface SyncResult {
   success: boolean
@@ -28,6 +29,9 @@ type SyncResponse = {
   error?: string
 }
 
+// Option A:
+// Each integration sync is modeled as a TanStack mutation.
+// On success, we invalidate the admin posts cache so the table refreshes automatically.
 function useIntegrationMutation(
   platform: Platform,
   setResults: Dispatch<SetStateAction<Record<Platform, SyncResult | null>>>,
@@ -38,7 +42,7 @@ function useIntegrationMutation(
     mutationFn: async () => {
       const response = await fetch(`/api/integrations/${platform}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {},
       })
 
       const data = (await response.json()) as SyncResponse
@@ -69,6 +73,7 @@ function useIntegrationMutation(
         },
       }))
 
+      // Trigger admin post list refresh after a successful sync
       queryClient.invalidateQueries({ queryKey: ["admin-posts"] })
     },
     onError: (error) => {
@@ -81,13 +86,9 @@ function useIntegrationMutation(
 }
 
 export function IntegrationSync() {
-  const [results, setResults] = useState<Record<Platform, SyncResult | null>>({
-    reddit: null,
-    linkedin: null,
-    patreon: null,
-    dailydev: null,
-    twitter: null,
-  })
+  const [results, setResults] = useState<Record<Platform, SyncResult | null>>(
+    Object.fromEntries(PLATFORMS.map((p) => [p, null])) as Record<Platform, SyncResult | null>,
+  )
 
   const redditMutation = useIntegrationMutation("reddit", setResults)
   const linkedinMutation = useIntegrationMutation("linkedin", setResults)
