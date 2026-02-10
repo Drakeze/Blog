@@ -249,7 +249,7 @@ export async function upsertExternalPost(input: unknown): Promise<BlogPost> {
     category: data.category,
     tags: data.tags,
     readTimeMinutes: data.readTimeMinutes,
-    publishedAt: data.publishedAt ?? now,
+    publishedAt: data.publishedAt ?? undefined,
     source: data.source,
     status: data.status,
     slug: data.slug || generateSlug(data.title, data.externalId),

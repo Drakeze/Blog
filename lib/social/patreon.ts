@@ -25,7 +25,7 @@ export interface TransformedPost {
   category: string
   tags: string[]
   readTimeMinutes: number
-  publishedAt: Date
+  publishedAt: Date | undefined
   source: "patreon"
   status: "published"
   externalId: string
@@ -72,7 +72,9 @@ export function transformPatreonPost(post: PatreonPost): TransformedPost {
     category: "Patreon",
     tags: ["patreon", "exclusive"],
     readTimeMinutes,
-    publishedAt: post.attributes.published_at ? new Date(post.attributes.published_at) : new Date(),
+    publishedAt: post.attributes.published_at
+      ? new Date(post.attributes.published_at)
+      : undefined,
     source: "patreon",
     status: "published",
     externalId: post.id,
