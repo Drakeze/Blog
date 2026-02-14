@@ -229,6 +229,7 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
                   <option value="twitter">Twitter/X</option>
                   <option value="linkedin">LinkedIn</option>
                   <option value="patreon">Patreon</option>
+                  <option value="dailydev">Daily.dev</option>
                 </select>
               </div>
               <div className="space-y-1.5">

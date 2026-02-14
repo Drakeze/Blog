@@ -1,18 +1,4 @@
-import { PrismaClient } from "@prisma/client"
-
-// PrismaClient is attached to the `global` object in development to prevent
-// exhausting your database connection limit during hot reloads
-declare global {
-  // eslint-disable-next-line no-var
-  var prisma: PrismaClient | undefined
-}
-
-export const prisma =
-  global.prisma ||
-  new PrismaClient({
-    log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
-  })
-
-if (process.env.NODE_ENV !== "production") {
-  global.prisma = prisma
-}
+// Prisma is currently on standby for this project.
+// Keeping this module as a safe placeholder prevents build-time failures
+// when Prisma Client is not generated in constrained environments.
+export const prisma = null

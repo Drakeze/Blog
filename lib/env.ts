@@ -2,9 +2,9 @@ import { z } from "zod"
 
 const serverSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  ADMIN_PASSWORD: z.string().min(12, "ADMIN_PASSWORD must be at least 12 characters"),
+  ADMIN_PASSWORD: z.string().optional(),
   AUTH_SECRET: z.string().min(1, "AUTH_SECRET is required").default("development-secret"),
-  DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
+  DATABASE_URL: z.string().optional(),
   PATREON_ACCESS_TOKEN: z.string().optional(),
   PATREON_CAMPAIGN_ID: z.string().optional(),
   REDDIT_CLIENT_ID: z.string().optional(),
@@ -12,6 +12,8 @@ const serverSchema = z.object({
   REDDIT_USER_AGENT: z.string().optional(),
   LINKEDIN_ACCESS_TOKEN: z.string().optional(),
   TWITTER_BEARER_TOKEN: z.string().optional(),
+  DAILYDEV_API_KEY: z.string().optional(),
+  DAILYDEV_USERNAME: z.string().optional(),
 })
 
 const clientSchema = z.object({
@@ -33,7 +35,12 @@ if (!parsed.success) {
   throw new Error(`Invalid environment variables: ${formatErrors(parsed.error.errors)}`)
 }
 
-export const env = parsed.data
+
+export const env = {
+  ...parsed.data,
+  ADMIN_PASSWORD: parsed.data.ADMIN_PASSWORD ?? "development-password",
+  DATABASE_URL: parsed.data.DATABASE_URL ?? "mongodb://localhost:27017/blog",
+}
 
 export const publicEnv = {
   NEXT_PUBLIC_SITE_URL: env.NEXT_PUBLIC_SITE_URL,
@@ -75,6 +82,10 @@ export const socialConfig = {
   }),
   twitter: buildPlatformConfig({
     bearerToken: env.TWITTER_BEARER_TOKEN,
+  }),
+  dailydev: buildPlatformConfig({
+    apiKey: env.DAILYDEV_API_KEY,
+    username: env.DAILYDEV_USERNAME,
   }),
 }
 

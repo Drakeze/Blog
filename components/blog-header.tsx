@@ -4,13 +4,17 @@ import { Moon, Sun } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useSyncExternalStore } from "react"
 
 import { Button } from "@/components/ui/button"
 
 export function BlogHeader() {
   const { setTheme, resolvedTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
+  const mounted = useSyncExternalStore(
+    () => () => undefined,
+    () => true,
+    () => false,
+  )
   const pathname = usePathname()
 
   const navItems = useMemo(
@@ -25,10 +29,6 @@ export function BlogHeader() {
     if (href === "/") return pathname === "/"
     return pathname.startsWith(href)
   }
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">

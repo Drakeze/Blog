@@ -10,7 +10,7 @@ export interface BlogPostDocument {
   category: string
   tags: string[]
   readTimeMinutes: number
-  source: "blog" | "reddit" | "twitter" | "linkedin" | "patreon" | "dailydev" |
+  source: "blog" | "reddit" | "twitter" | "linkedin" | "patreon" | "dailydev"
   status: "draft" | "published"
   slug: string
   externalId?: string | null
