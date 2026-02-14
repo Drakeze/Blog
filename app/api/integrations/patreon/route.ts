@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     }
 
     // Fetch and sync Patreon posts
-    const posts = await syncPatreonPosts(PATREON_CAMPAIGN_ID, limit)
+    const posts = await syncPatreonPosts(limit)
 
     const results = []
     for (const post of posts) {

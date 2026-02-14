@@ -24,7 +24,7 @@ export default function AdminPostsPage() {
     queryFn: fetchAdminPosts,
   })
 
-  if (status === "loading") {
+  if (status === "pending") {
     return <p>Loading posts…</p>
   }
 

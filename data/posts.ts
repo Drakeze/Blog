@@ -8,10 +8,10 @@ import {
   getPostsCollection,
 } from "@/models/BlogPost"
 
-export type PostSource = "blog" | "reddit" | "twitter" | "linkedin" | "patreon"
+export type PostSource = "blog" | "reddit" | "twitter" | "linkedin" | "patreon" | "dailydev"
 export type PostStatus = "draft" | "published"
 
-export const postSources: PostSource[] = ["blog", "reddit", "twitter", "linkedin", "patreon"]
+export const postSources: PostSource[] = ["blog", "reddit", "twitter", "linkedin", "patreon", "dailydev"]
 export const postStatuses: PostStatus[] = ["draft", "published"]
 
 export type BlogPost = {
@@ -44,22 +44,38 @@ export class PostValidationError extends Error {
   }
 }
 
+const heroImageSchema = z
+  .string()
+  .trim()
+  .refine((value) => value.startsWith("/") || z.string().url().safeParse(value).success, "Hero image must be an absolute URL or root-relative path")
+
 const postInputSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  excerpt: z.string().min(1, "Excerpt is required"),
+  excerpt: z.string().default(""),
   content: z.string().min(1, "Content is required"),
   category: z.string().default("General"),
   tags: z.array(z.string()).default([]),
-  readTimeMinutes: z.number().int().positive().default(5),
-  source: z.enum(["blog", "reddit", "twitter", "linkedin", "patreon"]).default("blog"),
+  readTimeMinutes: z.number().int().positive().optional(),
+  source: z.enum(["blog", "reddit", "twitter", "linkedin", "patreon", "dailydev"]).default("blog"),
   status: z.enum(["draft", "published"]).default("draft"),
   slug: z.string().optional(),
   externalId: z.string().optional(),
   externalUrl: z.string().url().optional(),
-  heroImage: z.string().url().optional(),
+  heroImage: heroImageSchema.optional(),
+  createdAt: z.coerce.date().optional(),
 })
 
 const postUpdateSchema = postInputSchema.partial()
+
+function estimateReadTimeMinutes(content: string) {
+  const wordCount = content.trim().split(/\s+/).filter(Boolean).length
+  return Math.max(1, Math.ceil(wordCount / 200))
+}
+
+function buildExcerpt(excerpt: string, content: string) {
+  if (excerpt.trim()) return excerpt.trim()
+  return content.replace(/\s+/g, " ").trim().slice(0, 180)
+}
 
 export async function getAllPosts(includeDrafts = false): Promise<BlogPost[]> {
   const collection = await getPostsCollection()
@@ -153,18 +169,18 @@ export async function addPost(input: unknown): Promise<BlogPost> {
 
   const doc: BlogPostDocument = {
     title: data.title,
-    excerpt: data.excerpt,
+    excerpt: buildExcerpt(data.excerpt, data.content),
     content: data.content,
     category: data.category,
     tags: data.tags,
-    readTimeMinutes: data.readTimeMinutes,
+    readTimeMinutes: data.readTimeMinutes ?? estimateReadTimeMinutes(data.content),
     source: data.source,
     status: data.status,
     slug: data.slug || generateSlug(data.title),
     externalId: data.externalId || null,
     externalUrl: data.externalUrl || null,
     heroImage: data.heroImage || null,
-    createdAt: now,
+    createdAt: data.createdAt ?? now,
     updatedAt: now,
   }
 
@@ -197,6 +213,12 @@ export async function updatePost(id: string, updates: unknown): Promise<BlogPost
   const collection = await getPostsCollection()
   const updateDoc: Partial<BlogPostDocument> = {
     ...data,
+    ...(data.content
+      ? {
+          excerpt: buildExcerpt(data.excerpt ?? "", data.content),
+          readTimeMinutes: data.readTimeMinutes ?? estimateReadTimeMinutes(data.content),
+        }
+      : {}),
     updatedAt: new Date(),
   }
 
@@ -241,24 +263,24 @@ export async function upsertExternalPost(input: unknown): Promise<BlogPost> {
 
   const doc: BlogPostDocument = {
     title: data.title,
-    excerpt: data.excerpt,
+    excerpt: buildExcerpt(data.excerpt, data.content),
     content: data.content,
     category: data.category,
     tags: data.tags,
-    readTimeMinutes: data.readTimeMinutes,
+    readTimeMinutes: data.readTimeMinutes ?? estimateReadTimeMinutes(data.content),
     source: data.source,
     status: data.status,
     slug: data.slug || generateSlug(data.title, data.externalId),
     externalId: data.externalId,
     externalUrl: data.externalUrl || null,
     heroImage: data.heroImage || null,
-    createdAt: now,
+    createdAt: data.createdAt ?? now,
     updatedAt: now,
   }
 
   const result = await collection.findOneAndUpdate(
     { externalId: data.externalId, source: data.source },
-    { $set: { ...doc, updatedAt: now }, $setOnInsert: { createdAt: now } },
+    { $set: { ...doc, updatedAt: now }, $setOnInsert: { createdAt: data.createdAt ?? now } },
     { upsert: true, returnDocument: "after" },
   )
 

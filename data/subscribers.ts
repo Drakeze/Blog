@@ -1,6 +1,6 @@
-import { Prisma } from "@prisma/client"
+import { MongoServerError } from "mongodb"
 
-import { prisma } from "@/lib/prisma"
+import { getDb } from "@/lib/mongo"
 
 export class SubscriberError extends Error {
   status: number
@@ -27,20 +27,32 @@ export async function addSubscriber(input: SubscriberInput) {
     throw new SubscriberError("Please provide a valid email address.", 400)
   }
 
+  const db = await getDb()
+  const collection = db.collection("subscribers")
+  await collection.createIndex({ email: 1 }, { unique: true })
+
+  const now = new Date()
   const email = normalizeEmail(input.email)
 
   try {
-    const subscriber = await prisma.subscriber.create({
-      data: {
-        email,
-        name: input.name?.trim() || undefined,
-        source: input.source?.trim() || undefined,
-      },
+    const result = await collection.insertOne({
+      email,
+      name: input.name?.trim() || null,
+      source: input.source?.trim() || null,
+      createdAt: now,
+      updatedAt: now,
     })
 
-    return subscriber
+    return {
+      id: result.insertedId.toString(),
+      email,
+      name: input.name?.trim() || null,
+      source: input.source?.trim() || null,
+      createdAt: now.toISOString(),
+      updatedAt: now.toISOString(),
+    }
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+    if (error instanceof MongoServerError && error.code === 11000) {
       throw new SubscriberError("You are already subscribed.", 409)
     }
     throw error
