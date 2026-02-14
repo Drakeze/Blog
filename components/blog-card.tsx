@@ -10,6 +10,7 @@ const sourceColors: Record<BlogPostSummary["source"], string> = {
   twitter: "bg-[#1DA1F2] text-white hover:bg-[#1DA1F2]/90",
   linkedin: "bg-[#0A66C2] text-white hover:bg-[#0A66C2]/90",
   patreon: "bg-[#FF424D] text-white hover:bg-[#FF424D]/90",
+  dailydev: "bg-[#6B46FF] text-white hover:bg-[#6B46FF]/90",
 }
 
 const sourceLabels: Record<BlogPostSummary["source"], string> = {
@@ -18,6 +19,7 @@ const sourceLabels: Record<BlogPostSummary["source"], string> = {
   twitter: "Twitter/X",
   linkedin: "LinkedIn",
   patreon: "Patreon",
+  dailydev: "Daily.dev",
 }
 
 export function BlogCard({ post }: { post: BlogPostSummary }) {

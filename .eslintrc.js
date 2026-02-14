@@ -30,6 +30,7 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'warn',
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/no-explicit-any': 'warn',
+    'react/prop-types': 'off',
   },
   ignorePatterns: ['node_modules/**', '.next/**', 'out/**', 'build/**', 'next-env.d.ts'],
 };

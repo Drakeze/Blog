@@ -2,6 +2,7 @@
 
 import { Github, Linkedin, Twitter } from "lucide-react"
 import { useState } from "react"
+import { useMutation } from "@tanstack/react-query"
 
 import { BlogFooter } from "@/components/blog-footer"
 import { BlogHeader } from "@/components/blog-header"
@@ -12,17 +13,9 @@ import { Label } from "@/components/ui/label"
 export default function SubscribePage() {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
-  const [submitting, setSubmitting] = useState(false)
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
-  const [error, setError] = useState<string | null>(null)
 
-  const submit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setSubmitting(true)
-    setStatus("idle")
-    setError(null)
-
-    try {
+  const subscribeMutation = useMutation({
+    mutationFn: async ({ name, email }: { name: string; email: string }) => {
       const response = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -34,16 +27,13 @@ export default function SubscribePage() {
         throw new Error(data.error ?? "Unable to subscribe")
       }
 
-      setStatus("success")
+      return response.json()
+    },
+    onSuccess: () => {
       setName("")
       setEmail("")
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Subscription failed")
-      setStatus("error")
-    } finally {
-      setSubmitting(false)
-    }
-  }
+    },
+  })
 
   return (
     <div className="min-h-screen bg-background">
@@ -65,7 +55,10 @@ export default function SubscribePage() {
         </div>
 
         <div className="rounded-3xl border border-border bg-card/80 p-8 shadow-sm md:p-12">
-          <form className="space-y-7" onSubmit={submit}>
+          <form className="space-y-7" onSubmit={(e) => {
+            e.preventDefault()
+            subscribeMutation.mutate({ name, email })
+          }}>
             <div className="space-y-2">
               <Label htmlFor="name" className="text-base font-semibold">
                 Name (optional)
@@ -95,21 +88,23 @@ export default function SubscribePage() {
               />
             </div>
 
-            <Button type="submit" size="lg" className="h-12 w-full rounded-xl text-base" disabled={submitting}>
-              {submitting ? "Subscribing..." : "Subscribe"}
+            <Button type="submit" size="lg" className="h-12 w-full rounded-xl text-base" disabled={subscribeMutation.isPending}>
+              {subscribeMutation.isPending ? "Subscribing..." : "Subscribe"}
             </Button>
 
             <p className="text-center text-sm text-muted-foreground">
               I respect your privacy. Unsubscribe at any time.
             </p>
 
-            {status === "success" && (
+            {subscribeMutation.isSuccess && (
               <p className="rounded-xl bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-700">
                 Thanks for subscribing!
               </p>
             )}
-            {status === "error" && error && (
-              <p className="rounded-xl bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">{error}</p>
+            {subscribeMutation.isError && (
+              <p className="rounded-xl bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
+                {(subscribeMutation.error as Error).message}
+              </p>
             )}
           </form>
         </div>

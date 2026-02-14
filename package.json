@@ -6,7 +6,9 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "start": "next start"
+    "start": "next start",
+    "type-check": "tsc --noEmit",
+    "test": "bun run lint && bun run type-check"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -61,6 +63,7 @@
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.6.1",
     "tailwindcss-animate": "^1.0.7",
+    "tanstack": "^1.0.3",
     "vaul": "^1.1.2",
     "zod": "3.25.76"
   },
@@ -87,5 +90,6 @@
   "overrides": {
     "@types/react": "19.2.10",
     "@types/react-dom": "19.2.3"
-  }
+  },
+  "packageManager": "bun@1.2.14"
 }

@@ -24,6 +24,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     twitter: "bg-[#1DA1F2] text-white",
     linkedin: "bg-[#0A66C2] text-white",
     patreon: "bg-[#FF424D] text-white",
+    dailydev: "bg-[#6B46FF] text-white",
   }
 
   const sourceLabels = {
@@ -32,6 +33,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     twitter: "Twitter/X",
     linkedin: "LinkedIn",
     patreon: "Patreon",
+    dailydev: "Daily.dev",
   }
 
   const siteUrl = publicEnv.NEXT_PUBLIC_SITE_URL
