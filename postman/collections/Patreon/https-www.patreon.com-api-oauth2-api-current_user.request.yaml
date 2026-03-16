@@ -1,8 +1,0 @@
-$kind: http-request
-name: 'https://www.patreon.com/api/oauth2/v2/identity'
-url: 'https://www.patreon.com/api/oauth2/v2/identity'
-method: GET
-headers:
-  - key: Authorization
-    value: 'Bearer {{patreonAccessToken}}'
-order: 1000
