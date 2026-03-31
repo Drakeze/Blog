@@ -16,7 +16,7 @@ export default async function BlogPage() {
       <div className="border-b border-border bg-muted/30">
         <div className="mx-auto max-w-6xl px-4 py-12 md:px-6">
           <h1 className="mb-4 text-4xl font-semibold tracking-tight text-secondary md:text-6xl">All Posts</h1>
-          <p className="text-base text-muted-foreground md:text-lg">Browse the complete archive from all platforms</p>
+          <p className="text-base text-muted-foreground md:text-lg">Browse published posts from the blog and imported Reddit updates</p>
         </div>
       </div>
 

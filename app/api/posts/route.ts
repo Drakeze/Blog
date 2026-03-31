@@ -12,8 +12,8 @@ const querySchema = z
     tag: z.string().trim().optional(),
     createdAt: z.string().trim().optional(),
     readTimeMinutes: z.coerce.number().int().positive().optional(),
-    source: z.string().trim().optional(),
-    status: z.string().trim().optional(),
+    source: z.enum(["blog", "reddit"]).optional(),
+    status: z.enum(["draft", "published", "all"]).optional(),
   })
   .strict()
 

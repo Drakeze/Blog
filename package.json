@@ -8,7 +8,8 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "start": "next start",
     "type-check": "tsc --noEmit --incremental false",
-    "test": "bun run lint && bun run type-check"
+    "test": "bun run lint && bun run type-check",
+    "seed": "bun run scripts/seed.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "latest",

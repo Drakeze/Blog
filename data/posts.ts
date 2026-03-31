@@ -8,10 +8,10 @@ import {
   getPostsCollection,
 } from "@/models/BlogPost"
 
-export type PostSource = "blog" | "reddit" | "twitter" | "linkedin" | "patreon" | "dailydev"
+export type PostSource = "blog" | "reddit"
 export type PostStatus = "draft" | "published"
 
-export const postSources: PostSource[] = ["blog", "reddit", "twitter", "linkedin", "patreon", "dailydev"]
+export const postSources: PostSource[] = ["blog", "reddit"]
 export const postStatuses: PostStatus[] = ["draft", "published"]
 
 export type BlogPost = {
@@ -25,6 +25,7 @@ export type BlogPost = {
   readTime: string
   source: PostSource
   status: PostStatus
+  featured: boolean
   slug: string
   createdAt: string
   updatedAt: string
@@ -47,7 +48,10 @@ export class PostValidationError extends Error {
 const heroImageSchema = z
   .string()
   .trim()
-  .refine((value) => value.startsWith("/") || z.string().url().safeParse(value).success, "Hero image must be an absolute URL or root-relative path")
+  .refine(
+    (value) => value.startsWith("/") || z.string().url().safeParse(value).success,
+    "Hero image must be an absolute URL or root-relative path",
+  )
 
 const postInputSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -56,8 +60,9 @@ const postInputSchema = z.object({
   category: z.string().default("General"),
   tags: z.array(z.string()).default([]),
   readTimeMinutes: z.number().int().positive().optional(),
-  source: z.enum(["blog", "reddit", "twitter", "linkedin", "patreon", "dailydev"]).default("blog"),
+  source: z.enum(["blog", "reddit"]).default("blog"),
   status: z.enum(["draft", "published"]).default("draft"),
+  featured: z.boolean().default(false),
   slug: z.string().optional(),
   externalId: z.string().optional(),
   externalUrl: z.string().url().optional(),
@@ -80,7 +85,7 @@ function buildExcerpt(excerpt: string, content: string) {
 export async function getAllPosts(includeDrafts = false): Promise<BlogPost[]> {
   const collection = await getPostsCollection()
   const filter = includeDrafts ? {} : { status: "published" as const }
-  const docs = await collection.find(filter).sort({ createdAt: -1 }).toArray()
+  const docs = await collection.find(filter).sort({ featured: -1, createdAt: -1 }).toArray()
   return docs.map(documentToPost)
 }
 
@@ -104,7 +109,7 @@ export async function getPostSummaries(limit?: number, includeDrafts = false): P
   const collection = await getPostsCollection()
   const filter = includeDrafts ? {} : { status: "published" as const }
   const projection = { content: 0 }
-  let query = collection.find(filter, { projection }).sort({ createdAt: -1 })
+  let query = collection.find(filter, { projection }).sort({ featured: -1, createdAt: -1 })
   if (limit) {
     query = query.limit(limit)
   }
@@ -153,7 +158,7 @@ export async function filterPosts(
     query.createdAt = { $gte: new Date(filters.createdAt) }
   }
 
-  const docs = await collection.find(query).sort({ createdAt: -1 }).toArray()
+  const docs = await collection.find(query).sort({ featured: -1, createdAt: -1 }).toArray()
   return docs.map(documentToPost)
 }
 
@@ -176,6 +181,7 @@ export async function addPost(input: unknown): Promise<BlogPost> {
     readTimeMinutes: data.readTimeMinutes ?? estimateReadTimeMinutes(data.content),
     source: data.source,
     status: data.status,
+    featured: data.featured,
     slug: data.slug || generateSlug(data.title),
     externalId: data.externalId || null,
     externalUrl: data.externalUrl || null,
@@ -219,6 +225,7 @@ export async function updatePost(id: string, updates: unknown): Promise<BlogPost
           readTimeMinutes: data.readTimeMinutes ?? estimateReadTimeMinutes(data.content),
         }
       : {}),
+    ...(data.title && !data.slug ? { slug: generateSlug(data.title) } : {}),
     updatedAt: new Date(),
   }
 
@@ -254,8 +261,8 @@ export async function upsertExternalPost(input: unknown): Promise<BlogPost> {
   }
 
   const data = parsed.data
-  if (!data.externalId || !data.source || data.source === "blog") {
-    throw new PostValidationError("externalId and valid source are required for external posts", 400)
+  if (!data.externalId || data.source !== "reddit") {
+    throw new PostValidationError("externalId and reddit source are required for imported posts", 400)
   }
 
   const collection = await getPostsCollection()
@@ -268,8 +275,9 @@ export async function upsertExternalPost(input: unknown): Promise<BlogPost> {
     category: data.category,
     tags: data.tags,
     readTimeMinutes: data.readTimeMinutes ?? estimateReadTimeMinutes(data.content),
-    source: data.source,
+    source: "reddit",
     status: data.status,
+    featured: data.featured,
     slug: data.slug || generateSlug(data.title, data.externalId),
     externalId: data.externalId,
     externalUrl: data.externalUrl || null,
@@ -279,7 +287,7 @@ export async function upsertExternalPost(input: unknown): Promise<BlogPost> {
   }
 
   const result = await collection.findOneAndUpdate(
-    { externalId: data.externalId, source: data.source },
+    { externalId: data.externalId, source: "reddit" },
     { $set: { ...doc, updatedAt: now }, $setOnInsert: { createdAt: data.createdAt ?? now } },
     { upsert: true, returnDocument: "after" },
   )

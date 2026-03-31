@@ -10,10 +10,6 @@ datasource db {
 enum PostSource {
   blog
   reddit
-  linkedin
-  patreon
-  twitter
-  dailydev
 }
 
 enum PostStatus {
@@ -42,6 +38,7 @@ model Post {
   category        String?
   tags            String[]
   status          PostStatus
+  featured        Boolean    @default(false)
   readTime        String
   readTimeMinutes Int
   createdAt       DateTime   @default(now())

@@ -7,19 +7,11 @@ import type { BlogPostSummary } from "@/data/posts"
 const sourceColors: Record<BlogPostSummary["source"], string> = {
   blog: "bg-foreground text-background hover:bg-foreground/90",
   reddit: "bg-[#FF4500] text-white hover:bg-[#FF4500]/90",
-  twitter: "bg-[#1DA1F2] text-white hover:bg-[#1DA1F2]/90",
-  linkedin: "bg-[#0A66C2] text-white hover:bg-[#0A66C2]/90",
-  patreon: "bg-[#FF424D] text-white hover:bg-[#FF424D]/90",
-  dailydev: "bg-[#6B46FF] text-white hover:bg-[#6B46FF]/90",
 }
 
 const sourceLabels: Record<BlogPostSummary["source"], string> = {
   blog: "Blog",
   reddit: "Reddit",
-  twitter: "Twitter/X",
-  linkedin: "LinkedIn",
-  patreon: "Patreon",
-  dailydev: "Daily.dev",
 }
 
 export function BlogCard({ post }: { post: BlogPostSummary }) {

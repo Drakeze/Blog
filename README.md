@@ -1,196 +1,58 @@
-# 📝 Blog Platform
+# Blog Platform (v1)
 
-A full-stack blog platform built with **Next.js**, designed to aggregate and manage content from multiple external platforms while demonstrating modern frontend architecture, API integration, and production-ready workflows.
+Production-ready Next.js blog with:
 
----
+- MongoDB-backed post CRUD
+- Clerk authentication with server-side admin allowlist checks
+- Admin dashboard for create/edit/delete/publish/feature
+- Reddit as the only external content source
 
-## 📌 Overview
+## Runtime
 
-This Blog Platform serves as a centralized system for managing and displaying content sourced from multiple external services.
+This repo uses **Bun**.
 
-It was built as part of my professional portfolio to demonstrate how I approach:
+## Commands
 
-- Content-driven application design  
-- Multi-source API integration  
-- Scalable frontend architecture  
-- Deployment-ready workflows  
+```bash
+bun install
+bun dev
+bun run lint
+bun run type-check
+bun run build
+bun run seed
+```
 
-The focus is on **clean data flow, maintainability, and real-world integration patterns**.
+## Environment
 
----
+Copy `.env.example` to `.env.local` and set values.
 
-## ✨ Key Features
+Required for production:
 
-- Multi-platform content aggregation  
-- External API integrations  
-- Clerk authentication for admin access  
-- Modern, responsive UI  
-- Environment-based configuration  
-- Deployed production build  
-
----
-
-## 🌐 External Data Sources
-
-This application integrates with multiple external platforms:
-
-- **Patreon API** — membership-based and gated content  
-- **LinkedIn API** — professional and long-form updates  
-- **Reddit API** — community-driven discussions and posts  
-
-These platforms require careful handling of authentication, rate limits, and data normalization.
-
----
-
-## 🧠 Development Approach
-
-This project follows a **tool-assisted, developer-led workflow**.
-
-### UI Exploration & Mockups
-- Layout inspiration and design exploration performed using **v0.dev**
-- Used to establish a consistent visual direction and component structure
-- Final UI implementation and integration completed manually  
-
-🔗 [v0.dev](https://v0.dev)
-
-### AI-Assisted Review & Baseline Validation
-- Codex was used for code review, refactoring suggestions, and baseline checks
-- Application logic, data flow, and architectural decisions were reviewed and validated by me  
-
-### API Validation & Integration
-- External API endpoints were tested and verified using **Postman**
-- Authentication flows and response structures were validated prior to integration
-- Each platform is handled through isolated integration logic
-- Data normalization and consumption logic were implemented manually  
-
-AI and tooling were used to **accelerate development and improve quality**, not replace engineering judgment.
-
----
-
-## 🧰 Tech Stack
-
-### Frontend
-- Next.js  
-- TypeScript  
-- Tailwind CSS  
-- Clerk  
-
-### APIs
-- Patreon API  
-- LinkedIn API  
-- Reddit API  
-
----
-
-> ## 🧰 Tooling & Infrastructure
-> 
-> **Runtime & Tooling**
-> - Bun (runtime & package management)
-> - Postman (API testing & validation)
-> - Codex (code review and optimization support)
-> 
-> **Infrastructure**
-> - Vercel (deployment)
-
----
-
-> ## ▶️ Running the Project Locally
-> 
-> This project uses **Bun** as the runtime and package manager.
-> 
-> **Install Dependencies**
-> ```bash
-> bun install
-> ```
-> 
-> **Start Development Server**
-> ```bash
-> bun dev
-> ```
-> 
-> **Build for Production**
-> ```bash
-> bun run build
-> ```
-> 
-> **Start Production Server**
-> ```bash
-> bun start
-> ```
-
-Environment variables are used to manage API credentials and configuration when running the project locally.
-
-Authentication now uses Clerk. For local and production setup, provide:
-
+- `DATABASE_URL`
+- `NEXT_PUBLIC_SITE_URL`
 - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
 - `CLERK_SECRET_KEY`
-- `CLERK_ADMIN_EMAILS` or `CLERK_ADMIN_USER_IDS` to restrict admin access
 
-Google sign-in should be enabled in the Clerk dashboard, and if this app is admin-only you should disable other providers and self-service sign-ups there.
+Recommended for admin security:
 
----
+- `CLERK_ADMIN_EMAILS` and/or `CLERK_ADMIN_USER_IDS`
 
-## 🔄 How the Application Works
+Required for Reddit sync:
 
-- Content is retrieved from external APIs (Patreon, LinkedIn, Reddit)  
-- Each platform is handled through isolated integration logic  
-- Data is normalized before being passed to UI components  
-- Components consume structured content consistently  
-- Environment variables manage authentication and configuration  
-- The application is deployed with production-safe defaults  
+- `REDDIT_CLIENT_ID`
+- `REDDIT_CLIENT_SECRET`
+- `REDDIT_USER_AGENT`
+- `REDDIT_USERNAME` (optional default username for sync UI)
 
----
+## Seed content
 
-## 📍 Current Status
+`bun run seed` inserts/updates two starter published posts:
 
-- Core content aggregation implemented  
-- Fully deployed and accessible  
-- Actively maintained  
+1. Patreon update post
+2. Soren Tech public Discord announcement
 
----
+## Deployment notes
 
-## 🧭 Planned Improvements
-
-Future iterations may include:
-
-- Backend persistence for cached content  
-- Expanded content filtering and categorization  
-- Additional platform integrations  
-- Analytics and engagement tracking  
-
-These enhancements are **planned but not yet implemented**.
-
----
-
-## 🤖 AI Usage Disclosure
-
-Portions of this project were developed with AI assistance, including code review, refactoring suggestions, and baseline validation.
-
-All architectural decisions, integrations, and final implementations were reviewed, modified, and approved by the author.
-
-AI was used as a productivity tool—not a substitute for engineering skill.
-
----
-
-## 🎯 What This Project Demonstrates
-
-- Multi-platform API integration  
-- Content-focused application architecture  
-- Clean data flow and normalization strategies  
-- Production deployment workflows  
-- Responsible and transparent AI-assisted development  
-
----
-
-## 🔗 Related Projects
-
-This application is part of a broader portfolio that includes:
-- A personal developer portfolio site  
-- A cryptocurrency tracking application  
-- A planned analytics/dashboard project  
-
----
-
-## 👤 Author
-
-Built and maintained as part of an ongoing professional development journey.
+- Configure the same environment variables in Vercel.
+- Ensure Clerk sign-in URLs include your deployed domain.
+- MongoDB should be reachable from the deployed environment.

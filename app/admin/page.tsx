@@ -43,9 +43,9 @@ export default async function AdminIndex() {
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <h2 className="text-2xl font-serif font-bold tracking-tight">Social Media Integrations</h2>
+          <h2 className="text-2xl font-serif font-bold tracking-tight">Reddit Integration</h2>
           <p className="text-sm text-muted-foreground">
-            Sync content from external platforms to your blog.
+            Sync and import posts from Reddit into MongoDB.
           </p>
         </div>
         <IntegrationSync />

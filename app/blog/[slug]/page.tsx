@@ -27,19 +27,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const sourceColors = {
     blog: "bg-foreground text-background",
     reddit: "bg-[#FF4500] text-white",
-    twitter: "bg-[#1DA1F2] text-white",
-    linkedin: "bg-[#0A66C2] text-white",
-    patreon: "bg-[#FF424D] text-white",
-    dailydev: "bg-[#6B46FF] text-white",
   }
 
   const sourceLabels = {
     blog: "Blog Post",
     reddit: "Reddit",
-    twitter: "Twitter/X",
-    linkedin: "LinkedIn",
-    patreon: "Patreon",
-    dailydev: "Daily.dev",
   }
 
   const siteUrl = publicEnv.NEXT_PUBLIC_SITE_URL

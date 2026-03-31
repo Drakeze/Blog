@@ -24,7 +24,7 @@ export function BlogFilters({ sources, tags, activeSource, activeTag, onSourceCh
             onClick={() => onSourceChange(source)}
             className="rounded-full px-4 py-2 text-sm capitalize shadow-none"
           >
-            {source === "all" ? "All" : source === "twitter" ? "Twitter/X" : source}
+            {source === "all" ? "All" : source}
           </Button>
         ))}
       </div>
