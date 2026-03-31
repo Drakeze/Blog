@@ -3,7 +3,7 @@ import PostEditor from "@/components/admin/PostEditor"
 import { requireAdmin } from "@/lib/auth"
 
 export default async function CreatePostPage() {
-  await requireAdmin()
+  await requireAdmin("/admin/create")
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">

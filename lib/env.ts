@@ -2,8 +2,10 @@ import { z } from "zod"
 
 const serverSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  ADMIN_PASSWORD: z.string().optional(),
   AUTH_SECRET: z.string().min(1, "AUTH_SECRET is required").default("development-secret"),
+  CLERK_SECRET_KEY: z.string().optional(),
+  CLERK_ADMIN_EMAILS: z.string().optional(),
+  CLERK_ADMIN_USER_IDS: z.string().optional(),
   DATABASE_URL: z.string().optional(),
   PATREON_ACCESS_TOKEN: z.string().optional(),
   PATREON_CAMPAIGN_ID: z.string().optional(),
@@ -17,6 +19,8 @@ const serverSchema = z.object({
 })
 
 const clientSchema = z.object({
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().optional(),
+  NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().default("/sign-in"),
   NEXT_PUBLIC_SITE_URL: z.string().url().default("http://localhost:3000"),
   NEXT_PUBLIC_PATREON_URL: z.string().url().optional(),
   NEXT_PUBLIC_LINKEDIN_URL: z.string().url().optional(),
@@ -38,15 +42,30 @@ if (!parsed.success) {
 
 export const env = {
   ...parsed.data,
-  ADMIN_PASSWORD: parsed.data.ADMIN_PASSWORD ?? "development-password",
   DATABASE_URL: parsed.data.DATABASE_URL ?? "mongodb://localhost:27017/blog",
 }
 
 export const publicEnv = {
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+  NEXT_PUBLIC_CLERK_SIGN_IN_URL: env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
   NEXT_PUBLIC_SITE_URL: env.NEXT_PUBLIC_SITE_URL,
   NEXT_PUBLIC_PATREON_URL: env.NEXT_PUBLIC_PATREON_URL,
   NEXT_PUBLIC_LINKEDIN_URL: env.NEXT_PUBLIC_LINKEDIN_URL,
   NEXT_PUBLIC_TWITTER_URL: env.NEXT_PUBLIC_TWITTER_URL,
+}
+
+function parseList(value: string | undefined) {
+  return value
+    ?.split(",")
+    .map((item) => item.trim())
+    .filter(Boolean) ?? []
+}
+
+export const authConfig = {
+  clerkEnabled: Boolean(env.CLERK_SECRET_KEY && env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY),
+  signInUrl: env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
+  adminEmails: parseList(env.CLERK_ADMIN_EMAILS).map((email) => email.toLowerCase()),
+  adminUserIds: parseList(env.CLERK_ADMIN_USER_IDS),
 }
 
 type PlatformConfig<TKeys extends Record<string, string | undefined>> = {

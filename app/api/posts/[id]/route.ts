@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 
 import { PostValidationError, removePost, updatePost } from "@/data/posts"
+import { requireAdminRequest } from "@/lib/auth"
 
 function formatError(error: unknown) {
   if (error instanceof PostValidationError) {
@@ -25,6 +26,11 @@ function isValidObjectId(id: string) {
 }
 
 export async function PUT(request: Request, context: RouteContext) {
+  const authResult = await requireAdminRequest()
+  if (!authResult.authorized) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   const { id } = await context.params
   if (!isValidObjectId(id)) {
     return NextResponse.json({ error: "Invalid post id" }, { status: 400 })
@@ -45,6 +51,11 @@ export async function PUT(request: Request, context: RouteContext) {
 }
 
 export async function DELETE(_request: Request, context: RouteContext) {
+  const authResult = await requireAdminRequest()
+  if (!authResult.authorized) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   const { id } = await context.params
   if (!isValidObjectId(id)) {
     return NextResponse.json({ error: "Invalid post id" }, { status: 400 })

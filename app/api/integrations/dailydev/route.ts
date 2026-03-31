@@ -5,8 +5,8 @@ import { syncDailyDevPosts } from "@/lib/social/dailydev"
 
 export const runtime = "nodejs"
 
-export async function POST(request: Request) {
-  const authResult = await requireAdminRequest(request)
+export async function POST(_request: Request) {
+  const authResult = await requireAdminRequest()
   if (!authResult.authorized) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }

@@ -7,12 +7,18 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { getPostBySlug } from "@/data/posts"
 import { publicEnv } from "@/lib/env"
+import { renderPostContent } from "@/lib/render-post-content"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  const post = await getPostBySlug(params.slug)
+type BlogPostPageProps = {
+  params: Promise<{ slug: string }>
+}
+
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const { slug } = await params
+  const post = await getPostBySlug(slug)
 
   if (!post) {
     notFound()
@@ -85,7 +91,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             prose-h2:mt-12 prose-h2:mb-6
             prose-p:leading-relaxed prose-p:mb-6 prose-li:leading-relaxed
             prose-a:text-primary prose-a:no-underline hover:prose-a:underline"
-          dangerouslySetInnerHTML={{ __html: post.content }}
+          dangerouslySetInnerHTML={{ __html: renderPostContent(post.content) }}
         />
 
         <div className="mt-12 flex flex-wrap gap-2 rounded-2xl border border-border bg-card/50 p-4">

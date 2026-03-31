@@ -1,38 +1,82 @@
-import { cookies } from "next/headers"
+import { auth, currentUser } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 
-import { env } from "@/lib/env"
+import { authConfig } from "@/lib/env"
 
-export const ADMIN_COOKIE_NAME = "admin-auth"
-export const ADMIN_COOKIE_MAX_AGE = 60 * 60 * 6
-export const ADMIN_COOKIE_PATH = "/admin"
+type AdminAuthorizationReason = "authorized" | "unauthenticated" | "forbidden" | "not-configured"
 
-export const adminCookieConfig = {
-  httpOnly: true,
-  sameSite: "lax" as const,
-  secure: env.NODE_ENV === "production",
-  path: ADMIN_COOKIE_PATH,
-  maxAge: ADMIN_COOKIE_MAX_AGE,
+type AdminAuthorizationResult = {
+  authorized: boolean
+  reason: AdminAuthorizationReason
+  userId: string | null
+}
+
+function buildSignInUrl(redirectUrl?: string) {
+  if (!redirectUrl) {
+    return authConfig.signInUrl
+  }
+
+  const separator = authConfig.signInUrl.includes("?") ? "&" : "?"
+  return `${authConfig.signInUrl}${separator}redirect_url=${encodeURIComponent(redirectUrl)}`
+}
+
+async function userMatchesAdminAllowlist(userId: string) {
+  if (!authConfig.adminEmails.length && !authConfig.adminUserIds.length) {
+    return true
+  }
+
+  if (authConfig.adminUserIds.includes(userId)) {
+    return true
+  }
+
+  if (!authConfig.adminEmails.length) {
+    return false
+  }
+
+  const user = await currentUser()
+  const emailAddresses =
+    user?.emailAddresses.map((emailAddress) => emailAddress.emailAddress.toLowerCase()) ?? []
+
+  return emailAddresses.some((email) => authConfig.adminEmails.includes(email))
+}
+
+async function getAdminAuthorization(): Promise<AdminAuthorizationResult> {
+  if (!authConfig.clerkEnabled) {
+    return { authorized: false, reason: "not-configured", userId: null }
+  }
+
+  const { userId } = await auth()
+  if (!userId) {
+    return { authorized: false, reason: "unauthenticated", userId: null }
+  }
+
+  const authorized = await userMatchesAdminAllowlist(userId)
+  return {
+    authorized,
+    reason: authorized ? "authorized" : "forbidden",
+    userId,
+  }
 }
 
 export async function isAdminAuthorized() {
-  const cookieStore = await cookies()
-  return cookieStore.get(ADMIN_COOKIE_NAME)?.value === "true"
+  const authorization = await getAdminAuthorization()
+  return authorization.authorized
 }
-export async function requireAdmin() {
-  if (!(await isAdminAuthorized())) {
-    redirect("/admin/login")
+
+export async function requireAdmin(redirectUrl?: string) {
+  const authorization = await getAdminAuthorization()
+
+  if (authorization.reason === "unauthenticated" || authorization.reason === "not-configured") {
+    redirect(buildSignInUrl(redirectUrl))
   }
 
-  return true
+  if (!authorization.authorized) {
+    redirect("/")
+  }
+
+  return authorization
 }
 
-export async function requireAdminRequest(request: Request) {
-  const cookieHeader = request.headers.get("cookie") ?? ""
-  const isAuthorized = cookieHeader
-    .split(/;\s*/)
-    .map((part) => part.split("="))
-    .some(([name, value]) => name === ADMIN_COOKIE_NAME && value === "true")
-
-  return { authorized: isAuthorized }
+export async function requireAdminRequest() {
+  return getAdminAuthorization()
 }

@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
 
+import { requireAdminRequest } from "@/lib/auth"
+
 const LINKEDIN_ACCESS_TOKEN = process.env.LINKEDIN_ACCESS_TOKEN
 const DEFAULT_LIMIT = 25
 
@@ -7,6 +9,11 @@ export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 export async function POST(request: Request) {
+  const authResult = await requireAdminRequest()
+  if (!authResult.authorized) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   try {
     const body = await request.json().catch(() => ({}))
     const { mockMode = false, limit = DEFAULT_LIMIT } = body as {

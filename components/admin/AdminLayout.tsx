@@ -3,6 +3,7 @@ import type { ReactNode } from "react"
 
 import { Button } from "@/components/ui/button"
 import { LogoutButton } from "@/components/admin/LogoutButton"
+import { authConfig } from "@/lib/env"
 
 export function AdminLayout({ children }: { children: ReactNode }) {
   return (
@@ -22,7 +23,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
             <Button asChild variant="ghost" size="sm" className="rounded-full px-3">
               <Link href="/admin/create">New Post</Link>
             </Button>
-            <LogoutButton />
+            {authConfig.clerkEnabled ? <LogoutButton /> : null}
           </nav>
         </div>
       </header>

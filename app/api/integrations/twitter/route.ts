@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 
 import { upsertExternalPost } from "@/data/posts"
+import { requireAdminRequest } from "@/lib/auth"
 import { syncTwitterPosts } from "@/lib/social/twitter"
 
 export const runtime = "nodejs"
@@ -18,6 +19,11 @@ interface SyncRequest {
 }
 
 export async function POST(request: Request) {
+  const authResult = await requireAdminRequest()
+  if (!authResult.authorized) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   try {
     const body = (await request.json()) as SyncRequest
     const { userId, username, limit = 25, mockMode = false } = body

@@ -40,6 +40,14 @@ export async function GET(request: Request) {
 
   const { status, source, ...filters } = parsed.data
   const includeDrafts = status === "all" || status === "draft"
+
+  if (includeDrafts) {
+    const authResult = await requireAdminRequest()
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+  }
+
   const filtered = await filterPosts(
     {
       ...filters,
@@ -55,7 +63,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const authResult = await requireAdminRequest(request)
+  const authResult = await requireAdminRequest()
   if (!authResult.authorized) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }

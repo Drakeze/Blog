@@ -5,9 +5,14 @@ import PostEditor from "@/components/admin/PostEditor"
 import { requireAdmin } from "@/lib/auth"
 import { getPostById } from "@/data/posts"
 
-export default async function EditPostPage({ params }: { params: { id: string } }) {
-  await requireAdmin()
-  const postId = params.id
+type EditPostPageProps = {
+  params: Promise<{ id: string }>
+}
+
+export default async function EditPostPage({ params }: EditPostPageProps) {
+  const { id: postId } = await params
+
+  await requireAdmin(`/admin/edit/${postId}`)
 
   if (!/^[a-f0-9]{24}$/i.test(postId)) {
     notFound()

@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { requireAdmin } from "@/lib/auth"
 
 export default async function AdminIndex() {
-  await requireAdmin()
+  await requireAdmin("/admin")
   return (
     <div className="space-y-10">
       <div className="space-y-2">

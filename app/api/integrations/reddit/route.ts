@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 
 import { upsertExternalPost } from "@/data/posts"
+import { requireAdminRequest } from "@/lib/auth"
 import { syncRedditPosts } from "@/lib/social/reddit"
 
 const REDDIT_USERNAME = process.env.REDDIT_USERNAME
@@ -10,19 +11,26 @@ export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 export async function POST(request: Request) {
+  const authResult = await requireAdminRequest()
+  if (!authResult.authorized) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   try {
     const body = await request.json().catch(() => ({}))
-    const { mockMode = false, limit = DEFAULT_LIMIT } = body as {
+    const { mockMode = false, limit = DEFAULT_LIMIT, username } = body as {
       mockMode?: boolean
       limit?: number
+      username?: string
     }
+    const redditUsername = username?.trim() || REDDIT_USERNAME
 
-    if (!REDDIT_USERNAME) {
+    if (!redditUsername) {
       return NextResponse.json(
         {
           enabled: false,
           integration: "reddit",
-          error: "REDDIT_USERNAME not configured",
+          error: "Provide a Reddit username or configure REDDIT_USERNAME",
         },
         { status: 200 },
       )
@@ -34,12 +42,12 @@ export async function POST(request: Request) {
         success: true,
         message: "Reddit payload validated successfully",
         mockMode: true,
-        validated: { username: REDDIT_USERNAME, limit },
+        validated: { username: redditUsername, limit },
       })
     }
 
     // Fetch and sync Reddit posts
-    const posts = await syncRedditPosts(REDDIT_USERNAME, limit)
+    const posts = await syncRedditPosts(redditUsername, limit)
 
     const results = []
     for (const post of posts) {
@@ -81,10 +89,11 @@ export async function GET() {
     description: "Server‑configured Reddit ingestion",
     usage: {
       POST: {
-        description: "Resync Reddit posts using server configuration",
+        description: "Resync Reddit posts using a typed username or server configuration",
         optionalBody: {
           limit: "number (optional)",
           mockMode: "boolean (optional)",
+          username: "string (optional)",
         },
       },
     },

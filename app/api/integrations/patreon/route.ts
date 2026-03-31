@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 
 import { upsertExternalPost } from "@/data/posts"
+import { requireAdminRequest } from "@/lib/auth"
 import { syncPatreonPosts } from "@/lib/social/patreon"
 
 const PATREON_ACCESS_TOKEN = process.env.PATREON_ACCESS_TOKEN
@@ -11,6 +12,11 @@ export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 export async function POST(request: Request) {
+  const authResult = await requireAdminRequest()
+  if (!authResult.authorized) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   try {
     const body = await request.json().catch(() => ({}))
     const { mockMode = false, limit = DEFAULT_LIMIT } = body as {

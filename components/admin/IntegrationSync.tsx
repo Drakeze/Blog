@@ -88,7 +88,10 @@ export function IntegrationSync() {
             <div className="h-2 w-2 rounded-full bg-[#FF4500]" />
             Reddit
           </CardTitle>
-          <CardDescription>Sync posts from a Reddit user profile.</CardDescription>
+          <CardDescription>
+            Sync posts from a Reddit user profile. The typed username is used first, then the
+            server fallback if one is configured.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">

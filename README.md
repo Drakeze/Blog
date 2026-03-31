@@ -23,6 +23,7 @@ The focus is on **clean data flow, maintainability, and real-world integration p
 
 - Multi-platform content aggregation  
 - External API integrations  
+- Clerk authentication for admin access  
 - Modern, responsive UI  
 - Environment-based configuration  
 - Deployed production build  
@@ -72,6 +73,7 @@ AI and tooling were used to **accelerate development and improve quality**, not 
 - Next.js  
 - TypeScript  
 - Tailwind CSS  
+- Clerk  
 
 ### APIs
 - Patreon API  
@@ -117,6 +119,14 @@ AI and tooling were used to **accelerate development and improve quality**, not 
 > ```
 
 Environment variables are used to manage API credentials and configuration when running the project locally.
+
+Authentication now uses Clerk. For local and production setup, provide:
+
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+- `CLERK_SECRET_KEY`
+- `CLERK_ADMIN_EMAILS` or `CLERK_ADMIN_USER_IDS` to restrict admin access
+
+Google sign-in should be enabled in the Clerk dashboard, and if this app is admin-only you should disable other providers and self-service sign-ups there.
 
 ---
 

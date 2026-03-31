@@ -1,5 +1,6 @@
 "use client"
 
+import { useAuth } from "@clerk/nextjs"
 import { Moon, Sun } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -8,7 +9,26 @@ import { useMemo, useSyncExternalStore } from "react"
 
 import { Button } from "@/components/ui/button"
 
+function AuthNavigation() {
+  const { isLoaded, userId } = useAuth()
+
+  if (!isLoaded) {
+    return null
+  }
+
+  return userId ? (
+    <Button asChild size="sm" className="rounded-full px-4">
+      <Link href="/admin">Admin</Link>
+    </Button>
+  ) : (
+    <Button asChild variant="outline" size="sm" className="rounded-full px-4">
+      <Link href="/sign-in">Sign in</Link>
+    </Button>
+  )
+}
+
 export function BlogHeader() {
+  const clerkEnabled = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY)
   const { setTheme, resolvedTheme } = useTheme()
   const mounted = useSyncExternalStore(
     () => () => undefined,
@@ -53,6 +73,7 @@ export function BlogHeader() {
                 {item.label}
               </Link>
             ))}
+            {clerkEnabled ? <AuthNavigation /> : null}
             {mounted && (
               <Button
                 variant="ghost"

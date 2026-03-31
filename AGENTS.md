@@ -87,18 +87,25 @@ The schema defines two main models:
 ### Environment Variables & Configuration
 
 Environment variables are validated using Zod schemas in `lib/env.ts`. The app distinguishes between:
-- **Server-only**: `DATABASE_URL`, `ADMIN_PASSWORD`, API tokens for external platforms
-- **Public** (NEXT_PUBLIC_*): Site URL and public profile links
+- **Server-only**: `DATABASE_URL`, Clerk secrets/admin allowlists, and API tokens for external platforms
+- **Public** (NEXT_PUBLIC_*): Site URL, Clerk publishable key/sign-in URL, and public profile links
+
+Authentication is now handled by **Clerk**:
+- `CLERK_SECRET_KEY`
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+- Optional admin restriction via `CLERK_ADMIN_EMAILS` and/or `CLERK_ADMIN_USER_IDS`
+
+Google sign-in and any provider restrictions are configured in the Clerk dashboard.
 
 **Important**: External platform integrations use a `socialConfig` pattern that checks for missing keys and disables features gracefully rather than crashing the app.
 
 ### Authentication
 
-Simple cookie-based admin authentication:
-- Admin password verified via `/api/admin/auth`
-- 6-hour session with httpOnly cookies
-- Cookie scoped to `/admin` path
-- No user accounts or complex auth flows
+Admin authentication uses Clerk:
+- Sign-in lives at `/sign-in`
+- Admin pages and admin-only API routes use server-side Clerk checks
+- Optional allowlists can restrict admin access to specific emails or Clerk user IDs
+- The old password-cookie admin flow is no longer used
 
 ### API Testing
 

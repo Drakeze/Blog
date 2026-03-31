@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import type { BlogPost, PostSource, PostStatus } from "@/data/posts"
+import { renderPostContent } from "@/lib/render-post-content"
 
 const defaultPost: Partial<BlogPost> = {
   title: "",
@@ -44,7 +45,7 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
   )
 
   const previewHtml = useMemo(() => {
-    return (formState.content ?? "").replace(/\n/g, "<br />")
+    return renderPostContent(formState.content ?? "")
   }, [formState.content])
 
   const handleFieldChange = (key: keyof BlogPost, value: unknown) => {
