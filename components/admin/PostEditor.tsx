@@ -20,6 +20,7 @@ const defaultPost: Partial<BlogPost> = {
   readTimeMinutes: 5,
   source: "blog",
   status: "draft",
+  featured: false,
 }
 
 type PostEditorProps = {
@@ -70,6 +71,7 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
         createdAt: formState.createdAt,
         externalId: formState.externalId,
         status: (formState.status as PostStatus) ?? "draft",
+        featured: formState.featured ?? false,
       }
 
       const url = mode === "edit" ? `/api/posts/${initialPost?.id}` : "/api/posts"
@@ -227,11 +229,7 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
                 >
                   <option value="blog">Blog</option>
                   <option value="reddit">Reddit</option>
-                  <option value="twitter">Twitter/X</option>
-                  <option value="linkedin">LinkedIn</option>
-                  <option value="patreon">Patreon</option>
-                  <option value="dailydev">Daily.dev</option>
-                </select>
+                                  </select>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="status">Status</Label>
@@ -243,6 +241,18 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
                 >
                   <option value="draft">Draft</option>
                   <option value="published">Published</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="featured">Featured</Label>
+                <select
+                  id="featured"
+                  value={String(formState.featured ?? false)}
+                  onChange={(event) => handleFieldChange("featured", event.target.value === "true")}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 capitalize"
+                >
+                  <option value="false">No</option>
+                  <option value="true">Yes</option>
                 </select>
               </div>
               <div className="space-y-1.5">

@@ -16,9 +16,9 @@ export default async function HomePage() {
       <BlogHero />
       <main className="container mx-auto px-4 py-16 max-w-6xl">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {recentPosts.map((post) => (
+          {recentPosts.length > 0 ? recentPosts.map((post) => (
             <BlogCard key={post.id} post={post} />
-          ))}
+          )) : <p className="text-muted-foreground">No published posts yet. Add your first post from the admin panel.</p>}
         </div>
       </main>
       <BlogFooter />

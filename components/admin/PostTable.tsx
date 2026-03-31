@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import type { BlogPostSummary } from "@/data/posts"
 
-const PAGE_SIZE = 5
+const PAGE_SIZE = 8
 
 type PostTableProps = {
   posts: BlogPostSummary[]
@@ -17,17 +17,15 @@ type PostTableProps = {
 
 type FilterState = {
   tag: string
-  source: string
   maxReadTime: string
   createdAt: string
   search: string
-  sort: 'date-desc' | 'date-asc' | 'title-asc' | 'title-desc' | 'source'
+  sort: "date-desc" | "date-asc" | "title-asc" | "title-desc" | "featured"
 }
 
 export default function PostTable({ posts }: PostTableProps) {
   const [filters, setFilters] = useState<FilterState>({
     tag: "all",
-    source: "all",
     maxReadTime: "0",
     createdAt: "",
     search: "",
@@ -37,13 +35,11 @@ export default function PostTable({ posts }: PostTableProps) {
   const [error, setError] = useState<string | null>(null)
 
   const uniqueTags = useMemo(() => Array.from(new Set(posts.flatMap((post) => post.tags))), [posts])
-  const uniqueSources = useMemo(() => Array.from(new Set(posts.map((post) => post.source))), [posts])
 
   const filteredPosts = useMemo(() => {
     const normalizedSearch = filters.search.trim().toLowerCase()
     const filtered = posts.filter((post) => {
       const tagMatch = filters.tag === "all" ? true : post.tags.includes(filters.tag)
-      const sourceMatch = filters.source === "all" ? true : post.source === filters.source
       const readTimeMatch =
         filters.maxReadTime && Number(filters.maxReadTime) > 0
           ? post.readTimeMinutes <= Number(filters.maxReadTime)
@@ -55,7 +51,7 @@ export default function PostTable({ posts }: PostTableProps) {
         post.excerpt.toLowerCase().includes(normalizedSearch) ||
         post.tags.some((tag) => tag.toLowerCase().includes(normalizedSearch))
 
-      return tagMatch && sourceMatch && readTimeMatch && dateMatch && searchMatch
+      return tagMatch && readTimeMatch && dateMatch && searchMatch
     })
 
     return [...filtered].sort((a, b) => {
@@ -64,10 +60,10 @@ export default function PostTable({ posts }: PostTableProps) {
           return a.title.localeCompare(b.title)
         case "title-desc":
           return b.title.localeCompare(a.title)
-        case "source":
-          return a.source.localeCompare(b.source)
         case "date-asc":
           return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        case "featured":
+          return Number(b.featured) - Number(a.featured) || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         case "date-desc":
         default:
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -84,7 +80,7 @@ export default function PostTable({ posts }: PostTableProps) {
       <CardHeader className="gap-4 border-b border-border bg-card/50 md:flex-row md:items-center md:justify-between md:rounded-t-2xl">
         <div className="space-y-1">
           <CardTitle className="text-xl">Posts</CardTitle>
-          <CardDescription>Filter by tag, source, read time, or date.</CardDescription>
+          <CardDescription>Manage post status, featuring, edits, and deletions.</CardDescription>
         </div>
         <div className="flex w-full flex-wrap gap-3 text-sm md:w-auto">
           <Input
@@ -109,21 +105,6 @@ export default function PostTable({ posts }: PostTableProps) {
             {uniqueTags.map((tag) => (
               <option key={tag} value={tag}>
                 {tag}
-              </option>
-            ))}
-          </select>
-          <select
-            value={filters.source}
-            onChange={(event) => {
-              setCurrentPage(1)
-              setFilters((prev) => ({ ...prev, source: event.target.value }))
-            }}
-            className="min-w-[150px] rounded-lg border border-border bg-background px-3 py-2 text-sm capitalize"
-          >
-            <option value="all">All sources</option>
-            {uniqueSources.map((source) => (
-              <option key={source} value={source} className="capitalize">
-                {source}
               </option>
             ))}
           </select>
@@ -159,7 +140,7 @@ export default function PostTable({ posts }: PostTableProps) {
             <option value="date-asc">Oldest first</option>
             <option value="title-asc">Title A-Z</option>
             <option value="title-desc">Title Z-A</option>
-            <option value="source">Source</option>
+            <option value="featured">Featured first</option>
           </select>
         </div>
       </CardHeader>
@@ -175,6 +156,7 @@ export default function PostTable({ posts }: PostTableProps) {
               <th className="px-6 py-3">Source</th>
               <th className="px-6 py-3">Read</th>
               <th className="px-6 py-3">Status</th>
+              <th className="px-6 py-3">Featured</th>
               <th className="px-6 py-3">Date</th>
               <th className="px-6 py-3">Actions</th>
             </tr>
@@ -197,9 +179,10 @@ export default function PostTable({ posts }: PostTableProps) {
                 <td className="px-6 py-4 capitalize text-muted-foreground">
                   <StatusBadge status={post.status} />
                 </td>
+                <td className="px-6 py-4 text-muted-foreground">{post.featured ? "Yes" : "No"}</td>
                 <td className="px-6 py-4 text-muted-foreground">{new Date(post.createdAt).toLocaleDateString()}</td>
                 <td className="px-6 py-4">
-                  <AdminTableActions postId={post.id} postTitle={post.title} onDeleteError={setError} />
+                  <AdminTableActions post={post} onActionError={setError} />
                 </td>
               </tr>
             ))}

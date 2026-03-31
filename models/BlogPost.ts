@@ -10,8 +10,9 @@ export interface BlogPostDocument {
   category: string
   tags: string[]
   readTimeMinutes: number
-  source: "blog" | "reddit" | "twitter" | "linkedin" | "patreon" | "dailydev"
+  source: "blog" | "reddit"
   status: "draft" | "published"
+  featured: boolean
   slug: string
   externalId?: string | null
   externalUrl?: string | null
@@ -30,10 +31,10 @@ export async function getPostsCollection(): Promise<Collection<BlogPostDocument>
   const db: Db = await getDb()
   cachedCollection = db.collection<BlogPostDocument>("posts")
 
-  // Create indexes for better query performance
   await cachedCollection.createIndex({ slug: 1 }, { unique: true })
   await cachedCollection.createIndex({ source: 1 })
   await cachedCollection.createIndex({ status: 1 })
+  await cachedCollection.createIndex({ featured: 1 })
   await cachedCollection.createIndex({ tags: 1 })
   await cachedCollection.createIndex({ createdAt: -1 })
   await cachedCollection.createIndex({ externalId: 1, source: 1 }, { unique: true, sparse: true })
@@ -53,6 +54,7 @@ export function documentToPost(doc: BlogPostDocument) {
     readTime: `${doc.readTimeMinutes} min read`,
     source: doc.source,
     status: doc.status,
+    featured: doc.featured ?? false,
     slug: doc.slug,
     externalId: doc.externalId || null,
     externalUrl: doc.externalUrl || null,
