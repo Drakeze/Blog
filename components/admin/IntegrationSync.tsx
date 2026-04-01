@@ -14,6 +14,7 @@ interface SyncResult {
   failed?: number
   message?: string
   error?: string
+  failures?: Array<{ externalId?: string; error?: string }>
 }
 
 export function IntegrationSync() {
@@ -44,6 +45,7 @@ export function IntegrationSync() {
           synced: data.synced,
           failed: data.failed,
           message: data.message,
+          failures: data.failures,
         })
       }
     } catch (error) {
@@ -97,6 +99,15 @@ export function IntegrationSync() {
               <>
                 ✓ Synced {result.synced} post(s)
                 {result.failed ? ` • ${result.failed} failed` : ""}
+                {result.failures?.length ? (
+                  <ul className="mt-2 list-disc space-y-1 pl-5">
+                    {result.failures.map((failure, index) => (
+                      <li key={`${failure.externalId ?? "unknown"}-${index}`}>
+                        {failure.externalId ?? "unknown"}: {failure.error ?? "Unknown error"}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
               </>
             ) : (
               <>✗ {result.error}</>

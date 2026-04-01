@@ -55,14 +55,16 @@ export async function fetchRedditPosts(username: string, limit = 25): Promise<Re
   })
 
   if (!tokenResponse.ok) {
-    throw new Error(`Reddit auth failed: ${tokenResponse.statusText}`)
+    const errorBody = await tokenResponse.text()
+    throw new Error(`Reddit auth failed (${tokenResponse.status}): ${errorBody || tokenResponse.statusText}`)
   }
 
   const tokenData = (await tokenResponse.json()) as { access_token: string }
 
   // Fetch user posts
+  const normalizedUsername = username.replace(/^u\//i, "").trim()
   const postsResponse = await fetch(
-    `https://oauth.reddit.com/user/${username}/submitted?limit=${limit}&sort=new`,
+    `https://oauth.reddit.com/user/${normalizedUsername}/submitted?limit=${limit}&sort=new`,
     {
       headers: {
         Authorization: `Bearer ${tokenData.access_token}`,
@@ -72,11 +74,12 @@ export async function fetchRedditPosts(username: string, limit = 25): Promise<Re
   )
 
   if (!postsResponse.ok) {
-    throw new Error(`Reddit fetch failed: ${postsResponse.statusText}`)
+    const errorBody = await postsResponse.text()
+    throw new Error(`Reddit fetch failed (${postsResponse.status}): ${errorBody || postsResponse.statusText}`)
   }
 
   const data = (await postsResponse.json()) as RedditApiResponse
-  return data.data.children.map((child) => child.data)
+  return data?.data?.children?.map((child) => child.data) ?? []
 }
 
 export function transformRedditPost(post: RedditPost): TransformedPost {

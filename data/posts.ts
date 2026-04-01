@@ -7,6 +7,7 @@ import {
   generateSlug,
   getPostsCollection,
 } from "@/models/BlogPost"
+import { starterPosts } from "@/data/starter-posts"
 
 export type PostSource = "blog" | "reddit"
 export type PostStatus = "draft" | "published"
@@ -86,14 +87,24 @@ export async function getAllPosts(includeDrafts = false): Promise<BlogPost[]> {
   const collection = await getPostsCollection()
   const filter = includeDrafts ? {} : { status: "published" as const }
   const docs = await collection.find(filter).sort({ featured: -1, createdAt: -1 }).toArray()
-  return docs.map(documentToPost)
+  const posts = docs.map(documentToPost)
+  if (!includeDrafts && posts.length === 0) {
+    return starterPosts
+  }
+  return posts
 }
 
 export async function getPostBySlug(slug: string, includeDrafts = false): Promise<BlogPost | undefined> {
   const collection = await getPostsCollection()
   const filter = includeDrafts ? { slug } : { slug, status: "published" as const }
   const doc = await collection.findOne(filter)
-  return doc ? documentToPost(doc) : undefined
+  if (doc) {
+    return documentToPost(doc)
+  }
+  if (!includeDrafts) {
+    return starterPosts.find((post) => post.slug === slug)
+  }
+  return undefined
 }
 
 export async function getPostById(id: string): Promise<BlogPost | undefined> {
@@ -114,11 +125,18 @@ export async function getPostSummaries(limit?: number, includeDrafts = false): P
     query = query.limit(limit)
   }
   const docs = await query.toArray()
-  return docs.map((doc) => {
+  const summaries = docs.map((doc) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { content, ...post } = documentToPost(doc as unknown as BlogPostDocument)
     return post
   })
+
+  if (!includeDrafts && summaries.length === 0) {
+    const fallback = starterPosts.map(({ content, ...post }) => post)
+    return typeof limit === "number" ? fallback.slice(0, limit) : fallback
+  }
+
+  return summaries
 }
 
 export async function filterPosts(

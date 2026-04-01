@@ -6,6 +6,7 @@ Production-ready Next.js blog with:
 - Clerk authentication with server-side admin allowlist checks
 - Admin dashboard for create/edit/delete/publish/feature
 - Reddit as the only external content source
+- Waitlist/subscriber API for future newsletter delivery
 
 ## Runtime
 
@@ -43,6 +44,12 @@ Required for Reddit sync:
 - `REDDIT_CLIENT_SECRET`
 - `REDDIT_USER_AGENT`
 - `REDDIT_USERNAME` (optional default username for sync UI)
+
+## Auth vs subscriptions
+
+- **Clerk** handles identity (sign-up/sign-in, sessions, and admin gating).
+- **Subscribers collection** stores newsletter/waitlist recipients in MongoDB (`email`, optional `name`, optional `clerkUserId`).
+- **Resend (optional, future)** should be used when you are ready to send outbound emails; this repo currently focuses on capture/storage.
 
 ## Seed content
 

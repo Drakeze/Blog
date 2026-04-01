@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 
 import { upsertExternalPost } from "@/data/posts"
 import { requireAdminRequest } from "@/lib/auth"
+import { socialConfig } from "@/lib/env"
 import { syncRedditPosts } from "@/lib/social/reddit"
 
 const REDDIT_USERNAME = process.env.REDDIT_USERNAME
@@ -25,6 +26,17 @@ export async function POST(request: Request) {
     }
     const redditUsername = username?.trim() || REDDIT_USERNAME
 
+    if (!socialConfig.reddit.enabled) {
+      return NextResponse.json(
+        {
+          enabled: false,
+          integration: "reddit",
+          error: `Missing Reddit credentials: ${socialConfig.reddit.missingKeys.join(", ")}`,
+        },
+        { status: 503 },
+      )
+    }
+
     if (!redditUsername) {
       return NextResponse.json(
         {
@@ -32,7 +44,7 @@ export async function POST(request: Request) {
           integration: "reddit",
           error: "Provide a Reddit username or configure REDDIT_USERNAME",
         },
-        { status: 200 },
+        { status: 400 },
       )
     }
 
@@ -72,6 +84,7 @@ export async function POST(request: Request) {
       synced: successCount,
       failed: failureCount,
       total: results.length,
+      failures: results.filter((result) => !result.success).slice(0, 5),
     })
   } catch (error) {
     console.error("Reddit sync error:", error)
@@ -85,8 +98,9 @@ export async function POST(request: Request) {
 export async function GET() {
   return NextResponse.json({
     integration: "reddit",
-    enabled: Boolean(REDDIT_USERNAME),
+    enabled: socialConfig.reddit.enabled,
     description: "Server‑configured Reddit ingestion",
+    missingKeys: socialConfig.reddit.missingKeys,
     usage: {
       POST: {
         description: "Resync Reddit posts using a typed username or server configuration",
