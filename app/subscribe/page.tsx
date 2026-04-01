@@ -130,6 +130,24 @@ export default function SubscribePage() {
           <p>Clerk handles identity. Waitlist subscriptions are stored in your database for future notifications.</p>
         </div>
 
+        <div className="mt-12 rounded-3xl border border-primary/20 bg-primary/5 p-8 text-center shadow-sm md:p-10">
+          <h2 className="mb-3 text-2xl font-semibold">Want deeper breakdowns?</h2>
+          <p className="mb-6 text-muted-foreground">
+            I share more in-depth builds, behind-the-scenes thinking, and full project breakdowns on Patreon.
+          </p>
+
+          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <Button asChild className="rounded-full px-6">
+              <a href="https://www.patreon.com/SorenTech" target="_blank" rel="noopener noreferrer">
+                View Patreon
+              </a>
+            </Button>
+            <p className="text-sm text-muted-foreground">
+              Free + paid tiers available
+            </p>
+          </div>
+        </div>
+
         <div className="mt-12 border-t border-border pt-8 text-center">
           <p className="mb-4 text-muted-foreground">Connect with me:</p>
           <div className="flex justify-center gap-4">
