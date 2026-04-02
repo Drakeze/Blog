@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 
 import { upsertExternalPost } from "@/data/posts"
 import { requireAdminRequest } from "@/lib/auth"
 import { socialConfig } from "@/lib/env"
-import { syncRedditPosts } from "@/lib/social/reddit"
+import { RedditIntegrationError, syncRedditPosts } from "@/lib/social/reddit"
 
-const REDDIT_USERNAME = process.env.REDDIT_USERNAME
 const DEFAULT_LIMIT = 25
 
 export const runtime = "nodejs"
@@ -19,12 +19,20 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json().catch(() => ({}))
-    const { mockMode = false, limit = DEFAULT_LIMIT, username } = body as {
-      mockMode?: boolean
-      limit?: number
-      username?: string
+    const parsedBody = z
+      .object({
+        mockMode: z.boolean().optional(),
+        limit: z.coerce.number().int().min(1).max(100).default(DEFAULT_LIMIT),
+        username: z.string().trim().optional(),
+      })
+      .safeParse(body)
+
+    if (!parsedBody.success) {
+      return NextResponse.json({ error: parsedBody.error.errors[0].message }, { status: 400 })
     }
-    const redditUsername = username?.trim() || REDDIT_USERNAME
+
+    const { mockMode = false, limit, username } = parsedBody.data
+    const redditUsername = username?.trim() || socialConfig.reddit.keys.username
 
     if (!socialConfig.reddit.enabled) {
       return NextResponse.json(
@@ -32,6 +40,10 @@ export async function POST(request: Request) {
           enabled: false,
           integration: "reddit",
           error: `Missing Reddit credentials: ${socialConfig.reddit.missingKeys.join(", ")}`,
+          troubleshooting: [
+            "Set REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET, and REDDIT_USER_AGENT.",
+            "Redeploy the app after updating the environment variables.",
+          ],
         },
         { status: 503 },
       )
@@ -43,6 +55,10 @@ export async function POST(request: Request) {
           enabled: false,
           integration: "reddit",
           error: "Provide a Reddit username or configure REDDIT_USERNAME",
+          troubleshooting: [
+            "Enter a Reddit username in the admin sync form.",
+            "Or set REDDIT_USERNAME as the default account to sync.",
+          ],
         },
         { status: 400 },
       )
@@ -81,6 +97,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       enabled: true,
       integration: "reddit",
+      username: redditUsername,
       synced: successCount,
       failed: failureCount,
       total: results.length,
@@ -88,6 +105,20 @@ export async function POST(request: Request) {
     })
   } catch (error) {
     console.error("Reddit sync error:", error)
+
+    if (error instanceof RedditIntegrationError) {
+      return NextResponse.json(
+        {
+          integration: "reddit",
+          enabled: socialConfig.reddit.enabled,
+          error: error.message,
+          code: error.code,
+          troubleshooting: error.troubleshooting,
+        },
+        { status: error.status },
+      )
+    }
+
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to sync Reddit posts" },
       { status: 500 },
@@ -99,8 +130,9 @@ export async function GET() {
   return NextResponse.json({
     integration: "reddit",
     enabled: socialConfig.reddit.enabled,
-    description: "Server‑configured Reddit ingestion",
+    description: "Server-configured Reddit ingestion",
     missingKeys: socialConfig.reddit.missingKeys,
+    defaultUsername: socialConfig.reddit.keys.username ?? null,
     usage: {
       POST: {
         description: "Resync Reddit posts using a typed username or server configuration",

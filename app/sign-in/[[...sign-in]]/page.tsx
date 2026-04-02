@@ -4,9 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { authConfig } from "@/lib/env"
 
 export default function SignInPage() {
+  const adminConfigReady = authConfig.clerkEnabled && authConfig.hasAdminAllowlist
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
-      {authConfig.clerkEnabled ? (
+      {adminConfigReady ? (
         <SignIn
           path="/sign-in"
           routing="path"
@@ -23,15 +25,13 @@ export default function SignInPage() {
           <CardHeader className="space-y-2">
             <CardTitle className="font-serif text-2xl">Clerk needs one more step</CardTitle>
             <CardDescription>
-              Add your Clerk publishable and secret keys, then enable Google as the only sign-in
-              provider in the Clerk dashboard.
+              Add your Clerk keys and configure an explicit admin allowlist before the admin panel can be used.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-muted-foreground">
             <p>`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` are both required.</p>
             <p>
-              If you want to limit admin access to specific accounts, set `CLERK_ADMIN_EMAILS`
-              and/or `CLERK_ADMIN_USER_IDS`.
+              Set `CLERK_ADMIN_EMAILS` and/or `CLERK_ADMIN_USER_IDS` so only approved accounts can access `/admin`.
             </p>
           </CardContent>
         </Card>

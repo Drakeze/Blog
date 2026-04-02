@@ -1,4 +1,5 @@
 import { Clock } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 
 import { Badge } from "@/components/ui/badge"
@@ -18,11 +19,14 @@ export function BlogCard({ post }: { post: BlogPostSummary }) {
   return (
     <Link href={`/blog/${post.slug}`} className="group block h-full">
       <article className="flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card/80 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
-        <div className="aspect-[16/10] overflow-hidden bg-muted">
-          <img
+        <div className="relative aspect-[16/10] overflow-hidden bg-muted">
+          <Image
             src={post.heroImage ?? "/placeholder.svg"}
             alt={post.title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            unoptimized
           />
         </div>
 

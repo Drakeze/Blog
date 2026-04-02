@@ -21,10 +21,6 @@ function buildSignInUrl(redirectUrl?: string) {
 }
 
 async function userMatchesAdminAllowlist(userId: string) {
-  if (!authConfig.adminEmails.length && !authConfig.adminUserIds.length) {
-    return true
-  }
-
   if (authConfig.adminUserIds.includes(userId)) {
     return true
   }
@@ -41,7 +37,7 @@ async function userMatchesAdminAllowlist(userId: string) {
 }
 
 async function getAdminAuthorization(): Promise<AdminAuthorizationResult> {
-  if (!authConfig.clerkEnabled) {
+  if (!authConfig.clerkEnabled || !authConfig.hasAdminAllowlist) {
     return { authorized: false, reason: "not-configured", userId: null }
   }
 
@@ -66,12 +62,16 @@ export async function isAdminAuthorized() {
 export async function requireAdmin(redirectUrl?: string) {
   const authorization = await getAdminAuthorization()
 
-  if (authorization.reason === "unauthenticated" || authorization.reason === "not-configured") {
+  if (authorization.reason === "unauthenticated") {
     redirect(buildSignInUrl(redirectUrl))
   }
 
+  if (authorization.reason === "not-configured") {
+    redirect("/admin/unauthorized?reason=not-configured")
+  }
+
   if (!authorization.authorized) {
-    redirect("/")
+    redirect("/admin/unauthorized?reason=forbidden")
   }
 
   return authorization

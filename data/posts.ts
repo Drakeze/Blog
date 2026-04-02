@@ -83,27 +83,51 @@ function buildExcerpt(excerpt: string, content: string) {
   return content.replace(/\s+/g, " ").trim().slice(0, 180)
 }
 
+function toPostSummary(post: BlogPost): BlogPostSummary {
+  const { content, ...summary } = post
+  return summary
+}
+
 export async function getAllPosts(includeDrafts = false): Promise<BlogPost[]> {
-  const collection = await getPostsCollection()
-  const filter = includeDrafts ? {} : { status: "published" as const }
-  const docs = await collection.find(filter).sort({ featured: -1, createdAt: -1 }).toArray()
-  const posts = docs.map(documentToPost)
-  if (!includeDrafts && posts.length === 0) {
-    return starterPosts
+  try {
+    const collection = await getPostsCollection()
+    const filter = includeDrafts ? {} : { status: "published" as const }
+    const docs = await collection.find(filter).sort({ featured: -1, createdAt: -1 }).toArray()
+    const posts = docs.map(documentToPost)
+    if (!includeDrafts && posts.length === 0) {
+      return starterPosts
+    }
+    return posts
+  } catch (error) {
+    if (!includeDrafts) {
+      console.error("Falling back to starter posts because MongoDB is unavailable.", error)
+      return starterPosts
+    }
+
+    throw error
   }
-  return posts
 }
 
 export async function getPostBySlug(slug: string, includeDrafts = false): Promise<BlogPost | undefined> {
-  const collection = await getPostsCollection()
-  const filter = includeDrafts ? { slug } : { slug, status: "published" as const }
-  const doc = await collection.findOne(filter)
-  if (doc) {
-    return documentToPost(doc)
+  try {
+    const collection = await getPostsCollection()
+    const filter = includeDrafts ? { slug } : { slug, status: "published" as const }
+    const doc = await collection.findOne(filter)
+    if (doc) {
+      return documentToPost(doc)
+    }
+  } catch (error) {
+    if (includeDrafts) {
+      throw error
+    }
+
+    console.error("Falling back to starter post because MongoDB is unavailable.", error)
   }
+
   if (!includeDrafts) {
     return starterPosts.find((post) => post.slug === slug)
   }
+
   return undefined
 }
 
@@ -117,26 +141,32 @@ export async function getPostById(id: string): Promise<BlogPost | undefined> {
 }
 
 export async function getPostSummaries(limit?: number, includeDrafts = false): Promise<BlogPostSummary[]> {
-  const collection = await getPostsCollection()
-  const filter = includeDrafts ? {} : { status: "published" as const }
-  const projection = { content: 0 }
-  let query = collection.find(filter, { projection }).sort({ featured: -1, createdAt: -1 })
-  if (limit) {
-    query = query.limit(limit)
-  }
-  const docs = await query.toArray()
-  const summaries = docs.map((doc) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { content, ...post } = documentToPost(doc as unknown as BlogPostDocument)
-    return post
-  })
+  try {
+    const collection = await getPostsCollection()
+    const filter = includeDrafts ? {} : { status: "published" as const }
+    const projection = { content: 0 }
+    let query = collection.find(filter, { projection }).sort({ featured: -1, createdAt: -1 })
+    if (limit) {
+      query = query.limit(limit)
+    }
+    const docs = await query.toArray()
+    const summaries = docs.map((doc) => toPostSummary(documentToPost(doc as unknown as BlogPostDocument)))
 
-  if (!includeDrafts && summaries.length === 0) {
-    const fallback = starterPosts.map(({ content, ...post }) => post)
-    return typeof limit === "number" ? fallback.slice(0, limit) : fallback
-  }
+    if (!includeDrafts && summaries.length === 0) {
+      const fallback = starterPosts.map((post) => toPostSummary(post))
+      return typeof limit === "number" ? fallback.slice(0, limit) : fallback
+    }
 
-  return summaries
+    return summaries
+  } catch (error) {
+    if (!includeDrafts) {
+      console.error("Falling back to starter post summaries because MongoDB is unavailable.", error)
+      const fallback = starterPosts.map((post) => toPostSummary(post))
+      return typeof limit === "number" ? fallback.slice(0, limit) : fallback
+    }
+
+    throw error
+  }
 }
 
 export async function filterPosts(
@@ -149,7 +179,6 @@ export async function filterPosts(
   },
   includeDrafts = false,
 ): Promise<BlogPost[]> {
-  const collection = await getPostsCollection()
   const query: Record<string, unknown> = {}
 
   if (!includeDrafts && !filters?.status) {
@@ -176,8 +205,32 @@ export async function filterPosts(
     query.createdAt = { $gte: new Date(filters.createdAt) }
   }
 
-  const docs = await collection.find(query).sort({ featured: -1, createdAt: -1 }).toArray()
-  return docs.map(documentToPost)
+  try {
+    const collection = await getPostsCollection()
+    const docs = await collection.find(query).sort({ featured: -1, createdAt: -1 }).toArray()
+    return docs.map(documentToPost)
+  } catch (error) {
+    if (!includeDrafts) {
+      console.error("Falling back to starter posts while filtering because MongoDB is unavailable.", error)
+      return starterPosts.filter((post) => {
+        if (filters?.status && post.status !== filters.status) {
+          return false
+        }
+
+        if (filters?.source && post.source !== filters.source) {
+          return false
+        }
+
+        if (filters?.tag && !post.tags.includes(filters.tag)) {
+          return false
+        }
+
+        return true
+      })
+    }
+
+    throw error
+  }
 }
 
 export async function addPost(input: unknown): Promise<BlogPost> {

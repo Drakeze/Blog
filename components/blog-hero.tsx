@@ -10,11 +10,11 @@ export function BlogHero() {
           Build updates, engineering notes, and product progress
         </h1>
         <p className="mx-auto max-w-2xl text-base text-muted-foreground md:text-lg">
-          Follow new posts from the blog and Reddit in one place, and join the waitlist to get email notifications when new content goes live.
+          Follow new posts from the blog and Reddit in one place, and subscribe to get email updates when new content goes live.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Button asChild className="rounded-full px-6">
-            <Link href="/subscribe">Join waitlist</Link>
+            <Link href="/subscribe">Subscribe</Link>
           </Button>
           <Button asChild variant="outline" className="rounded-full bg-transparent px-6">
             <Link href="/blog">Browse posts</Link>

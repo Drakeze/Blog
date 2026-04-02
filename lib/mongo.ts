@@ -1,28 +1,29 @@
 import { Db, MongoClient } from "mongodb"
 
-import { env } from "@/lib/env"
-
-// Support both MONGODB_URI (legacy) and DATABASE_URL (Prisma standard)
-const MONGODB_URI = process.env.MONGODB_URI || env.DATABASE_URL
+import { databaseConfig } from "@/lib/env"
 
 // Global is used here to prevent creating multiple connections
 // during hot reloads in development.
 declare global {
-  // eslint-disable-next-line no-var
   var _mongoClientPromise: Promise<MongoClient> | undefined
 }
 
-let clientPromise: Promise<MongoClient>
-
-if (process.env.NODE_ENV === "development") {
-  if (!global._mongoClientPromise) {
-    const client = new MongoClient(MONGODB_URI)
-    global._mongoClientPromise = client.connect()
+function getClientPromise() {
+  if (!databaseConfig.connectionString) {
+    throw new Error("DATABASE_URL is required to connect to MongoDB in production.")
   }
-  clientPromise = global._mongoClientPromise
-} else {
-  const client = new MongoClient(MONGODB_URI)
-  clientPromise = client.connect()
+
+  if (process.env.NODE_ENV === "development") {
+    if (!global._mongoClientPromise) {
+      const client = new MongoClient(databaseConfig.connectionString)
+      global._mongoClientPromise = client.connect()
+    }
+
+    return global._mongoClientPromise
+  }
+
+  const client = new MongoClient(databaseConfig.connectionString)
+  return client.connect()
 }
 
 /**
@@ -30,6 +31,6 @@ if (process.env.NODE_ENV === "development") {
  * No collections, no models, no assumptions.
  */
 export async function getDb(): Promise<Db> {
-  const client = await clientPromise
+  const client = await getClientPromise()
   return client.db()
 }

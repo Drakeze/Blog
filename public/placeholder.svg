@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Blog placeholder image</title>
+  <desc id="desc">Abstract placeholder graphic for blog posts without a hero image.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#f4efe6" />
+      <stop offset="100%" stop-color="#d7e0ea" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)" />
+  <g fill="none" stroke="#1f2937" stroke-linecap="round" stroke-width="18" opacity="0.18">
+    <path d="M120 520c110-120 210-180 300-180s170 40 250 120 150 120 210 120 120-20 200-90" />
+    <path d="M180 180c70 50 130 75 180 75s110-20 180-60 150-60 220-60 150 30 260 110" />
+  </g>
+  <g fill="#111827" opacity="0.88">
+    <circle cx="250" cy="220" r="44" />
+    <rect x="330" y="188" width="340" height="34" rx="17" />
+    <rect x="330" y="244" width="250" height="24" rx="12" opacity="0.65" />
+    <rect x="250" y="358" width="700" height="20" rx="10" opacity="0.6" />
+    <rect x="250" y="404" width="620" height="20" rx="10" opacity="0.45" />
+    <rect x="250" y="450" width="520" height="20" rx="10" opacity="0.3" />
+  </g>
+</svg>

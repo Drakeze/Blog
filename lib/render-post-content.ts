@@ -41,6 +41,44 @@ function renderInlineContent(value: string) {
   return result.replace(/\n/g, "<br />")
 }
 
+function renderList(items: string[]) {
+  const children = items
+    .map((item) => item.replace(/^[-*]\s+/, ""))
+    .map((item) => `<li>${renderInlineContent(item)}</li>`)
+    .join("")
+
+  return `<ul>${children}</ul>`
+}
+
+function renderBlock(block: string) {
+  const trimmed = block.trim()
+  if (!trimmed) {
+    return ""
+  }
+
+  if (trimmed.startsWith("### ")) {
+    return `<h3>${renderInlineContent(trimmed.slice(4))}</h3>`
+  }
+
+  if (trimmed.startsWith("## ")) {
+    return `<h2>${renderInlineContent(trimmed.slice(3))}</h2>`
+  }
+
+  if (trimmed.startsWith("# ")) {
+    return `<h1>${renderInlineContent(trimmed.slice(2))}</h1>`
+  }
+
+  if (trimmed.split("\n").every((line) => /^[-*]\s+/.test(line))) {
+    return renderList(trimmed.split("\n"))
+  }
+
+  if (trimmed.startsWith("> ")) {
+    return `<blockquote>${renderInlineContent(trimmed.replace(/^>\s+/gm, ""))}</blockquote>`
+  }
+
+  return `<p>${renderInlineContent(trimmed)}</p>`
+}
+
 export function renderPostContent(value: string) {
   const normalized = value.trim().replace(/\r\n/g, "\n")
   if (!normalized) {
@@ -49,6 +87,6 @@ export function renderPostContent(value: string) {
 
   return normalized
     .split(/\n{2,}/)
-    .map((paragraph) => `<p>${renderInlineContent(paragraph.trim())}</p>`)
+    .map(renderBlock)
     .join("")
 }

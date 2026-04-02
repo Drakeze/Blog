@@ -1,13 +1,15 @@
-import { auth, currentUser } from "@clerk/nextjs/server"
+import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
+import { z } from "zod"
 
 import { addSubscriber, SubscriberError } from "@/data/subscribers"
 import { authConfig } from "@/lib/env"
+import { sendSubscriptionConfirmationEmail } from "@/lib/email"
 import { rateLimitByIp } from "@/lib/rate-limit"
 
-function normalizeEmail(email: string) {
-  return email.trim().toLowerCase()
-}
+const subscribeRequestSchema = z.object({
+  email: z.string().email("Please provide a valid email address."),
+})
 
 export async function POST(request: Request) {
   const limiterResult = await rateLimitByIp({ request, maxRequests: 5, windowSeconds: 60 })
@@ -16,42 +18,44 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => null)
-  const { name, email, source } = body ?? {}
-
-  const providedEmail = typeof email === "string" ? normalizeEmail(email) : ""
+  const parsedBody = subscribeRequestSchema.safeParse(body)
+  if (!parsedBody.success) {
+    return NextResponse.json({ error: parsedBody.error.errors[0].message }, { status: 400 })
+  }
 
   let clerkUserId: string | undefined
-  let clerkEmail: string | undefined
-  let clerkName: string | undefined
 
   if (authConfig.clerkEnabled) {
     const { userId } = await auth()
     clerkUserId = userId ?? undefined
-
-    if (clerkUserId) {
-      const user = await currentUser()
-      const primaryEmail = user?.primaryEmailAddress?.emailAddress
-      const fallbackEmail = user?.emailAddresses[0]?.emailAddress
-      clerkEmail = (primaryEmail ?? fallbackEmail)?.toLowerCase()
-      clerkName = [user?.firstName, user?.lastName].filter(Boolean).join(" ") || undefined
-    }
-  }
-
-  const resolvedEmail = providedEmail || clerkEmail
-
-  if (!resolvedEmail) {
-    return NextResponse.json({ error: "Email is required. Sign in or enter an email." }, { status: 400 })
   }
 
   try {
-    const subscriber = await addSubscriber({
-      email: resolvedEmail,
-      name: typeof name === "string" ? name.trim() || undefined : clerkName,
-      source: typeof source === "string" ? source.trim() || undefined : "subscribe-page",
+    const { created, subscriber } = await addSubscriber({
+      email: parsedBody.data.email,
       clerkUserId,
     })
 
-    return NextResponse.json({ success: true, subscriber })
+    const emailDelivery = created
+      ? await sendSubscriptionConfirmationEmail(subscriber.email)
+      : {
+          status: "skipped" as const,
+          message: "Confirmation email skipped because the address is already subscribed.",
+        }
+
+    const message = created
+      ? emailDelivery.status === "sent"
+        ? "You're subscribed. Check your inbox for a confirmation email."
+        : "You're subscribed. We could not send a confirmation email right now, but your address is saved."
+      : "You're already subscribed. We kept your subscription active."
+
+    return NextResponse.json({
+      success: true,
+      alreadySubscribed: !created,
+      message,
+      subscriber,
+      emailDelivery,
+    })
   } catch (error) {
     if (error instanceof SubscriberError) {
       return NextResponse.json({ error: error.message }, { status: error.status })

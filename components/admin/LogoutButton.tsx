@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 
 export function LogoutButton() {
   return (
-    <SignOutButton redirectUrl="/sign-in">
+    <SignOutButton redirectUrl="/">
       <Button variant="ghost" size="sm" className="rounded-full px-3">
         Sign out
       </Button>

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 
 import { addPost, filterPosts, type PostSource, type PostStatus, PostValidationError } from "@/data/posts"
+import { emailConfig } from "@/lib/env"
+import { sendPostEmailToSubscribers } from "@/lib/email"
 import { requireAdminRequest } from "@/lib/auth"
 
 export const runtime = "nodejs"
@@ -71,7 +73,25 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     const newPost = await addPost(body)
-    return NextResponse.json(newPost, { status: 201 })
+    const shouldNotifySubscribers =
+      (typeof body?.notifySubscribers === "boolean"
+        ? body.notifySubscribers
+        : emailConfig.autoSendPostEmails) &&
+      newPost.status === "published" &&
+      newPost.source === "blog"
+
+    const newsletterDelivery = shouldNotifySubscribers
+      ? await sendPostEmailToSubscribers(newPost)
+      : {
+          status: "skipped" as const,
+          message: "Subscriber email delivery was not requested for this post.",
+          totalSubscribers: 0,
+          sentCount: 0,
+          failedCount: 0,
+          failures: [],
+        }
+
+    return NextResponse.json({ post: newPost, newsletterDelivery }, { status: 201 })
   } catch (error) {
     return formatError(error)
   }

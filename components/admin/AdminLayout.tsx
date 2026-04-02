@@ -21,6 +21,9 @@ export function AdminLayout({ children }: { children: ReactNode }) {
               <Link href="/admin/posts">Posts</Link>
             </Button>
             <Button asChild variant="ghost" size="sm" className="rounded-full px-3">
+              <Link href="/admin/subscribers">Subscribers</Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm" className="rounded-full px-3">
               <Link href="/admin/create">New Post</Link>
             </Button>
             {authConfig.clerkEnabled ? <LogoutButton /> : null}

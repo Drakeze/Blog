@@ -1,22 +1,37 @@
 import { z } from "zod"
 
+const optionalString = z.preprocess(
+  (value) => {
+    if (typeof value !== "string") {
+      return value
+    }
+
+    const trimmed = value.trim()
+    return trimmed.length === 0 ? undefined : trimmed
+  },
+  z.string().optional(),
+)
+
 const serverSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  AUTH_SECRET: z.string().min(1, "AUTH_SECRET is required").default("development-secret"),
-  CLERK_SECRET_KEY: z.string().optional(),
-  CLERK_ADMIN_EMAILS: z.string().optional(),
-  CLERK_ADMIN_USER_IDS: z.string().optional(),
-  DATABASE_URL: z.string().optional(),
-  REDDIT_CLIENT_ID: z.string().optional(),
-  REDDIT_CLIENT_SECRET: z.string().optional(),
-  REDDIT_USER_AGENT: z.string().optional(),
-  REDDIT_USERNAME: z.string().optional(),
+  CLERK_SECRET_KEY: optionalString,
+  CLERK_ADMIN_EMAILS: optionalString,
+  CLERK_ADMIN_USER_IDS: optionalString,
+  DATABASE_URL: optionalString,
+  RESEND_API_KEY: optionalString,
+  RESEND_FROM_EMAIL: optionalString,
+  RESEND_REPLY_TO_EMAIL: optionalString,
+  AUTO_SEND_POST_EMAILS: z.enum(["true", "false"]).default("false"),
+  REDDIT_CLIENT_ID: optionalString,
+  REDDIT_CLIENT_SECRET: optionalString,
+  REDDIT_USER_AGENT: optionalString,
+  REDDIT_USERNAME: optionalString,
 })
 
 const clientSchema = z.object({
-  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().optional(),
-  NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().default("/sign-in"),
-  NEXT_PUBLIC_SITE_URL: z.string().url().default("http://localhost:3000"),
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: optionalString,
+  NEXT_PUBLIC_CLERK_SIGN_IN_URL: optionalString.default("/sign-in"),
+  NEXT_PUBLIC_SITE_URL: optionalString.pipe(z.string().url()).default("http://localhost:3000"),
 })
 
 const mergedSchema = serverSchema.merge(clientSchema)
@@ -33,7 +48,6 @@ if (!parsed.success) {
 
 export const env = {
   ...parsed.data,
-  DATABASE_URL: parsed.data.DATABASE_URL ?? "mongodb://localhost:27017/blog",
 }
 
 export const publicEnv = {
@@ -56,6 +70,24 @@ export const authConfig = {
   signInUrl: env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
   adminEmails: parseList(env.CLERK_ADMIN_EMAILS).map((email) => email.toLowerCase()),
   adminUserIds: parseList(env.CLERK_ADMIN_USER_IDS),
+  hasAdminAllowlist: Boolean(parseList(env.CLERK_ADMIN_EMAILS).length || parseList(env.CLERK_ADMIN_USER_IDS).length),
+}
+
+export const databaseConfig = {
+  configured: Boolean(env.DATABASE_URL),
+  connectionString:
+    env.DATABASE_URL ?? (env.NODE_ENV === "production" ? null : "mongodb://localhost:27017/blog"),
+}
+
+export const emailConfig = {
+  resendEnabled: Boolean(env.RESEND_API_KEY && env.RESEND_FROM_EMAIL),
+  autoSendPostEmails: env.AUTO_SEND_POST_EMAILS === "true",
+  resendMissingKeys: [
+    !env.RESEND_API_KEY ? "RESEND_API_KEY" : null,
+    !env.RESEND_FROM_EMAIL ? "RESEND_FROM_EMAIL" : null,
+  ].filter(Boolean) as string[],
+  fromEmail: env.RESEND_FROM_EMAIL ?? null,
+  replyToEmail: env.RESEND_REPLY_TO_EMAIL ?? null,
 }
 
 type PlatformConfig<TKeys extends Record<string, string | undefined>> = {
@@ -81,6 +113,7 @@ export const socialConfig = {
     clientId: env.REDDIT_CLIENT_ID,
     clientSecret: env.REDDIT_CLIENT_SECRET,
     userAgent: env.REDDIT_USER_AGENT,
+    username: env.REDDIT_USERNAME,
   }),
 }
 

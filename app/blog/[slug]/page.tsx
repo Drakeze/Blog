@@ -1,4 +1,5 @@
 import { ExternalLink,Share2 } from "lucide-react"
+import Image from "next/image"
 import { notFound } from "next/navigation"
 
 import { BlogFooter } from "@/components/blog-footer"
@@ -44,11 +45,16 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <article className="mx-auto max-w-4xl px-4 py-16 md:px-6 md:py-20">
         {post.heroImage && (
           <div className="mb-12 overflow-hidden rounded-3xl border border-border bg-muted shadow-sm">
-            <img
+            <div className="relative aspect-[2/1] w-full">
+              <Image
               src={post.heroImage || "/placeholder.svg"}
               alt={post.title}
-              className="aspect-[2/1] w-full object-cover"
+              fill
+              sizes="100vw"
+              className="object-cover"
+              unoptimized
             />
+            </div>
           </div>
         )}
 
