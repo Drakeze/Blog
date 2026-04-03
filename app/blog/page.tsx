@@ -30,18 +30,30 @@ export default async function BlogPage() {
 
       <main className="mx-auto max-w-6xl space-y-10 px-4 py-12 md:px-6 md:py-14">
         {latestRedditPosts.length > 0 ? (
-          <section className="rounded-xl border border-border bg-card p-5">
-            <h2 className="text-xl font-semibold">Latest from Reddit</h2>
-            <ul className="mt-4 space-y-3">
+          <section className="space-y-6">
+            <h2 className="text-2xl font-bold">Latest from Reddit</h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {latestRedditPosts.map((post) => (
-                <li key={post.id} className="text-sm text-muted-foreground">
-                  <Link className="font-medium text-foreground hover:underline" href={post.permalink} target="_blank" rel="noreferrer">
-                    {post.title}
-                  </Link>
-                  <span className="ml-2">r/{post.subreddit}</span>
-                </li>
+                <Link
+                  key={post.id}
+                  className="cursor-pointer rounded-xl border p-4 transition hover:shadow-md"
+                  href={post.permalink}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <h3 className="line-clamp-2 text-lg font-semibold">{post.title}</h3>
+
+                  <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
+                    {post.content || "No description available"}
+                  </p>
+
+                  <div className="mt-4 flex justify-between text-xs text-muted-foreground">
+                    <span>r/{post.subreddit}</span>
+                    <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                  </div>
+                </Link>
               ))}
-            </ul>
+            </div>
           </section>
         ) : null}
 

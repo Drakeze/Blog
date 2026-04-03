@@ -4,7 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs"
 import type { Metadata } from "next"
 import type React from "react"
 
-import { authConfig } from "@/lib/env"
+import { authConfig, publicEnv } from "@/lib/env"
 import { Providers } from "./providers"
 
 export const metadata: Metadata = {
@@ -21,13 +21,11 @@ export default function RootLayout({
   const app = <Providers>{children}</Providers>
 
   return (
-    <html lang="en">
-      <body className="font-sans antialiased" suppressHydrationWarning>
-        {authConfig.clerkEnabled ? (
-          <ClerkProvider signInUrl={authConfig.signInUrl}>{app}</ClerkProvider>
-        ) : (
-          app
-        )}
+    <html lang="en" suppressHydrationWarning>
+      <body className="font-sans antialiased">
+        <ClerkProvider publishableKey={publicEnv.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY} signInUrl={authConfig.signInUrl}>
+          {app}
+        </ClerkProvider>
       </body>
     </html>
   )
