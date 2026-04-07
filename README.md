@@ -16,6 +16,7 @@ This repo uses **Bun**.
 
 ```bash
 bun install
+bunx prisma generate
 bun dev
 bun run lint
 bun run type-check
@@ -59,6 +60,20 @@ Required for Reddit sync:
 - `REDDIT_CLIENT_SECRET`
 - `REDDIT_USER_AGENT`
 - `REDDIT_USERNAME` (optional default username for sync UI)
+
+## Prisma Setup
+
+This app can use Prisma as the blog content manager for a shared MongoDB database without redefining the existing schema.
+
+1. Set `DATABASE_URL` in `.env.local`.
+2. Generate the Prisma client:
+
+```bash
+bunx prisma generate
+```
+
+3. Use the singleton client from [src/lib/db.ts](/Users/zen/Dev/repos/Blog/src/lib/db.ts).
+4. Example blog queries live in [src/lib/posts.ts](/Users/zen/Dev/repos/Blog/src/lib/posts.ts).
 
 ## Auth vs subscriptions
 

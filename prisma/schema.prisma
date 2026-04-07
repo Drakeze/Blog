@@ -7,43 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum PostSource {
-  blog
-  reddit
-}
-
-enum PostStatus {
-  draft
-  published
-}
-
-model Subscriber {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  email       String   @unique
-  clerkUserId String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
 model Post {
-  id              String     @id @default(auto()) @map("_id") @db.ObjectId
-  slug            String     @unique
-  title           String
-  excerpt         String
-  content         String
-  source          PostSource
-  externalId      String?
-  externalUrl     String?
-  heroImage       String?
-  category        String?
-  tags            String[]
-  status          PostStatus
-  featured        Boolean    @default(false)
-  readTime        String
-  readTimeMinutes Int
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  slug      String   @unique
+  content   String
+  status    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@unique([source, externalId])
   @@index([status, createdAt])
 }
