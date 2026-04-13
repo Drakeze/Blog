@@ -1,6 +1,8 @@
-import { MongoClient } from "mongodb"
+import { Collection, MongoClient } from "mongodb"
 
-const databaseUrl = process.env.DATABASE_URL ?? "mongodb://localhost:27017/blog"
+import { BLOG_DB_NAME, blogCollectionNames } from "../lib/mongo"
+
+const databaseUrl = process.env.DATABASE_URL ?? "mongodb://localhost:27017/blog_db"
 
 const seedPosts = [
   {
@@ -74,15 +76,41 @@ function estimateReadTimeMinutes(content: string) {
   return Math.max(1, Math.ceil(wordCount / 200))
 }
 
+async function ensurePostIndexes(posts: Collection) {
+  const indexes = await posts.indexes()
+  const externalIndex = indexes.find((index) => index.name === "externalId_1_source_1")
+  const usesPartialExternalIdIndex =
+    externalIndex &&
+    "partialFilterExpression" in externalIndex &&
+    externalIndex.partialFilterExpression?.externalId?.$type === "string"
+
+  if (externalIndex?.name && !usesPartialExternalIdIndex) {
+    await posts.dropIndex(externalIndex.name)
+  }
+
+  await posts.createIndex({ slug: 1 }, { unique: true })
+  await posts.createIndex(
+    {
+      externalId: 1,
+      source: 1,
+    },
+    {
+      unique: true,
+      partialFilterExpression: {
+        externalId: { $type: "string" },
+      },
+    },
+  )
+}
+
 async function run() {
   const client = new MongoClient(databaseUrl)
   await client.connect()
 
-  const db = client.db()
-  const posts = db.collection("posts")
+  const db = client.db(BLOG_DB_NAME)
+  const posts = db.collection(blogCollectionNames.posts)
 
-  await posts.createIndex({ slug: 1 }, { unique: true })
-  await posts.createIndex({ externalId: 1, source: 1 }, { unique: true, sparse: true })
+  await ensurePostIndexes(posts)
 
   const now = new Date()
 

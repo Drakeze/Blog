@@ -76,7 +76,7 @@ export const authConfig = {
 export const databaseConfig = {
   configured: Boolean(env.DATABASE_URL),
   connectionString:
-    env.DATABASE_URL ?? (env.NODE_ENV === "production" ? null : "mongodb://localhost:27017/blog"),
+    env.DATABASE_URL ?? (env.NODE_ENV === "production" ? null : "mongodb://localhost:27017/blog_db"),
 }
 
 export const emailConfig = {

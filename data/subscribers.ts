@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-import { getDb } from "@/lib/mongo"
+import { blogCollectionNames, getDb } from "@/lib/mongo"
 
 export class SubscriberError extends Error {
   status: number
@@ -57,7 +57,7 @@ export async function addSubscriber(input: SubscriberInput) {
   }
 
   const db = await getDb()
-  const collection = db.collection("subscribers")
+  const collection = db.collection(blogCollectionNames.subscribers)
   await collection.createIndex({ email: 1 }, { unique: true })
   await collection.createIndex({ clerkUserId: 1 }, { sparse: true })
 
@@ -114,20 +114,20 @@ export async function addSubscriber(input: SubscriberInput) {
 
 export async function listSubscribers(limit = 200): Promise<SubscriberRecord[]> {
   const db = await getDb()
-  const collection = db.collection("subscribers")
+  const collection = db.collection(blogCollectionNames.subscribers)
   const docs = await collection.find({}).sort({ createdAt: -1 }).limit(limit).toArray()
   return docs.map((doc) => mapSubscriber(doc as never))
 }
 
 export async function countSubscribers() {
   const db = await getDb()
-  const collection = db.collection("subscribers")
+  const collection = db.collection(blogCollectionNames.subscribers)
   return collection.countDocuments({})
 }
 
 export async function listSubscriberEmails() {
   const db = await getDb()
-  const collection = db.collection("subscribers")
+  const collection = db.collection(blogCollectionNames.subscribers)
   const docs = await collection
     .find({}, { projection: { email: 1 } })
     .sort({ createdAt: -1 })

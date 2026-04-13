@@ -2,6 +2,12 @@ import { Db, MongoClient } from "mongodb"
 
 import { databaseConfig } from "@/lib/env"
 
+export const BLOG_DB_NAME = "blog_db"
+export const blogCollectionNames = {
+  posts: "blog_post",
+  subscribers: "blog_subscribers",
+} as const
+
 // Global is used here to prevent creating multiple connections
 // during hot reloads in development.
 declare global {
@@ -32,5 +38,5 @@ function getClientPromise() {
  */
 export async function getDb(): Promise<Db> {
   const client = await getClientPromise()
-  return client.db()
+  return client.db(BLOG_DB_NAME)
 }

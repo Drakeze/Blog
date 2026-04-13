@@ -2,7 +2,6 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ThemeProvider } from "@/components/theme-provider"
-import { Analytics } from "@vercel/analytics/next"
 import { useState } from "react"
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -13,7 +12,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
         {children}
-        <Analytics />
       </ThemeProvider>
     </QueryClientProvider>
   )
