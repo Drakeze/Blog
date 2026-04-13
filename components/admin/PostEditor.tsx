@@ -26,14 +26,22 @@ const defaultPost: Partial<BlogPost> = {
 type PostEditorProps = {
   mode: "create" | "edit"
   initialPost?: BlogPost
+  emailDeliveryAvailable?: boolean
+  missingEmailKeys?: string[]
 }
 
-export default function PostEditor({ mode, initialPost }: PostEditorProps) {
+export default function PostEditor({
+  mode,
+  initialPost,
+  emailDeliveryAvailable = false,
+  missingEmailKeys = [],
+}: PostEditorProps) {
   const router = useRouter()
   const [formState, setFormState] = useState<Partial<BlogPost>>(initialPost ?? defaultPost)
   const [tagsInput, setTagsInput] = useState((initialPost?.tags ?? []).join(", "))
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [notifySubscribers, setNotifySubscribers] = useState(mode === "create")
 
   const parsedTags = useMemo(
     () =>
@@ -71,6 +79,7 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
         externalId: formState.externalId,
         status: (formState.status as PostStatus) ?? "draft",
         featured: formState.featured ?? false,
+        notifySubscribers,
       }
 
       const url = mode === "edit" ? `/api/posts/${initialPost?.id}` : "/api/posts"
@@ -82,9 +91,17 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
         body: JSON.stringify(payload),
       })
 
+      const data = await response.json()
+
       if (!response.ok) {
-        const data = await response.json()
         throw new Error(data.error ?? "Unable to save post")
+      }
+
+      if (mode === "create" && data.newsletterDelivery?.message) {
+        const delivery = data.newsletterDelivery
+        if (notifySubscribers || delivery.status !== "skipped") {
+          window.alert(`Post saved. ${delivery.message}`)
+        }
       }
 
       router.push("/admin/posts")
@@ -198,6 +215,29 @@ export default function PostEditor({ mode, initialPost }: PostEditorProps) {
                 onChange={(event) => handleFieldChange("externalUrl", event.target.value)}
                 placeholder="https://example.com"
               />
+            </div>
+
+            <div className="rounded-2xl border border-border bg-muted/30 p-4 text-sm">
+              <div className="flex items-start gap-3">
+                <input
+                  id="notifySubscribers"
+                  type="checkbox"
+                  checked={notifySubscribers}
+                  disabled={!emailDeliveryAvailable}
+                  onChange={(event) => setNotifySubscribers(event.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-border"
+                />
+                <div className="space-y-1">
+                  <Label htmlFor="notifySubscribers" className="cursor-pointer">
+                    Email subscribers when this post is published
+                  </Label>
+                  <p className="text-muted-foreground">
+                    {emailDeliveryAvailable
+                      ? "If this post is saved as a published blog post, subscribers can be notified immediately."
+                      : `Resend is not configured yet. Missing: ${missingEmailKeys.join(", ") || "email keys"}.`}
+                  </p>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>

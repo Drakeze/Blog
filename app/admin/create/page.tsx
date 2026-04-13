@@ -1,9 +1,11 @@
 import { BackButton } from "@/components/admin/BackButton"
 import PostEditor from "@/components/admin/PostEditor"
 import { requireAdmin } from "@/lib/auth"
+import { emailConfig } from "@/lib/env"
 
 export default async function CreatePostPage() {
   await requireAdmin("/admin/create")
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -13,7 +15,11 @@ export default async function CreatePostPage() {
         </div>
         <BackButton label="Back to posts" />
       </div>
-      <PostEditor mode="create" />
+      <PostEditor
+        mode="create"
+        emailDeliveryAvailable={emailConfig.resendEnabled}
+        missingEmailKeys={emailConfig.resendMissingKeys}
+      />
     </div>
   )
 }

@@ -132,12 +132,10 @@ async function run() {
   }
 
   await client.close()
-  // eslint-disable-next-line no-console
   console.log(`Seeded ${seedPosts.length} starter posts.`)
 }
 
 run().catch((error) => {
-  // eslint-disable-next-line no-console
   console.error("Failed to seed posts", error)
   process.exit(1)
 })

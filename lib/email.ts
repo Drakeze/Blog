@@ -32,11 +32,11 @@ function buildSubscriptionConfirmationEmail(email: string) {
   const blogUrl = `${publicEnv.NEXT_PUBLIC_SITE_URL}/blog`
 
   return {
-    subject: "You’ve successfully subscribed",
+    subject: "You've successfully subscribed",
     text: `You're subscribed to new posts and newsletter updates for ${publicEnv.NEXT_PUBLIC_SITE_URL}. Read the latest posts at ${blogUrl}.`,
     html: `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827; padding: 24px;">
-        <h1 style="margin: 0 0 16px; font-size: 24px;">You’ve successfully subscribed</h1>
+        <h1 style="margin: 0 0 16px; font-size: 24px;">You've successfully subscribed</h1>
         <p style="margin: 0 0 16px;">${email} is now subscribed to receive new posts and newsletter updates.</p>
         <p style="margin: 0 0 24px;">You can read the latest articles any time on the blog.</p>
         <a href="${blogUrl}" style="display: inline-block; padding: 12px 18px; border-radius: 999px; background: #111827; color: #ffffff; text-decoration: none;">Read the blog</a>

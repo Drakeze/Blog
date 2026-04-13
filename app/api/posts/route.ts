@@ -58,7 +58,6 @@ export async function GET(request: Request) {
     },
     includeDrafts,
   )
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const summaries = filtered.map(({ content, ...summary }) => summary)
 
   return NextResponse.json(summaries)

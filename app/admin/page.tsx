@@ -5,6 +5,7 @@ import { IntegrationSync } from "@/components/admin/IntegrationSync"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { requireAdmin } from "@/lib/auth"
+import { authConfig, emailConfig } from "@/lib/env"
 
 export default async function AdminIndex() {
   await requireAdmin("/admin")
@@ -52,6 +53,38 @@ export default async function AdminIndex() {
             <Button asChild variant="outline" className="w-full rounded-full">
               <Link href="/admin/subscribers">Open subscribers</Link>
             </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle>Admin Access</CardTitle>
+            <CardDescription>
+              {authConfig.clerkEnabled && authConfig.hasAdminAllowlist
+                ? "Clerk and the admin allowlist are configured."
+                : "Clerk admin access is still missing configuration."}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm text-muted-foreground">
+            <p>Allowed emails: {authConfig.adminEmails.length ? authConfig.adminEmails.join(", ") : "None set"}</p>
+            <p>User IDs: {authConfig.adminUserIds.length ? authConfig.adminUserIds.join(", ") : "None set"}</p>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle>Email Delivery</CardTitle>
+            <CardDescription>
+              {emailConfig.resendEnabled
+                ? "Resend is configured for subscription and new-post emails."
+                : "Resend is not configured yet for post-delivery emails."}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm text-muted-foreground">
+            <p>Auto-send on publish: {emailConfig.autoSendPostEmails ? "Enabled" : "Disabled"}</p>
+            <p>
+              Missing keys: {emailConfig.resendMissingKeys.length ? emailConfig.resendMissingKeys.join(", ") : "None"}
+            </p>
           </CardContent>
         </Card>
       </div>

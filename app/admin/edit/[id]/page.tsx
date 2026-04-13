@@ -4,6 +4,7 @@ import { BackButton } from "@/components/admin/BackButton"
 import PostEditor from "@/components/admin/PostEditor"
 import { requireAdmin } from "@/lib/auth"
 import { getPostById } from "@/data/posts"
+import { emailConfig } from "@/lib/env"
 
 type EditPostPageProps = {
   params: Promise<{ id: string }>
@@ -32,7 +33,12 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
         </div>
         <BackButton label="Back to posts" />
       </div>
-      <PostEditor mode="edit" initialPost={post} />
+      <PostEditor
+        mode="edit"
+        initialPost={post}
+        emailDeliveryAvailable={emailConfig.resendEnabled}
+        missingEmailKeys={emailConfig.resendMissingKeys}
+      />
     </div>
   )
 }
