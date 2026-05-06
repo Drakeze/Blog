@@ -1,4 +1,4 @@
-import { Github, Heart,Linkedin, Twitter } from "lucide-react"
+import { Github, Heart, Linkedin, Twitter } from "lucide-react"
 import Link from "next/link"
 
 export function BlogFooter() {
@@ -74,13 +74,22 @@ export function BlogFooter() {
                 <span className="sr-only">LinkedIn</span>
               </a>
               <a
-                href="https://www.patreon.com/SorenTech"
+                href="https://www.patreon.com/Drakeze"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground hover:scale-105 transition-transform"
               >
                 <Heart className="h-5 w-5" />
                 <span className="sr-only">Patreon</span>
+              </a>
+              <a
+                href="https://linktr.ee/Drakeze"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground hover:scale-105 transition-transform"
+              >
+                <Heart className="h-5 w-5" />
+                <span className="sr-only">Linktree</span>
               </a>
             </div>
           </div>
