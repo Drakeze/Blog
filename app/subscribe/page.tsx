@@ -92,7 +92,7 @@ export default function SubscribePage() {
 
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Button asChild className="rounded-full px-6">
-              <a href="https://www.patreon.com/SorenTech" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.patreon.com/Drakeze" target="_blank" rel="noopener noreferrer">
                 View Patreon
               </a>
             </Button>

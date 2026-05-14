@@ -1,3 +1,4 @@
+import { Globe } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -23,7 +24,8 @@ export function AuthorBio() {
             <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">About the author</p>
             <h2 className="mb-3 text-2xl font-serif font-bold tracking-tight">Anthony Shead</h2>
             <p className="mb-6 max-w-xl text-muted-foreground leading-relaxed">
-              Builder, thinker, and occasional Reddit poster. I write about software, ideas, and what happens when you think a little differently about problems.
+              Builder and thinker. I write about software, ideas, and building in public — these are the bigger updates
+              for my portfolio work and projects. Thinking out loud, one post at a time.
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-3 md:justify-start">
@@ -36,13 +38,19 @@ export function AuthorBio() {
               <Button asChild variant="outline" size="sm" className="rounded-full gap-2 bg-transparent">
                 <a href="https://x.com/SorenIdeas" target="_blank" rel="noopener noreferrer">
                   <XIcon className="h-4 w-4" />
-                  X / Twitter
+                  Twitter
                 </a>
               </Button>
               <Button asChild variant="outline" size="sm" className="rounded-full gap-2 bg-transparent">
                 <a href="https://www.linkedin.com/in/anthonyshead/" target="_blank" rel="noopener noreferrer">
                   <LinkedInIcon className="h-4 w-4" />
                   LinkedIn
+                </a>
+              </Button>
+              <Button asChild variant="outline" size="sm" className="rounded-full gap-2 bg-transparent">
+                <a href="https://drakeze.com" target="_blank" rel="noopener noreferrer">
+                  <Globe className="h-4 w-4" />
+                  Portfolio
                 </a>
               </Button>
               <Button asChild size="sm" className="rounded-full">

@@ -1,7 +1,6 @@
-import { Heart, Link2 } from "lucide-react"
 import Link from "next/link"
 
-import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/icons/social"
+import { GitHubIcon, LinkedInIcon, PatreonIcon } from "@/components/icons/social"
 
 export function BlogFooter() {
   return (
@@ -40,24 +39,6 @@ export function BlogFooter() {
             <h4 className="font-semibold mb-4">Connect</h4>
             <div className="flex gap-4">
               <a
-                href="https://github.com/Drakeze"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <GitHubIcon className="h-5 w-5" />
-                <span className="sr-only">GitHub</span>
-              </a>
-              <a
-                href="https://x.com/SorenIdeas"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <XIcon className="h-5 w-5" />
-                <span className="sr-only">X / Twitter</span>
-              </a>
-              <a
                 href="https://www.linkedin.com/in/anthonyshead/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -67,29 +48,29 @@ export function BlogFooter() {
                 <span className="sr-only">LinkedIn</span>
               </a>
               <a
+                href="https://github.com/Drakeze"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <GitHubIcon className="h-5 w-5" />
+                <span className="sr-only">GitHub</span>
+              </a>
+              <a
                 href="https://www.patreon.com/Drakeze"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground transition-colors"
               >
-                <Heart className="h-5 w-5" />
+                <PatreonIcon className="h-5 w-5" />
                 <span className="sr-only">Patreon</span>
-              </a>
-              <a
-                href="https://linktr.ee/Drakeze"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <Link2 className="h-5 w-5" />
-                <span className="sr-only">Linktree</span>
               </a>
             </div>
           </div>
         </div>
 
         <div className="mt-8 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Anthony Shead. All rights reserved.</p>
         </div>
       </div>
     </footer>
