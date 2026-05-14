@@ -1,10 +1,12 @@
+import { Suspense } from "react"
+
 import { BlogCollection } from "@/components/blog-collection"
 import { BlogFooter } from "@/components/blog-footer"
 import { BlogHeader } from "@/components/blog-header"
 import { getPostSummaries } from "@/data/posts"
 
 export const runtime = "nodejs"
-export const dynamic = "force-dynamic"
+export const revalidate = 60
 
 export default async function BlogPage() {
   const posts = await getPostSummaries()
@@ -23,7 +25,9 @@ export default async function BlogPage() {
       </div>
 
       <main className="mx-auto max-w-6xl space-y-10 px-4 py-12 md:px-6 md:py-14">
-        <BlogCollection posts={posts} enablePagination pageSize={9} />
+        <Suspense>
+          <BlogCollection posts={posts} enablePagination pageSize={9} />
+        </Suspense>
       </main>
 
       <BlogFooter />

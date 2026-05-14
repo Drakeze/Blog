@@ -1,3 +1,4 @@
+import { AuthorBio } from "@/components/author-bio"
 import { BlogCard } from "@/components/blog-card"
 import { BlogFooter } from "@/components/blog-footer"
 import { BlogHeader } from "@/components/blog-header"
@@ -5,7 +6,7 @@ import { BlogHero } from "@/components/blog-hero"
 import { getPostSummaries } from "@/data/posts"
 
 export const runtime = "nodejs"
-export const dynamic = "force-dynamic"
+export const revalidate = 60
 
 export default async function HomePage() {
   const recentPosts = await getPostSummaries(3)
@@ -21,6 +22,7 @@ export default async function HomePage() {
           )) : <p className="text-muted-foreground">No published posts yet. Add your first post from the admin panel.</p>}
         </div>
       </main>
+      <AuthorBio />
       <BlogFooter />
     </div>
   )

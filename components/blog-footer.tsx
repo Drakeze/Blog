@@ -1,5 +1,7 @@
-import { Github, Heart, Linkedin, Twitter } from "lucide-react"
+import { Heart, Link2 } from "lucide-react"
 import Link from "next/link"
+
+import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/icons/social"
 
 export function BlogFooter() {
   return (
@@ -7,9 +9,9 @@ export function BlogFooter() {
       <div className="container mx-auto px-4 py-12">
         <div className="grid gap-8 md:grid-cols-3">
           <div>
-            <h3 className="font-serif font-bold text-lg mb-4">Thoughts</h3>
+            <h3 className="font-serif font-bold text-lg mb-4">Thinking Outside The Box</h3>
             <p className="text-sm text-muted-foreground">
-              A collection of ideas, insights, and reflections from across the web.
+              Ideas, insights, and build updates from the blog and Reddit.
             </p>
           </div>
 
@@ -17,18 +19,18 @@ export function BlogFooter() {
             <h4 className="font-semibold mb-4">Navigation</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/" className="text-muted-foreground hover:text-foreground hover:scale-105 transition-transform">
+                <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/subscribe" className="text-muted-foreground hover:text-foreground hover:scale-105 transition-transform">
-                  Subscribe
+                <Link href="/blog" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Blog
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="text-muted-foreground hover:text-foreground hover:scale-105 transition-transform">
-                  Blog
+                <Link href="/subscribe" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Subscribe
                 </Link>
               </li>
             </ul>
@@ -41,43 +43,34 @@ export function BlogFooter() {
                 href="https://github.com/Drakeze"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground hover:scale-105 transition-transform"
+                className="text-muted-foreground hover:text-foreground transition-colors"
               >
-                <Github className="h-5 w-5" />
-                <span className="sr-only">GitHub</span>
-              </a>
-              <a
-                href="https://github.com/DrakezeWind"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground hover:scale-105 transition-transform"
-              >
-                <Github className="h-5 w-5" />
+                <GitHubIcon className="h-5 w-5" />
                 <span className="sr-only">GitHub</span>
               </a>
               <a
                 href="https://x.com/SorenIdeas"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground hover:scale-105 transition-transform"
+                className="text-muted-foreground hover:text-foreground transition-colors"
               >
-                <Twitter className="h-5 w-5" />
-                <span className="sr-only">Twitter</span>
+                <XIcon className="h-5 w-5" />
+                <span className="sr-only">X / Twitter</span>
               </a>
               <a
                 href="https://www.linkedin.com/in/anthonyshead/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground hover:scale-105 transition-transform"
+                className="text-muted-foreground hover:text-foreground transition-colors"
               >
-                <Linkedin className="h-5 w-5" />
+                <LinkedInIcon className="h-5 w-5" />
                 <span className="sr-only">LinkedIn</span>
               </a>
               <a
                 href="https://www.patreon.com/Drakeze"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground hover:scale-105 transition-transform"
+                className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 <Heart className="h-5 w-5" />
                 <span className="sr-only">Patreon</span>
@@ -86,9 +79,9 @@ export function BlogFooter() {
                 href="https://linktr.ee/Drakeze"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground hover:scale-105 transition-transform"
+                className="text-muted-foreground hover:text-foreground transition-colors"
               >
-                <Heart className="h-5 w-5" />
+                <Link2 className="h-5 w-5" />
                 <span className="sr-only">Linktree</span>
               </a>
             </div>

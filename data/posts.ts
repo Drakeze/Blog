@@ -325,6 +325,30 @@ export async function removePost(id: string): Promise<boolean> {
   return result.deletedCount > 0
 }
 
+export async function getAdjacentPosts(slug: string): Promise<{ prev: BlogPostSummary | null; next: BlogPostSummary | null }> {
+  try {
+    const collection = await getPostsCollection()
+    const projection = { content: 0 }
+    const docs = await collection
+      .find({ status: "published" as const }, { projection })
+      .sort({ createdAt: -1 })
+      .toArray()
+
+    const index = docs.findIndex((doc) => doc.slug === slug)
+    if (index === -1) return { prev: null, next: null }
+
+    const prevDoc = index + 1 < docs.length ? docs[index + 1] : null
+    const nextDoc = index - 1 >= 0 ? docs[index - 1] : null
+
+    return {
+      prev: prevDoc ? toPostSummary(documentToPost(prevDoc as unknown as BlogPostDocument)) : null,
+      next: nextDoc ? toPostSummary(documentToPost(nextDoc as unknown as BlogPostDocument)) : null,
+    }
+  } catch {
+    return { prev: null, next: null }
+  }
+}
+
 export async function upsertExternalPost(input: unknown): Promise<BlogPost> {
   const parsed = postInputSchema.safeParse(input)
   if (!parsed.success) {

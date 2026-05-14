@@ -1,20 +1,57 @@
-import { ExternalLink,Share2 } from "lucide-react"
+import { ChevronLeft, ChevronRight, ExternalLink, Share2 } from "lucide-react"
+import type { Metadata } from "next"
 import Image from "next/image"
+import Link from "next/link"
 import { notFound } from "next/navigation"
 
 import { BlogFooter } from "@/components/blog-footer"
 import { BlogHeader } from "@/components/blog-header"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { getPostBySlug } from "@/data/posts"
+import { getAdjacentPosts, getPostBySlug } from "@/data/posts"
 import { publicEnv } from "@/lib/env"
 import { renderPostContent } from "@/lib/render-post-content"
 
 export const runtime = "nodejs"
-export const dynamic = "force-dynamic"
+export const revalidate = 60
 
 type BlogPostPageProps = {
   params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
+  const { slug } = await params
+  const post = await getPostBySlug(slug)
+
+  if (!post) {
+    return { title: "Post Not Found" }
+  }
+
+  const siteUrl = publicEnv.NEXT_PUBLIC_SITE_URL
+  const postUrl = `${siteUrl}/blog/${post.slug}`
+  const description = post.excerpt.slice(0, 160)
+
+  return {
+    title: `${post.title} | Thinking Outside The Box`,
+    description,
+    openGraph: {
+      title: post.title,
+      description,
+      url: postUrl,
+      type: "article",
+      publishedTime: post.createdAt,
+      modifiedTime: post.updatedAt,
+      tags: post.tags,
+      ...(post.heroImage ? { images: [{ url: post.heroImage, alt: post.title }] } : {}),
+    },
+    twitter: {
+      card: post.heroImage ? "summary_large_image" : "summary",
+      title: post.title,
+      description,
+      ...(post.heroImage ? { images: [post.heroImage] } : {}),
+    },
+    alternates: { canonical: postUrl },
+  }
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
@@ -24,6 +61,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   if (!post) {
     notFound()
   }
+
+  const { prev, next } = await getAdjacentPosts(post.slug)
 
   const sourceColors = {
     blog: "bg-foreground text-background",
@@ -45,14 +84,13 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <article className="mx-auto max-w-4xl px-4 py-16 md:px-6 md:py-20">
         {post.heroImage && (
           <div className="mb-12 overflow-hidden rounded-3xl border border-border bg-muted shadow-sm">
-            <div className="relative aspect-[2/1] w-full">
+            <div className="relative aspect-2/1 w-full">
               <Image
               src={post.heroImage || "/placeholder.svg"}
               alt={post.title}
               fill
               sizes="100vw"
               className="object-cover"
-              unoptimized
             />
             </div>
           </div>
@@ -135,6 +173,41 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </Button>
           </div>
         </div>
+
+        {(prev || next) && (
+          <nav className="mt-12 grid grid-cols-2 gap-4">
+            {prev ? (
+              <Link
+                href={`/blog/${prev.slug}`}
+                className="group flex flex-col gap-1 rounded-2xl border border-border bg-card/70 p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+              >
+                <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                  <ChevronLeft className="h-3.5 w-3.5" /> Previous
+                </span>
+                <span className="line-clamp-2 text-sm font-semibold leading-snug group-hover:text-primary">
+                  {prev.title}
+                </span>
+              </Link>
+            ) : (
+              <div />
+            )}
+            {next ? (
+              <Link
+                href={`/blog/${next.slug}`}
+                className="group flex flex-col items-end gap-1 rounded-2xl border border-border bg-card/70 p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+              >
+                <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                  Next <ChevronRight className="h-3.5 w-3.5" />
+                </span>
+                <span className="line-clamp-2 text-right text-sm font-semibold leading-snug group-hover:text-primary">
+                  {next.title}
+                </span>
+              </Link>
+            ) : (
+              <div />
+            )}
+          </nav>
+        )}
       </article>
 
       <BlogFooter />

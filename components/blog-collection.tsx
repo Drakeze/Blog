@@ -1,6 +1,7 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useMemo, useTransition } from "react"
 
 import { BlogFilters } from "@/components/blog-filters"
 import { BlogGrid } from "@/components/blog-grid"
@@ -16,24 +17,41 @@ type BlogCollectionProps = {
 }
 
 export function BlogCollection({ posts, enablePagination = false, pageSize = DEFAULT_PAGE_SIZE }: BlogCollectionProps) {
-  const [activeTag, setActiveTag] = useState("all")
-  const [activeSource, setActiveSource] = useState<PostSource | "all">("all")
-  const [searchTerm, setSearchTerm] = useState("")
-  const [page, setPage] = useState(1)
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const [, startTransition] = useTransition()
+
+  const activeTag = searchParams.get("tag") ?? "all"
+  const activeSource = (searchParams.get("source") ?? "all") as PostSource | "all"
+  const searchTerm = searchParams.get("q") ?? ""
+  const page = Math.max(1, Number(searchParams.get("page") ?? "1"))
+
+  function updateParams(updates: Record<string, string>) {
+    const params = new URLSearchParams(searchParams.toString())
+    for (const [key, value] of Object.entries(updates)) {
+      if (!value || value === "all" || value === "1") {
+        params.delete(key)
+      } else {
+        params.set(key, value)
+      }
+    }
+    startTransition(() => {
+      router.replace(`?${params.toString()}`, { scroll: false })
+    })
+  }
 
   const tags = useMemo(
     () => ["all", ...Array.from(new Set(posts.flatMap((post) => post.tags)))],
-    [posts]
+    [posts],
   )
 
   const sources = useMemo(
     () => ["all" as const, ...Array.from(new Set(posts.map((post) => post.source)))] as (PostSource | "all")[],
-    [posts]
+    [posts],
   )
 
   const filteredPosts = useMemo(() => {
     const normalizedSearch = searchTerm.toLowerCase().trim()
-
     return posts.filter((post) => {
       const matchesTag = activeTag === "all" || post.tags.includes(activeTag)
       const matchesSource = activeSource === "all" || post.source === activeSource
@@ -42,31 +60,13 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
         post.title.toLowerCase().includes(normalizedSearch) ||
         post.excerpt.toLowerCase().includes(normalizedSearch) ||
         post.tags.some((tag) => tag.toLowerCase().includes(normalizedSearch))
-
       return matchesTag && matchesSearch && matchesSource
     })
   }, [activeSource, activeTag, posts, searchTerm])
 
   const totalPages = enablePagination ? Math.max(1, Math.ceil(filteredPosts.length / pageSize)) : 1
   const startIndex = enablePagination ? (page - 1) * pageSize : 0
-  const visiblePosts = enablePagination
-    ? filteredPosts.slice(startIndex, startIndex + pageSize)
-    : filteredPosts
-
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value)
-    setPage(1)
-  }
-
-  const handleTagChange = (value: string) => {
-    setActiveTag(value)
-    setPage(1)
-  }
-
-  const handleSourceChange = (value: PostSource | "all") => {
-    setActiveSource(value)
-    setPage(1)
-  }
+  const visiblePosts = enablePagination ? filteredPosts.slice(startIndex, startIndex + pageSize) : filteredPosts
 
   return (
     <div className="space-y-12">
@@ -74,7 +74,7 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
         <div className="w-full">
           <Input
             value={searchTerm}
-            onChange={(event) => handleSearchChange(event.target.value)}
+            onChange={(e) => updateParams({ q: e.target.value, page: "1" })}
             placeholder="Search posts by title, excerpt, or tag"
             className="h-12 rounded-full border-border bg-background/70 px-5 text-sm shadow-none"
           />
@@ -85,8 +85,8 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
           tags={tags}
           activeSource={activeSource}
           activeTag={activeTag}
-          onSourceChange={handleSourceChange}
-          onTagChange={handleTagChange}
+          onSourceChange={(value) => updateParams({ source: value, page: "1" })}
+          onTagChange={(value) => updateParams({ tag: value, page: "1" })}
         />
       </div>
 
@@ -95,13 +95,13 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
       {enablePagination && totalPages > 1 && (
         <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card/70 p-4 text-sm shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div className="text-muted-foreground">
-            Showing {startIndex + 1}-{Math.min(startIndex + pageSize, filteredPosts.length)} of {filteredPosts.length}
+            Showing {startIndex + 1}–{Math.min(startIndex + pageSize, filteredPosts.length)} of {filteredPosts.length}
           </div>
           <div className="flex items-center gap-2">
             <button
               type="button"
               disabled={page === 1}
-              onClick={() => setPage((current) => Math.max(1, current - 1))}
+              onClick={() => updateParams({ page: String(page - 1) })}
               className="rounded-full border border-border bg-background px-4 py-2 text-foreground shadow-sm transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
             >
               Previous
@@ -112,7 +112,7 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
             <button
               type="button"
               disabled={page === totalPages}
-              onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+              onClick={() => updateParams({ page: String(page + 1) })}
               className="rounded-full border border-border bg-background px-4 py-2 text-foreground shadow-sm transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
             >
               Next
