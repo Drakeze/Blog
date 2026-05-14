@@ -127,7 +127,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             prose-h2:mt-12 prose-h2:mb-6
             prose-p:leading-relaxed prose-p:mb-6 prose-li:leading-relaxed
             prose-a:text-primary prose-a:no-underline hover:prose-a:underline"
-          dangerouslySetInnerHTML={{ __html: renderPostContent(post.content) }}
+          dangerouslySetInnerHTML={{ __html: renderPostContent(post.content, post.title) }}
         />
 
         <div className="mt-12 flex flex-wrap gap-2 rounded-2xl border border-border bg-card/50 p-4">

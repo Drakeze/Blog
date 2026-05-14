@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 import { AuthorBio } from "@/components/author-bio"
 import { BlogCard } from "@/components/blog-card"
 import { BlogFooter } from "@/components/blog-footer"
@@ -15,11 +17,22 @@ export default async function HomePage() {
     <div className="min-h-screen bg-background">
       <BlogHeader />
       <BlogHero />
-      <main className="container mx-auto px-4 py-16 max-w-6xl">
+      <main className="container mx-auto max-w-6xl px-4 py-16">
+        <div className="mb-10 flex items-end justify-between">
+          <div>
+            <h2 className="font-serif text-2xl font-bold tracking-tight">Recent posts</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Latest updates from the blog and Reddit</p>
+          </div>
+          <Link href="/blog" className="text-sm font-medium text-primary hover:underline">
+            View all →
+          </Link>
+        </div>
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {recentPosts.length > 0 ? recentPosts.map((post) => (
-            <BlogCard key={post.id} post={post} />
-          )) : <p className="text-muted-foreground">No published posts yet. Add your first post from the admin panel.</p>}
+          {recentPosts.length > 0 ? (
+            recentPosts.map((post) => <BlogCard key={post.id} post={post} />)
+          ) : (
+            <p className="text-muted-foreground">No published posts yet. Add your first post from the admin panel.</p>
+          )}
         </div>
       </main>
       <AuthorBio />

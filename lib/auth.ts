@@ -37,6 +37,11 @@ async function userMatchesAdminAllowlist(userId: string) {
 }
 
 async function getAdminAuthorization(): Promise<AdminAuthorizationResult> {
+  // Dev bypass: allow admin without Clerk when running locally
+  if (process.env.NODE_ENV === "development" && !authConfig.clerkEnabled) {
+    return { authorized: true, reason: "authorized", userId: "dev" }
+  }
+
   if (!authConfig.clerkEnabled || !authConfig.hasAdminAllowlist) {
     return { authorized: false, reason: "not-configured", userId: null }
   }
