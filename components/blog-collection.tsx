@@ -70,16 +70,7 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
 
   return (
     <div className="space-y-12">
-      <div className="rounded-2xl border border-border bg-card/60 p-6 shadow-sm space-y-6">
-        <div className="w-full">
-          <Input
-            value={searchTerm}
-            onChange={(e) => updateParams({ q: e.target.value, page: "1" })}
-            placeholder="Search posts by title, excerpt, or tag"
-            className="h-12 rounded-full border-border bg-background/70 px-5 text-sm shadow-none"
-          />
-        </div>
-
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <BlogFilters
           sources={sources}
           tags={tags}
@@ -87,6 +78,12 @@ export function BlogCollection({ posts, enablePagination = false, pageSize = DEF
           activeTag={activeTag}
           onSourceChange={(value) => updateParams({ source: value, page: "1" })}
           onTagChange={(value) => updateParams({ tag: value, page: "1" })}
+        />
+        <Input
+          value={searchTerm}
+          onChange={(e) => updateParams({ q: e.target.value, page: "1" })}
+          placeholder="Search posts…"
+          className="h-9 rounded-full border-border bg-background px-4 text-sm shadow-none sm:w-56"
         />
       </div>
 

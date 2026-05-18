@@ -17,7 +17,6 @@ export const metadata: Metadata = {
 }
 
 export const runtime = "nodejs"
-export const dynamic = "force-dynamic"
 
 export default function RootLayout({
   children,
@@ -26,7 +25,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="font-sans antialiased">
+      <body className="font-sans antialiased" suppressHydrationWarning>
         <Providers>{children}</Providers>
         <Analytics />
       </body>

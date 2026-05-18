@@ -15,32 +15,36 @@ type BlogFiltersProps = {
 
 export function BlogFilters({ sources, tags, activeSource, activeTag, onSourceChange, onTagChange }: BlogFiltersProps) {
   return (
-    <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-border bg-card/60 p-4 shadow-sm sm:flex-row sm:items-center">
-      <div className="flex flex-wrap gap-2">
-        {sources.map((source) => (
-          <Button
-            key={source}
-            variant={activeSource === source ? "default" : "outline"}
-            onClick={() => onSourceChange(source)}
-            className="rounded-full px-4 py-2 text-sm capitalize shadow-none"
-          >
-            {source === "all" ? "All" : source}
-          </Button>
-        ))}
-      </div>
+    <div className="flex flex-wrap items-center gap-2">
+      {sources.map((source) => (
+        <Button
+          key={source}
+          variant="ghost"
+          onClick={() => onSourceChange(source)}
+          className={`h-8 rounded-full px-4 text-sm capitalize transition-colors ${
+            activeSource === source
+              ? "bg-primary text-primary-foreground hover:bg-primary/90"
+              : "border border-border text-muted-foreground hover:bg-accent hover:text-foreground"
+          }`}
+        >
+          {source === "all" ? "All" : source}
+        </Button>
+      ))}
 
-      <Select value={activeTag} onValueChange={onTagChange}>
-        <SelectTrigger className="w-[220px] rounded-full bg-background text-sm shadow-none">
-          <SelectValue placeholder="Filter by tag" />
-        </SelectTrigger>
-        <SelectContent>
-          {tags.map((tag) => (
-            <SelectItem key={tag} value={tag} className="capitalize">
-              {tag === "all" ? "All tags" : tag}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {tags.length > 2 && (
+        <Select value={activeTag} onValueChange={onTagChange}>
+          <SelectTrigger className="h-8 w-auto min-w-35 rounded-full border-border bg-background text-sm">
+            <SelectValue placeholder="Filter by tag" />
+          </SelectTrigger>
+          <SelectContent>
+            {tags.map((tag) => (
+              <SelectItem key={tag} value={tag} className="capitalize">
+                {tag === "all" ? "All tags" : tag}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
     </div>
   )
 }

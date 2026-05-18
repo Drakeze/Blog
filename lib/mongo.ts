@@ -19,17 +19,17 @@ function getClientPromise() {
     throw new Error("DATABASE_URL is required to connect to MongoDB in production.")
   }
 
-  if (process.env.NODE_ENV === "development") {
-    if (!global._mongoClientPromise) {
-      const client = new MongoClient(databaseConfig.connectionString)
-      global._mongoClientPromise = client.connect()
-    }
-
-    return global._mongoClientPromise
+  // Cache the client promise globally so serverless functions reuse the same
+  // connection instead of opening a new TCP connection on every request.
+  if (!global._mongoClientPromise) {
+    const client = new MongoClient(databaseConfig.connectionString, {
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+    })
+    global._mongoClientPromise = client.connect()
   }
 
-  const client = new MongoClient(databaseConfig.connectionString)
-  return client.connect()
+  return global._mongoClientPromise
 }
 
 /**

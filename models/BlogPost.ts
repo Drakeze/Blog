@@ -37,10 +37,9 @@ async function ensurePostIndexes(collection: Collection<BlogPostDocument>) {
 
   await collection.createIndex({ slug: 1 }, { unique: true })
   await collection.createIndex({ source: 1 })
-  await collection.createIndex({ status: 1 })
-  await collection.createIndex({ featured: 1 })
   await collection.createIndex({ tags: 1 })
-  await collection.createIndex({ createdAt: -1 })
+  // Compound index covering the main listing query: published posts sorted by featured + date
+  await collection.createIndex({ status: 1, featured: -1, createdAt: -1 })
   await collection.createIndex(
     { externalId: 1, source: 1 },
     {
