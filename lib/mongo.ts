@@ -1,42 +1,24 @@
-import { Db, MongoClient } from "mongodb"
+import { MongoClient } from "mongodb"
+import { env } from "./env"
 
-import { databaseConfig } from "@/lib/env"
-
-export const BLOG_DB_NAME = "blog_db"
-export const blogCollectionNames = {
-  posts: "blog_post",
-  subscribers: "blog_subscribers",
-} as const
-
-// Global is used here to prevent creating multiple connections
-// during hot reloads in development.
 declare global {
   var _mongoClientPromise: Promise<MongoClient> | undefined
 }
 
-function getClientPromise() {
-  if (!databaseConfig.connectionString) {
-    throw new Error("DATABASE_URL is required to connect to MongoDB in production.")
-  }
+let clientPromise: Promise<MongoClient>
 
-  // Cache the client promise globally so serverless functions reuse the same
-  // connection instead of opening a new TCP connection on every request.
+if (process.env.NODE_ENV === "development") {
   if (!global._mongoClientPromise) {
-    const client = new MongoClient(databaseConfig.connectionString, {
-      maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
-    })
-    global._mongoClientPromise = client.connect()
+    global._mongoClientPromise = new MongoClient(env.DATABASE_URL).connect()
   }
-
-  return global._mongoClientPromise
+  clientPromise = global._mongoClientPromise
+} else {
+  clientPromise = new MongoClient(env.DATABASE_URL).connect()
 }
 
-/**
- * Get a connected MongoDB database instance.
- * No collections, no models, no assumptions.
- */
-export async function getDb(): Promise<Db> {
-  const client = await getClientPromise()
-  return client.db(BLOG_DB_NAME)
+export default clientPromise
+
+export async function getDb() {
+  const client = await clientPromise
+  return client.db()
 }
