@@ -11,6 +11,9 @@ export const metadata: Metadata = {
     template: "%s | Blog",
   },
   description: "A tech and developer blog.",
+  icons: {
+    icon: "/Minecraft Pfp 1.png",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
