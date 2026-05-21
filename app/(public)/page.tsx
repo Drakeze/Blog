@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { getDb } from "@/lib/mongo"
 import type { PostSummary } from "@/models/post"
 import { PostCard } from "@/components/post-card"
@@ -12,12 +13,6 @@ export default async function HomePage({
   const { tag, page: pageParam } = await searchParams
   const page = parseInt(pageParam ?? "1")
   const limit = 12
-
-  const params = new URLSearchParams({
-    page: String(page),
-    limit: String(limit),
-    ...(tag ? { tag } : {}),
-  })
 
   const db = await getDb()
   const filter: Record<string, unknown> = { status: "published" }
@@ -54,7 +49,7 @@ export default async function HomePage({
       {/* Tag filter */}
       {allTags.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-8">
-          <a
+          <Link
             href="/"
             className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
               !tag
@@ -63,9 +58,9 @@ export default async function HomePage({
             }`}
           >
             All
-          </a>
+          </Link>
           {allTags.map((t: string) => (
-            <a
+            <Link
               key={t}
               href={`/?tag=${t}`}
               className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
@@ -75,7 +70,7 @@ export default async function HomePage({
               }`}
             >
               {t}
-            </a>
+            </Link>
           ))}
         </div>
       )}
@@ -99,23 +94,23 @@ export default async function HomePage({
       {totalPages > 1 && (
         <div className="flex justify-center gap-2 mt-12">
           {page > 1 && (
-            <a
+            <Link
               href={`/?${new URLSearchParams({ ...(tag ? { tag } : {}), page: String(page - 1) })}`}
               className="px-4 py-2 text-sm border border-border rounded-md hover:bg-accent transition-colors"
             >
               ← Previous
-            </a>
+            </Link>
           )}
           <span className="px-4 py-2 text-sm text-muted-foreground">
             Page {page} of {totalPages}
           </span>
           {page < totalPages && (
-            <a
+            <Link
               href={`/?${new URLSearchParams({ ...(tag ? { tag } : {}), page: String(page + 1) })}`}
               className="px-4 py-2 text-sm border border-border rounded-md hover:bg-accent transition-colors"
             >
               Next →
-            </a>
+            </Link>
           )}
         </div>
       )}

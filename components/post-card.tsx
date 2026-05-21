@@ -1,7 +1,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
-import { formatDate, readingTime } from "@/lib/utils"
+import { formatDate } from "@/lib/utils"
 import type { PostSummary } from "@/models/post"
 
 interface PostCardProps {
@@ -13,7 +13,7 @@ export function PostCard({ post }: PostCardProps) {
     <Link href={`/blog/${post.slug}`} className="group block">
       <article className="h-full rounded-xl border border-border bg-card overflow-hidden hover:border-foreground/20 transition-colors">
         {post.coverImage && (
-          <div className="relative aspect-[16/9] overflow-hidden bg-muted">
+          <div className="relative aspect-video overflow-hidden bg-muted">
             <Image
               src={post.coverImage}
               alt={post.title}

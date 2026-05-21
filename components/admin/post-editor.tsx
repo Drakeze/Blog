@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { toast } from "sonner"
 import { marked } from "marked"
 import { Button } from "@/components/ui/button"
@@ -215,7 +216,9 @@ export function PostEditor({ post, authorId, authorName, authorImageUrl }: PostE
             onChange={handleFileSelect}
           />
           {coverImage && (
-            <img src={coverImage} alt="Cover preview" className="mt-2 h-32 w-full rounded-md object-cover" />
+            <div className="relative mt-2 h-32 w-full overflow-hidden rounded-md">
+              <Image src={coverImage} alt="Cover preview" fill className="object-cover" unoptimized />
+            </div>
           )}
         </div>
 

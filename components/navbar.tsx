@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { isAdmin } from "@/lib/auth"
 import { SignInButton, UserButton } from "@clerk/nextjs"
 import { auth } from "@clerk/nextjs/server"
+import { Bookmark } from "lucide-react"
 import Link from "next/link"
 
 export async function Navbar() {
@@ -24,7 +25,14 @@ export async function Navbar() {
           )}
           <ThemeToggle />
           {userId ? (
-            <UserButton />
+            <>
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/bookmarks" aria-label="Bookmarks">
+                  <Bookmark className="h-4 w-4" />
+                </Link>
+              </Button>
+              <UserButton />
+            </>
           ) : (
             <SignInButton mode="modal">
               <Button variant="outline" size="sm">Sign in</Button>

@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import Image from "next/image"
+import Link from "next/link"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -87,7 +88,7 @@ export function CommentsSection({ postId, userId, isAdmin }: Props) {
         </form>
       ) : (
         <p className="text-sm text-muted-foreground">
-          <a href="/sign-in" className="underline underline-offset-4 hover:opacity-80">Sign in</a> to leave a comment.
+          <Link href="/sign-in" className="underline underline-offset-4 hover:opacity-80">Sign in</Link> to leave a comment.
         </p>
       )}
 
