@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { marked } from "marked"
@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Eye, EyeOff, X, Loader2, Send, Save } from "lucide-react"
+import { Eye, EyeOff, X, Loader2, Send, Save, FolderOpen } from "lucide-react"
 import { slugify } from "@/lib/utils"
 import type { Post } from "@/models/post"
 
@@ -36,6 +36,28 @@ export function PostEditor({ post, authorId, authorName, authorImageUrl }: PostE
   const [preview, setPreview] = useState(false)
   const [saving, setSaving] = useState(false)
   const [publishing, setPublishing] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const form = new FormData()
+      form.append("file", file)
+      const res = await fetch("/api/upload", { method: "POST", body: form })
+      const data = await res.json()
+      if (!res.ok) { toast.error(data.error ?? "Upload failed"); return }
+      setCoverImage(data.url)
+      toast.success("Image uploaded")
+    } catch {
+      toast.error("Upload failed")
+    } finally {
+      setUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ""
+    }
+  }
 
   const slug = slugify(title)
 
@@ -164,13 +186,37 @@ export function PostEditor({ post, authorId, authorName, authorImageUrl }: PostE
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="cover">Cover Image URL</Label>
-          <Input
-            id="cover"
-            value={coverImage}
-            onChange={(e) => setCoverImage(e.target.value)}
-            placeholder="https://..."
+          <Label htmlFor="cover">Cover Image</Label>
+          <div className="flex gap-2">
+            <Input
+              id="cover"
+              value={coverImage}
+              onChange={(e) => setCoverImage(e.target.value)}
+              placeholder="https://... or use Browse to upload"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+            >
+              {uploading
+                ? <Loader2 className="h-4 w-4 animate-spin" />
+                : <FolderOpen className="h-4 w-4" />}
+              <span className="ml-1.5">{uploading ? "Uploading…" : "Browse"}</span>
+            </Button>
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+            className="hidden"
+            onChange={handleFileSelect}
           />
+          {coverImage && (
+            <img src={coverImage} alt="Cover preview" className="mt-2 h-32 w-full rounded-md object-cover" />
+          )}
         </div>
 
         <div className="space-y-1.5">

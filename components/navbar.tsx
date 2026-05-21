@@ -1,9 +1,9 @@
-import Link from "next/link"
-import { auth } from "@clerk/nextjs/server"
-import { SignInButton, UserButton } from "@clerk/nextjs"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { isAdmin } from "@/lib/auth"
+import { SignInButton, UserButton } from "@clerk/nextjs"
+import { auth } from "@clerk/nextjs/server"
+import Link from "next/link"
 
 export async function Navbar() {
   const { userId } = await auth()
@@ -13,7 +13,7 @@ export async function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="mx-auto flex h-14 max-w-4xl items-center justify-between px-4">
         <Link href="/" className="text-sm font-semibold tracking-tight hover:opacity-80 transition-opacity">
-          Blog
+          Drakeze Blog
         </Link>
 
         <nav className="flex items-center gap-1">

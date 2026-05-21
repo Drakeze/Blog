@@ -31,6 +31,9 @@ bun-debug.log*
 # NOTE: .env.example is NOT ignored (it MUST remain in repo)
 # Make sure .env.example contains ONLY placeholder values.
 
+# Uploaded images (local dev only)
+public/uploads/
+
 # OS files
 .DS_Store
 Thumbs.db

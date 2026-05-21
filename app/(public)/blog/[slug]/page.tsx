@@ -119,6 +119,19 @@ export default async function BlogPostPage({
         <SubscribeForm userId={userId ?? undefined} />
       </div>
 
+      {/* Patreon */}
+      <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-muted/30 px-6 py-4 mb-12">
+        <p className="text-sm text-muted-foreground">☕ Enjoying the content?</p>
+        <a
+          href="https://www.patreon.com/cw/Drakeze"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm font-medium hover:underline whitespace-nowrap"
+        >
+          Support on Patreon →
+        </a>
+      </div>
+
       {/* Comments */}
       <CommentsSection postId={slug} userId={userId ?? undefined} isAdmin={admin} />
     </article>
