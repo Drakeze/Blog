@@ -1,14 +1,14 @@
-import { currentUser } from "@clerk/nextjs/server"
 import { mkdir, writeFile } from "fs/promises"
 import { NextRequest, NextResponse } from "next/server"
 import path from "path"
+import { isAdmin } from "@/lib/auth"
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"]
 const MAX_SIZE = 10 * 1024 * 1024 // 10 MB
 
 export async function POST(req: NextRequest) {
-  const user = await currentUser()
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const admin = await isAdmin()
+  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const formData = await req.formData()
   const file = formData.get("file") as File | null

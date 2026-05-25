@@ -1,4 +1,5 @@
 import { MongoClient } from "mongodb"
+import type { Post } from "@/models/post"
 
 const DATABASE_URL = process.env.DATABASE_URL
 if (!DATABASE_URL) throw new Error("DATABASE_URL is not set")
@@ -11,7 +12,7 @@ function daysAgo(n: number) {
   return d
 }
 
-const posts = [
+const posts: Post[] = [
   {
     title: "Thinking Outside the Box: Why Conventional Wisdom Holds Us Back",
     slug: "thinking-outside-the-box",
@@ -256,7 +257,7 @@ async function seed() {
   // Remove existing seed posts so re-running is safe
   await col.deleteMany({ authorId: "seed_author" })
 
-  const result = await col.insertMany(posts as any)
+  const result = await col.insertMany(posts)
   console.log(`✓ Inserted ${result.insertedCount} seed posts into blog_db.posts`)
 
   await client.close()
