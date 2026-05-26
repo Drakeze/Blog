@@ -1,7 +1,7 @@
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { isAdmin } from "@/lib/auth"
-import { SignInButton, UserButton } from "@clerk/nextjs"
+import { UserButton } from "@clerk/nextjs"
 import { auth } from "@clerk/nextjs/server"
 import { Bookmark } from "lucide-react"
 import Link from "next/link"
@@ -34,9 +34,9 @@ export async function Navbar() {
               <UserButton />
             </>
           ) : (
-            <SignInButton mode="modal">
-              <Button variant="outline" size="sm">Sign in</Button>
-            </SignInButton>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/sign-in">Sign in</Link>
+            </Button>
           )}
         </nav>
       </div>
