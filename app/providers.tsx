@@ -14,6 +14,24 @@ export function Providers({ children }: { children: React.ReactNode }) {
       publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
       signInUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL ?? "/sign-in"}
       signUpUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL ?? "/sign-up"}
+      localization={{
+        signUp: {
+          start: {
+            title: "Subscribe to Drakeze's Blog",
+            subtitle: "Create an account to join the community",
+            actionText: "Already a member?",
+            actionLink: "Sign in",
+          },
+        },
+        signIn: {
+          start: {
+            title: "Welcome back to Drakeze's Blog",
+            subtitle: "Sign in to continue",
+            actionText: "Not a member yet?",
+            actionLink: "Subscribe",
+          },
+        },
+      }}
     >
       <QueryClientProvider client={queryClient}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
