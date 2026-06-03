@@ -29,6 +29,7 @@ export async function sendNewsletterEmail({
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="font-family:system-ui,-apple-system,sans-serif;color:#0a0a0a;background:#fff;margin:0;padding:0">
   <div style="max-width:600px;margin:0 auto;padding:40px 24px">
+    <a herf="${postImage}</a>"
     <h1 style="font-size:24px;font-weight:700;margin:0 0 8px">${postTitle}</h1>
     <p style="color:#737373;font-size:16px;line-height:1.6;margin:0 0 24px">${postExcerpt}</p>
     <a href="${postUrl}" style="display:inline-block;background:#0a0a0a;color:#fff;text-decoration:none;padding:12px 24px;border-radius:6px;font-weight:600;font-size:14px">Read the post →</a>
