@@ -21,6 +21,8 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     }
 
     await db.collection<Comment>("comments").deleteOne({ _id: new ObjectId(id) })
+    // Cascade delete replies to this comment
+    await db.collection<Comment>("comments").deleteMany({ parentId: id })
     return NextResponse.json({ success: true })
   } catch {
     return NextResponse.json({ error: "Failed to delete comment" }, { status: 500 })

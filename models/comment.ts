@@ -7,6 +7,7 @@ export interface Comment {
   userDisplayName: string
   userImageUrl?: string
   content: string
+  parentId?: string       // ObjectId string of parent comment; absent = top-level
   createdAt: Date
   updatedAt: Date
 }

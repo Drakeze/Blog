@@ -34,6 +34,9 @@ export async function POST(req: Request) {
           postExcerpt: post.excerpt,
           postUrl: `${env.SITE_URL}/blog/${post.slug}`,
           unsubscribeUrl: `${env.SITE_URL}/api/subscribers/unsubscribe?token=${sub.unsubscribeToken}`,
+          postImage: post.coverImage,
+          authorName: post.authorName,
+          authorImageUrl: post.authorImageUrl,
         })
         sent++
       } catch {

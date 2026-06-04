@@ -11,7 +11,7 @@ import { CommentsSection } from "@/components/comments-section"
 import { BookmarkButton } from "@/components/bookmark-button"
 import { SubscribeForm } from "@/components/subscribe-form"
 import { Separator } from "@/components/ui/separator"
-import { formatDate, readingTime } from "@/lib/utils"
+import { formatDate, readingTime, getTagColorClasses, cn } from "@/lib/utils"
 import type { Metadata } from "next"
 
 export const revalidate = 60
@@ -67,7 +67,7 @@ export default async function BlogPostPage({
           <div className="flex flex-wrap gap-2">
             {post.tags.map((tag) => (
               <a key={tag} href={`/?tag=${tag}`}>
-                <Badge variant="secondary">{tag}</Badge>
+                <Badge className={cn("border-transparent", getTagColorClasses(tag))}>{tag}</Badge>
               </a>
             ))}
           </div>

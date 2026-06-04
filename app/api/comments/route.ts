@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { auth, currentUser } from "@clerk/nextjs/server"
 import { getDb } from "@/lib/mongo"
+import { sendReplyNotification } from "@/lib/email"
+import { env } from "@/lib/env"
 import type { Comment } from "@/models/comment"
 
 export async function GET(req: Request) {
@@ -31,7 +33,7 @@ export async function POST(req: Request) {
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const body = await req.json()
-    const { postId, content } = body
+    const { postId, content, parentId } = body
 
     if (!postId || !content?.trim()) {
       return NextResponse.json({ error: "postId and content are required" }, { status: 400 })
@@ -48,11 +50,25 @@ export async function POST(req: Request) {
       userDisplayName: user.fullName ?? user.username ?? "Anonymous",
       userImageUrl: user.imageUrl,
       content: content.trim(),
+      parentId: parentId ?? undefined,
       createdAt: now,
       updatedAt: now,
     }
 
     const result = await db.collection<Comment>("comments").insertOne(comment)
+
+    if (parentId) {
+      void sendReplyNotification({
+        db,
+        parentCommentId: parentId,
+        replyingUserId: userId,
+        replierDisplayName: comment.userDisplayName,
+        postId,
+        postUrl: `${env.SITE_URL}/blog/${postId}`,
+        replyContent: comment.content,
+      })
+    }
+
     return NextResponse.json({ ...comment, _id: result.insertedId }, { status: 201 })
   } catch {
     return NextResponse.json({ error: "Failed to post comment" }, { status: 500 })

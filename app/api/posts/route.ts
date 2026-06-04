@@ -117,6 +117,9 @@ async function sendNewsletter(post: Post, db: import("mongodb").Db) {
       postExcerpt: post.excerpt,
       postUrl,
       unsubscribeUrl: unsubUrl,
+      postImage: post.coverImage,
+      authorName: post.authorName,
+      authorImageUrl: post.authorImageUrl,
     })
   }
 }

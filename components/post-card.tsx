@@ -1,7 +1,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
-import { formatDate } from "@/lib/utils"
+import { formatDate, getTagColorClasses, cn } from "@/lib/utils"
 import type { PostSummary } from "@/models/post"
 
 interface PostCardProps {
@@ -27,7 +27,7 @@ export function PostCard({ post }: PostCardProps) {
           {post.tags.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-3">
               {post.tags.slice(0, 3).map((tag) => (
-                <Badge key={tag} variant="secondary" className="text-xs">
+                <Badge key={tag} className={cn("text-xs border-transparent", getTagColorClasses(tag))}>
                   {tag}
                 </Badge>
               ))}
