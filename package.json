@@ -43,7 +43,7 @@
     "@radix-ui/react-tooltip": "1.1.6",
     "@react-email/components": "^1.0.12",
     "@tanstack/react-query": "^5.101.0",
-    "@vercel/analytics": "latest",
+    "@vercel/analytics": "^2.0.1",
     "autoprefixer": "^10.5.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
