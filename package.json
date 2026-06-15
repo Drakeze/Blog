@@ -12,6 +12,7 @@
     "seed": "bun run scripts/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1068.0",
     "@clerk/nextjs": "latest",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "1.2.2",
