@@ -54,7 +54,7 @@ async function main() {
   const db = client.db("blog_db")
   const posts = db.collection("posts")
 
-  const all = await posts.find({ coverImage: { $exists: true, $ne: null, $ne: "" } }).toArray()
+  const all = await posts.find({ coverImage: { $exists: true, $nin: [null, ""] } }).toArray()
   console.log(`Found ${all.length} posts with cover images\n`)
 
   let migrated = 0
