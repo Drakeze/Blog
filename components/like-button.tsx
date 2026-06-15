@@ -1,17 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState, useSyncExternalStore } from "react"
 import { Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 
-function getFingerprint(): string {
-  let fp = localStorage.getItem("like_fp")
-  if (!fp) {
-    fp = crypto.randomUUID()
-    localStorage.setItem("like_fp", fp)
-  }
-  return fp
+function subscribe(callback: () => void) {
+  window.addEventListener("storage", callback)
+  return () => window.removeEventListener("storage", callback)
 }
 
 function readLiked(postSlug: string): boolean {
@@ -30,7 +26,19 @@ function persistLiked(postSlug: string, liked: boolean) {
       ? [...new Set([...existing, postSlug])]
       : existing.filter((s) => s !== postSlug)
     localStorage.setItem("liked_posts", JSON.stringify(updated))
-  } catch {}
+    window.dispatchEvent(new Event("storage"))
+  } catch {
+    // localStorage unavailable
+  }
+}
+
+function getFingerprint(): string {
+  let fp = localStorage.getItem("like_fp")
+  if (!fp) {
+    fp = crypto.randomUUID()
+    localStorage.setItem("like_fp", fp)
+  }
+  return fp
 }
 
 interface LikeButtonProps {
@@ -38,32 +46,23 @@ interface LikeButtonProps {
 }
 
 export function LikeButton({ postSlug }: LikeButtonProps) {
-  const [liked, setLiked] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
-    setMounted(true)
-    setLiked(readLiked(postSlug))
-  }, [postSlug])
-
-  if (!mounted) {
-    return (
-      <Button variant="ghost" size="sm" disabled aria-label="Like post" className="gap-1.5 px-2">
-        <Heart className="h-4 w-4" />
-      </Button>
-    )
-  }
+  const liked = useSyncExternalStore(
+    subscribe,
+    () => readLiked(postSlug),
+    () => false,
+  )
 
   async function toggle() {
     setLoading(true)
     try {
       const fingerprint = getFingerprint()
       if (liked) {
-        await fetch(`/api/likes?postSlug=${encodeURIComponent(postSlug)}&fingerprint=${encodeURIComponent(fingerprint)}`, {
-          method: "DELETE",
-        })
-        setLiked(false)
+        await fetch(
+          `/api/likes?postSlug=${encodeURIComponent(postSlug)}&fingerprint=${encodeURIComponent(fingerprint)}`,
+          { method: "DELETE" },
+        )
         persistLiked(postSlug, false)
       } else {
         await fetch("/api/likes", {
@@ -71,7 +70,6 @@ export function LikeButton({ postSlug }: LikeButtonProps) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ postSlug, fingerprint }),
         })
-        setLiked(true)
         persistLiked(postSlug, true)
         toast("Thanks for the like!")
       }
