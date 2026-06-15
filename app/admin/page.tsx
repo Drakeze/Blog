@@ -3,6 +3,7 @@ import type { Post } from "@/models/post"
 import type { Subscriber } from "@/models/subscriber"
 import type { Comment } from "@/models/comment"
 import { FileText, Users, MessageSquare, TrendingUp } from "lucide-react"
+import { LikesAnalytics } from "@/components/admin/likes-analytics"
 
 export const metadata = { title: "Admin Dashboard" }
 
@@ -49,6 +50,8 @@ export default async function AdminDashboard() {
           </div>
         ))}
       </div>
+
+      <LikesAnalytics />
 
       <div>
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">

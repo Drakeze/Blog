@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { formatDate } from "@/lib/utils"
 import { Loader2, Trash2, MessageSquare, CornerDownRight } from "lucide-react"
 import type { Comment } from "@/models/comment"
+import { LikeButton } from "@/components/like-button"
 
 interface Props {
   postId: string
@@ -90,9 +91,12 @@ export function CommentsSection({ postId, userId, isAdmin }: Props) {
 
   return (
     <section className="space-y-6">
-      <div className="flex items-center gap-2">
-        <MessageSquare className="h-4 w-4" />
-        <h2 className="font-semibold">{comments.length} Comment{comments.length !== 1 ? "s" : ""}</h2>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <MessageSquare className="h-4 w-4" />
+          <h2 className="font-semibold">{comments.length} Comment{comments.length !== 1 ? "s" : ""}</h2>
+        </div>
+        <LikeButton postSlug={postId} />
       </div>
 
       {userId ? (
