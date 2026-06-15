@@ -90,6 +90,25 @@ export async function sendCommentNotificationEmail({
   })
 }
 
+export async function sendSubscriptionConfirmationEmail(email: string) {
+  if (!env.RESEND_API_KEY || !env.RESEND_FROM_EMAIL) {
+    return { status: "skipped" as const, message: "Email not configured." }
+  }
+
+  try {
+    await resend.emails.send({
+      from: env.RESEND_FROM_EMAIL,
+      replyTo: env.RESEND_REPLY_TO_EMAIL,
+      to: email,
+      subject: "You're subscribed!",
+      html: `<p>Thanks for subscribing. You'll receive new posts straight to your inbox.</p>`,
+    })
+    return { status: "sent" as const }
+  } catch {
+    return { status: "error" as const, message: "Failed to send confirmation email." }
+  }
+}
+
 export async function sendReplyNotification({
   db,
   parentCommentId,

@@ -18,6 +18,13 @@ if (process.env.NODE_ENV === "development") {
 
 export default clientPromise
 
+export const BLOG_DB_NAME = "blog_db"
+
+export const blogCollectionNames = {
+  posts: "posts",
+  subscribers: "subscribers",
+} as const
+
 export async function getDb() {
   const client = await clientPromise
   return client.db()
