@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/auth"
 import { getDb } from "@/lib/mongo"
 import { sendNewsletterEmail } from "@/lib/email"
+import { getPostHogClient } from "@/lib/posthog-server"
 import { env } from "@/lib/env"
 import type { Post } from "@/models/post"
 import type { Subscriber } from "@/models/subscriber"
@@ -43,6 +44,19 @@ export async function POST(req: Request) {
         failed++
       }
     }
+
+    const posthog = getPostHogClient()
+    posthog.capture({
+      distinctId: "admin",
+      event: "server_newsletter_sent",
+      properties: {
+        post_slug: post.slug,
+        post_title: post.title,
+        total_subscribers: subscribers.length,
+        sent,
+        failed,
+      },
+    })
 
     return NextResponse.json({ sent, failed, total: subscribers.length })
   } catch (err) {

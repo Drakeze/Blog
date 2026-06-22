@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useSyncExternalStore } from "react"
+import posthog from "posthog-js"
 import { Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
@@ -64,6 +65,7 @@ export function LikeButton({ postSlug }: LikeButtonProps) {
           { method: "DELETE" },
         )
         persistLiked(postSlug, false)
+        posthog.capture("post_unliked", { post_slug: postSlug })
       } else {
         await fetch("/api/likes", {
           method: "POST",
@@ -71,6 +73,7 @@ export function LikeButton({ postSlug }: LikeButtonProps) {
           body: JSON.stringify({ postSlug, fingerprint }),
         })
         persistLiked(postSlug, true)
+        posthog.capture("post_liked", { post_slug: postSlug })
         toast("Thanks for the like!")
       }
     } catch {

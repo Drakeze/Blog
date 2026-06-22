@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { auth, currentUser } from "@clerk/nextjs/server"
 import { getDb } from "@/lib/mongo"
 import { requireAdmin } from "@/lib/auth"
+import { getPostHogClient } from "@/lib/posthog-server"
 import type { Subscriber } from "@/models/subscriber"
 import crypto from "crypto"
 
@@ -58,6 +59,14 @@ export async function POST(req: Request) {
     }
 
     await db.collection<Subscriber>("subscribers").insertOne(subscriber)
+
+    const posthog = getPostHogClient()
+    posthog.capture({
+      distinctId: userId ?? email,
+      event: "server_newsletter_subscribed",
+      properties: { email, is_authenticated: !!userId },
+    })
+
     return NextResponse.json({ message: "Subscribed successfully" }, { status: 201 })
   } catch {
     return NextResponse.json({ error: "Failed to subscribe" }, { status: 500 })

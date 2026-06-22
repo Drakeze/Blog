@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { getDb } from "@/lib/mongo"
+import { getPostHogClient } from "@/lib/posthog-server"
 import type { Subscriber } from "@/models/subscriber"
 
 // GET: redirect email unsubscribe links to the confirmation page
@@ -17,6 +18,8 @@ export async function DELETE(req: Request) {
     if (!token) return NextResponse.json({ error: "Token required" }, { status: 400 })
 
     const db = await getDb()
+    const subscriber = await db.collection<Subscriber>("subscribers").findOne({ unsubscribeToken: token })
+
     const result = await db
       .collection<Subscriber>("subscribers")
       .deleteOne({ unsubscribeToken: token })
@@ -24,6 +27,13 @@ export async function DELETE(req: Request) {
     if (result.deletedCount === 0) {
       return NextResponse.json({ error: "Invalid token" }, { status: 404 })
     }
+
+    const posthog = getPostHogClient()
+    posthog.capture({
+      distinctId: subscriber?.userId ?? subscriber?.email ?? token,
+      event: "server_newsletter_unsubscribed",
+      properties: { email: subscriber?.email },
+    })
 
     return NextResponse.json({ success: true })
   } catch {

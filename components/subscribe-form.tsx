@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import posthog from "posthog-js"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -26,6 +27,7 @@ export function SubscribeForm({ userId }: { userId?: string }) {
         return
       }
       setDone(true)
+      posthog.capture("newsletter_subscribed", { method: "email_form" })
       toast.success("You're subscribed!")
     } catch {
       toast.error("Something went wrong")
@@ -55,6 +57,7 @@ export function SubscribeForm({ userId }: { userId?: string }) {
         const data = await res.json()
         if (!res.ok && res.status !== 200) { toast.error(data.error ?? "Failed to subscribe"); return }
         setDone(true)
+        posthog.capture("newsletter_subscribed", { method: "one_click" })
         toast.success("You're subscribed!")
       } catch {
         toast.error("Something went wrong")

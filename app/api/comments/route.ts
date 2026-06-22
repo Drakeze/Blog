@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { auth, currentUser } from "@clerk/nextjs/server"
 import { getDb } from "@/lib/mongo"
 import { sendReplyNotification } from "@/lib/email"
+import { getPostHogClient } from "@/lib/posthog-server"
 import { env } from "@/lib/env"
 import type { Comment } from "@/models/comment"
 
@@ -56,6 +57,17 @@ export async function POST(req: Request) {
     }
 
     const result = await db.collection<Comment>("comments").insertOne(comment)
+
+    const posthog = getPostHogClient()
+    posthog.capture({
+      distinctId: userId,
+      event: "server_comment_posted",
+      properties: {
+        post_id: postId,
+        is_reply: !!parentId,
+        content_length: comment.content.length,
+      },
+    })
 
     if (parentId) {
       void sendReplyNotification({

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/auth"
 import { getDb } from "@/lib/mongo"
 import { slugify } from "@/lib/utils"
+import { getPostHogClient } from "@/lib/posthog-server"
 import type { Post } from "@/models/post"
 import { sendNewsletterEmail } from "@/lib/email"
 import { env } from "@/lib/env"
@@ -85,6 +86,20 @@ export async function POST(req: Request) {
     }
 
     const result = await db.collection<Post>("posts").insertOne(post)
+
+    if (status === "published") {
+      const posthog = getPostHogClient()
+      posthog.capture({
+        distinctId: authorId ?? "admin",
+        event: "server_post_published",
+        properties: {
+          post_slug: post.slug,
+          post_title: post.title,
+          tags: post.tags,
+          author_name: post.authorName,
+        },
+      })
+    }
 
     // Send newsletter if published and auto-send is on
     if (status === "published" && env.AUTO_SEND_POST_EMAILS) {

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import posthog from "posthog-js"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import Image from "next/image"
 import Link from "next/link"
@@ -45,11 +46,13 @@ export function CommentsSection({ postId, userId, isAdmin }: Props) {
       if (!res.ok) throw new Error(data.error ?? "Failed to post")
       return data
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       setContent("")
       setReplyContent("")
+      const wasReply = !!variables.parentId
       setReplyingTo(null)
       qc.invalidateQueries({ queryKey: ["comments", postId] })
+      posthog.capture(wasReply ? "comment_reply_posted" : "comment_posted", { post_id: postId })
       toast.success("Comment posted")
     },
     onError: (err) => toast.error(err.message),

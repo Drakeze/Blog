@@ -1,10 +1,26 @@
 "use client"
 
-import { ClerkProvider } from "@clerk/nextjs"
+import { ClerkProvider, useUser } from "@clerk/nextjs"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ThemeProvider } from "next-themes"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import posthog from "posthog-js"
 import { Toaster } from "sonner"
+
+function PostHogIdentity() {
+  const { user, isSignedIn } = useUser()
+  useEffect(() => {
+    if (isSignedIn && user) {
+      posthog.identify(user.id, {
+        email: user.primaryEmailAddress?.emailAddress,
+        name: user.fullName ?? user.username ?? undefined,
+      })
+    } else if (isSignedIn === false) {
+      posthog.reset()
+    }
+  }, [isSignedIn, user])
+  return null
+}
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient())
@@ -35,6 +51,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     >
       <QueryClientProvider client={queryClient}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <PostHogIdentity />
           {children}
           <Toaster richColors position="top-right" />
         </ThemeProvider>

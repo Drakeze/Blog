@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import posthog from "posthog-js"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Bookmark, BookmarkCheck, Loader2 } from "lucide-react"
@@ -35,6 +36,7 @@ export function BookmarkButton({
       if (bookmarked) {
         await fetch(`/api/bookmarks?postSlug=${postSlug}`, { method: "DELETE" })
         setBookmarked(false)
+        posthog.capture("post_bookmark_removed", { post_slug: postSlug, post_title: postTitle })
         toast.success("Bookmark removed")
       } else {
         await fetch("/api/bookmarks", {
@@ -43,6 +45,7 @@ export function BookmarkButton({
           body: JSON.stringify({ postSlug, postTitle, postExcerpt, postCoverImage }),
         })
         setBookmarked(true)
+        posthog.capture("post_bookmarked", { post_slug: postSlug, post_title: postTitle })
         toast.success("Bookmarked!")
       }
     } catch {
