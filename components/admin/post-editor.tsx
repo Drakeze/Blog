@@ -11,9 +11,23 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Eye, EyeOff, X, Loader2, Send, Save, FolderOpen } from "lucide-react"
+import { Eye, EyeOff, X, Loader2, Send, Save, FolderOpen, ImageIcon } from "lucide-react"
 import { slugify } from "@/lib/utils"
 import type { Post } from "@/models/post"
+
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"]
+
+function getCaretOffsetAtPoint(x: number, y: number): number | null {
+  if ("caretPositionFromPoint" in document) {
+    const pos = (document as Document & { caretPositionFromPoint(x: number, y: number): { offset: number } | null }).caretPositionFromPoint(x, y)
+    return pos?.offset ?? null
+  }
+  if ("caretRangeFromPoint" in document) {
+    const range = (document as Document & { caretRangeFromPoint(x: number, y: number): Range | null }).caretRangeFromPoint(x, y)
+    return range?.startOffset ?? null
+  }
+  return null
+}
 
 type SerializedPost = Omit<Post, "_id"> & { _id: string }
 
@@ -38,7 +52,81 @@ export function PostEditor({ post, authorId, authorName, authorImageUrl }: PostE
   const [saving, setSaving] = useState(false)
   const [publishing, setPublishing] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [uploadingInline, setUploadingInline] = useState(false)
+  const [isDraggingOver, setIsDraggingOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const inlineFileInputRef = useRef<HTMLInputElement>(null)
+  const contentRef = useRef<HTMLTextAreaElement>(null)
+  const lastCursorRef = useRef<{ start: number; end: number }>({ start: 0, end: 0 })
+
+  function saveCursor(e: React.SyntheticEvent<HTMLTextAreaElement>) {
+    const t = e.currentTarget
+    lastCursorRef.current = { start: t.selectionStart, end: t.selectionEnd }
+  }
+
+  function insertAtCursor(text: string) {
+    const { start, end } = lastCursorRef.current
+    setContent((prev) => prev.slice(0, start) + text + prev.slice(end))
+    setTimeout(() => {
+      const ta = contentRef.current
+      if (!ta) return
+      ta.focus()
+      ta.selectionStart = start + text.length
+      ta.selectionEnd = start + text.length
+    }, 0)
+  }
+
+  async function uploadInlineFile(file: File) {
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      toast.error("File type not allowed")
+      return
+    }
+    setUploadingInline(true)
+    try {
+      const form = new FormData()
+      form.append("file", file)
+      const res = await fetch("/api/upload", { method: "POST", body: form })
+      const data = await res.json()
+      if (!res.ok) { toast.error(data.error ?? "Upload failed"); return }
+      insertAtCursor(`\n\n![image](${data.url})\n\n`)
+      toast.success("Image inserted")
+    } catch {
+      toast.error("Upload failed")
+    } finally {
+      setUploadingInline(false)
+    }
+  }
+
+  async function handleInlineFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    await uploadInlineFile(file)
+    if (inlineFileInputRef.current) inlineFileInputRef.current.value = ""
+  }
+
+  function handleDragOver(e: React.DragEvent<HTMLTextAreaElement>) {
+    if (!e.dataTransfer.types.includes("Files")) return
+    e.preventDefault()
+    setIsDraggingOver(true)
+    // Keep cursor tracking up to date while dragging
+    const ta = e.currentTarget
+    lastCursorRef.current = { start: ta.selectionStart, end: ta.selectionEnd }
+  }
+
+  function handleDragLeave() {
+    setIsDraggingOver(false)
+  }
+
+  async function handleDrop(e: React.DragEvent<HTMLTextAreaElement>) {
+    setIsDraggingOver(false)
+    const files = Array.from(e.dataTransfer.files).filter(f => ALLOWED_IMAGE_TYPES.includes(f.type))
+    if (files.length === 0) return
+    e.preventDefault()
+    // Try to get the character offset at the drop coordinates
+    const dropOffset = getCaretOffsetAtPoint(e.clientX, e.clientY) ?? lastCursorRef.current.start
+    lastCursorRef.current = { start: dropOffset, end: dropOffset }
+    await uploadInlineFile(files[0])
+  }
 
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -254,7 +342,31 @@ export function PostEditor({ post, authorId, authorName, authorImageUrl }: PostE
 
       {/* Editor / Preview */}
       <div className="space-y-1.5">
-        <Label>{preview ? "Preview" : "Content (Markdown)"}</Label>
+        <div className="flex items-center justify-between">
+          <Label>{preview ? "Preview" : "Content (Markdown)"}</Label>
+          {!preview && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={() => inlineFileInputRef.current?.click()}
+              disabled={uploadingInline}
+            >
+              {uploadingInline
+                ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                : <ImageIcon className="h-3.5 w-3.5 mr-1.5" />}
+              {uploadingInline ? "Uploading…" : "Insert Image"}
+            </Button>
+          )}
+        </div>
+        <input
+          ref={inlineFileInputRef}
+          type="file"
+          accept={ALLOWED_IMAGE_TYPES.join(",")}
+          className="hidden"
+          onChange={handleInlineFileSelect}
+        />
         {preview ? (
           <div className="min-h-125 rounded-md border border-border p-6 prose">
             {content ? (
@@ -265,11 +377,18 @@ export function PostEditor({ post, authorId, authorName, authorImageUrl }: PostE
           </div>
         ) : (
           <Textarea
+            ref={contentRef}
             value={content}
             onChange={(e) => setContent(e.target.value)}
+            onSelect={saveCursor}
+            onClick={saveCursor}
+            onKeyUp={saveCursor}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
             placeholder={`# Your post title\n\nStart writing in Markdown...`}
             rows={28}
-            className="font-mono text-sm resize-y"
+            className={`font-mono text-sm resize-y transition-colors ${isDraggingOver ? "border-primary bg-primary/5" : ""}`}
           />
         )}
       </div>
