@@ -1,6 +1,7 @@
 import {
   Body,
   Button,
+  Column,
   Container,
   Head,
   Hr,
@@ -8,9 +9,17 @@ import {
   Img,
   Link,
   Preview,
+  Row,
   Section,
   Text,
 } from "@react-email/components"
+
+const SOCIAL_LINKS = {
+  x: "https://x.com/SorenIdeas",
+  github: "https://github.com/Drakeze",
+  linkedin: "https://www.linkedin.com/in/anthonyshead/",
+  reddit: "https://www.reddit.com/user/Putrid-Economy1639/",
+}
 
 interface NewsletterEmailProps {
   postTitle: string
@@ -31,77 +40,110 @@ export function NewsletterEmail({
   postImage,
   authorName,
   authorImageUrl,
-  siteUrl = "http://localhost:3000",
 }: NewsletterEmailProps) {
-  const shareUrl = `https://x.com/intent/post?text=${encodeURIComponent(postTitle)}&url=${encodeURIComponent(postUrl)}`
-  const bookmarkUrl = `${siteUrl}/bookmarks`
+  const xShareUrl = `https://x.com/intent/post?text=${encodeURIComponent(postTitle)}&url=${encodeURIComponent(postUrl)}`
+  const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(postUrl)}`
 
   return (
     <Html>
       <Head />
-      <Preview>{postTitle} — {postExcerpt.slice(0, 90)}</Preview>
+      <Preview>
+        {postTitle} — {postExcerpt.slice(0, 90)}
+      </Preview>
       <Body style={body}>
         <Container style={container}>
-          {/* Header */}
-          <Section style={header}>
-            <Text style={headerLabel}>NEW POST</Text>
-          </Section>
-
-          {/* Cover image */}
           {postImage && (
-            <Section style={{ padding: 0 }}>
-              <Img
-                src={postImage}
-                alt={postTitle}
-                width="600"
-                style={coverImage}
-              />
-            </Section>
+            <Img
+              src={postImage}
+              alt={postTitle}
+              width="600"
+              style={heroImage}
+            />
           )}
 
-          {/* Content */}
           <Section style={content}>
-            <Text style={title}>{postTitle}</Text>
-            <Text style={excerpt}>{postExcerpt}</Text>
-
-            {/* Author row */}
-            {authorName && (
-              <Section style={authorRow}>
-                {authorImageUrl && (
-                  <Img
-                    src={authorImageUrl}
-                    alt={authorName}
-                    width="24"
-                    height="24"
-                    style={authorAvatar}
-                  />
-                )}
-                <Text style={authorText}>{authorName}</Text>
-              </Section>
-            )}
-
-            {/* CTA buttons */}
-            <Section style={buttonRow}>
-              <Button href={postUrl} style={primaryButton}>
-                Read the Post →
-              </Button>
-            </Section>
-
-            <Section style={secondaryButtonRow}>
-              <Button href={bookmarkUrl} style={secondaryButton}>
-                Save for Later →
-              </Button>
-              <Link href={shareUrl} style={shareLink}>
-                Share on X ↗
-              </Link>
-            </Section>
+            <Text style={titleStyle}>{postTitle}</Text>
+            <Text style={excerptStyle}>{postExcerpt}</Text>
           </Section>
 
-          {/* Footer */}
           <Hr style={divider} />
+
+          {/* Author + Read CTA */}
+          <Section style={authorSection}>
+            <Row>
+              <Column style={authorCol}>
+                {authorName && (
+                  <>
+                    {authorImageUrl && (
+                      <Img
+                        src={authorImageUrl}
+                        alt={authorName}
+                        width="36"
+                        height="36"
+                        style={avatarStyle}
+                      />
+                    )}
+                    <span style={authorNameStyle}>{authorName}</span>
+                  </>
+                )}
+              </Column>
+              <Column style={ctaCol}>
+                <Button href={postUrl} style={primaryButton}>
+                  Read the Full Post →
+                </Button>
+              </Column>
+            </Row>
+          </Section>
+
+          <Hr style={divider} />
+
+          {/* Share this post */}
+          <Section style={socialSection}>
+            <Text style={socialLabel}>Share this post</Text>
+            <Row>
+              <Column>
+                <Link href={xShareUrl} style={sharePillStyle}>
+                  Share on X ↗
+                </Link>
+              </Column>
+              <Column>
+                <Link href={linkedInShareUrl} style={sharePillStyle}>
+                  Share on LinkedIn ↗
+                </Link>
+              </Column>
+            </Row>
+          </Section>
+
+          <Hr style={divider} />
+
+          {/* Follow me */}
+          <Section style={socialSection}>
+            <Text style={socialLabel}>Follow me</Text>
+            <Text style={followRowStyle}>
+              <Link href={SOCIAL_LINKS.x} style={followLink}>
+                X (Twitter)
+              </Link>
+              {" · "}
+              <Link href={SOCIAL_LINKS.github} style={followLink}>
+                GitHub
+              </Link>
+              {" · "}
+              <Link href={SOCIAL_LINKS.linkedin} style={followLink}>
+                LinkedIn
+              </Link>
+              {" · "}
+              <Link href={SOCIAL_LINKS.reddit} style={followLink}>
+                Reddit
+              </Link>
+            </Text>
+          </Section>
+
+          <Hr style={divider} />
+
           <Section style={footerSection}>
             <Text style={footerText}>
-              You&apos;re receiving this because you subscribed to the blog newsletter.{" "}
+              You&apos;re receiving this because you subscribed to the blog
+              newsletter.{" "}
               <Link href={unsubscribeUrl} style={footerLink}>
                 Unsubscribe
               </Link>
@@ -113,7 +155,6 @@ export function NewsletterEmail({
   )
 }
 
-// Styles
 const body: React.CSSProperties = {
   backgroundColor: "#f4f4f5",
   fontFamily: "system-ui, -apple-system, sans-serif",
@@ -129,23 +170,10 @@ const container: React.CSSProperties = {
   overflow: "hidden",
 }
 
-const header: React.CSSProperties = {
-  backgroundColor: "#0a0a0a",
-  padding: "20px 32px",
-}
-
-const headerLabel: React.CSSProperties = {
-  color: "#a3a3a3",
-  fontSize: "11px",
-  fontWeight: "700",
-  letterSpacing: "0.1em",
-  margin: 0,
-  textTransform: "uppercase",
-}
-
-const coverImage: React.CSSProperties = {
+const heroImage: React.CSSProperties = {
+  borderRadius: "8px 8px 0 0",
   display: "block",
-  maxHeight: "280px",
+  maxHeight: "300px",
   objectFit: "cover",
   width: "100%",
 }
@@ -154,44 +182,51 @@ const content: React.CSSProperties = {
   padding: "32px 32px 24px",
 }
 
-const title: React.CSSProperties = {
+const titleStyle: React.CSSProperties = {
   color: "#0a0a0a",
-  fontSize: "22px",
+  fontSize: "26px",
   fontWeight: "700",
   lineHeight: "1.3",
-  margin: "0 0 12px",
+  margin: "0 0 16px",
 }
 
-const excerpt: React.CSSProperties = {
+const excerptStyle: React.CSSProperties = {
   color: "#525252",
   fontSize: "16px",
-  lineHeight: "1.65",
-  margin: "0 0 24px",
+  lineHeight: "1.7",
+  margin: 0,
 }
 
-const authorRow: React.CSSProperties = {
-  alignItems: "center",
-  display: "flex",
-  marginBottom: "24px",
+const divider: React.CSSProperties = {
+  border: "none",
+  borderTop: "1px solid #e5e5e5",
+  margin: "0 32px",
 }
 
-const authorAvatar: React.CSSProperties = {
+const authorSection: React.CSSProperties = {
+  padding: "20px 32px",
+}
+
+const authorCol: React.CSSProperties = {
+  verticalAlign: "middle",
+}
+
+const ctaCol: React.CSSProperties = {
+  textAlign: "right",
+  verticalAlign: "middle",
+}
+
+const avatarStyle: React.CSSProperties = {
   borderRadius: "50%",
   display: "inline-block",
-  marginRight: "8px",
+  marginRight: "10px",
   verticalAlign: "middle",
 }
 
-const authorText: React.CSSProperties = {
-  color: "#737373",
-  display: "inline-block",
-  fontSize: "13px",
-  margin: 0,
+const authorNameStyle: React.CSSProperties = {
+  color: "#525252",
+  fontSize: "14px",
   verticalAlign: "middle",
-}
-
-const buttonRow: React.CSSProperties = {
-  marginBottom: "12px",
 }
 
 const primaryButton: React.CSSProperties = {
@@ -201,39 +236,44 @@ const primaryButton: React.CSSProperties = {
   display: "inline-block",
   fontSize: "14px",
   fontWeight: "600",
-  padding: "12px 24px",
+  padding: "11px 22px",
   textDecoration: "none",
 }
 
-const secondaryButtonRow: React.CSSProperties = {
-  alignItems: "center",
-  display: "flex",
-  gap: "16px",
-  marginBottom: "8px",
+const socialSection: React.CSSProperties = {
+  padding: "20px 32px",
 }
 
-const secondaryButton: React.CSSProperties = {
+const socialLabel: React.CSSProperties = {
+  color: "#a3a3a3",
+  fontSize: "11px",
+  fontWeight: "700",
+  letterSpacing: "0.08em",
+  margin: "0 0 12px",
+  textTransform: "uppercase",
+}
+
+const sharePillStyle: React.CSSProperties = {
   backgroundColor: "#f4f4f5",
   border: "1px solid #e5e5e5",
   borderRadius: "6px",
   color: "#0a0a0a",
   display: "inline-block",
-  fontSize: "14px",
+  fontSize: "13px",
   fontWeight: "500",
-  padding: "10px 20px",
+  padding: "8px 16px",
   textDecoration: "none",
 }
 
-const shareLink: React.CSSProperties = {
+const followRowStyle: React.CSSProperties = {
   color: "#737373",
   fontSize: "14px",
-  textDecoration: "underline",
+  margin: 0,
 }
 
-const divider: React.CSSProperties = {
-  border: "none",
-  borderTop: "1px solid #e5e5e5",
-  margin: "0 32px",
+const followLink: React.CSSProperties = {
+  color: "#525252",
+  textDecoration: "none",
 }
 
 const footerSection: React.CSSProperties = {

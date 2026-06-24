@@ -5,10 +5,18 @@ import {
   Head,
   Hr,
   Html,
+  Link,
   Preview,
   Section,
   Text,
 } from "@react-email/components"
+
+const SOCIAL_LINKS = {
+  x: "https://x.com/SorenIdeas",
+  github: "https://github.com/Drakeze",
+  linkedin: "https://www.linkedin.com/in/anthonyshead/",
+  reddit: "https://www.reddit.com/user/Putrid-Economy1639/",
+}
 
 interface CommentNotificationEmailProps {
   replierDisplayName: string
@@ -41,29 +49,26 @@ export function CommentNotificationEmail({
       </Preview>
       <Body style={body}>
         <Container style={container}>
-          {/* Header */}
-          <Section style={header}>
-            <Text style={headerLabel}>NEW REPLY</Text>
-          </Section>
-
-          {/* Content */}
           <Section style={content}>
-            <Text style={heading}>Someone replied to your comment</Text>
-            <Text style={subheading}>
-              <strong>{replierDisplayName}</strong> replied on &quot;{postTitle}&quot;
+            <Text style={label}>New Reply</Text>
+            <Text style={heading}>
+              {replierDisplayName} replied to your comment
+            </Text>
+            <Text style={subtext}>
+              on{" "}
+              <Link href={postUrl} style={postLink}>
+                &quot;{postTitle}&quot;
+              </Link>
             </Text>
 
-            {/* Original comment quoted */}
-            <Text style={quoteLabel}>Your comment:</Text>
+            <Text style={quoteLabel}>Your comment</Text>
             <Section style={quotedBlock}>
               <Text style={quotedText}>{truncatedOriginal}</Text>
             </Section>
 
-            {/* Reply */}
-            <Text style={replyLabel}>{replierDisplayName} wrote:</Text>
+            <Text style={replyLabel}>{replierDisplayName} says</Text>
             <Text style={replyText}>{replyContent}</Text>
 
-            {/* CTA */}
             <Section style={buttonRow}>
               <Button href={conversationUrl} style={primaryButton}>
                 View the conversation →
@@ -71,11 +76,36 @@ export function CommentNotificationEmail({
             </Section>
           </Section>
 
-          {/* Footer */}
           <Hr style={divider} />
+
+          {/* Follow me */}
+          <Section style={socialSection}>
+            <Text style={socialLabel}>Follow me</Text>
+            <Text style={followRowStyle}>
+              <Link href={SOCIAL_LINKS.x} style={followLink}>
+                X (Twitter)
+              </Link>
+              {" · "}
+              <Link href={SOCIAL_LINKS.github} style={followLink}>
+                GitHub
+              </Link>
+              {" · "}
+              <Link href={SOCIAL_LINKS.linkedin} style={followLink}>
+                LinkedIn
+              </Link>
+              {" · "}
+              <Link href={SOCIAL_LINKS.reddit} style={followLink}>
+                Reddit
+              </Link>
+            </Text>
+          </Section>
+
+          <Hr style={divider} />
+
           <Section style={footerSection}>
             <Text style={footerText}>
-              You received this because someone replied to your comment on the blog.
+              You received this because someone replied to your comment on the
+              blog.
             </Text>
           </Section>
         </Container>
@@ -84,7 +114,6 @@ export function CommentNotificationEmail({
   )
 }
 
-// Styles
 const body: React.CSSProperties = {
   backgroundColor: "#f4f4f5",
   fontFamily: "system-ui, -apple-system, sans-serif",
@@ -100,42 +129,48 @@ const container: React.CSSProperties = {
   overflow: "hidden",
 }
 
-const header: React.CSSProperties = {
-  backgroundColor: "#0a0a0a",
-  padding: "20px 32px",
-}
-
-const headerLabel: React.CSSProperties = {
-  color: "#a3a3a3",
-  fontSize: "11px",
-  fontWeight: "700",
-  letterSpacing: "0.1em",
-  margin: 0,
-  textTransform: "uppercase",
-}
-
 const content: React.CSSProperties = {
   padding: "32px 32px 24px",
 }
 
+const label: React.CSSProperties = {
+  backgroundColor: "#f4f4f5",
+  border: "1px solid #e5e5e5",
+  borderRadius: "4px",
+  color: "#525252",
+  display: "inline-block",
+  fontSize: "11px",
+  fontWeight: "700",
+  letterSpacing: "0.08em",
+  margin: "0 0 20px",
+  padding: "3px 10px",
+  textTransform: "uppercase",
+}
+
 const heading: React.CSSProperties = {
   color: "#0a0a0a",
-  fontSize: "20px",
+  fontSize: "22px",
   fontWeight: "700",
+  lineHeight: "1.3",
   margin: "0 0 8px",
 }
 
-const subheading: React.CSSProperties = {
-  color: "#525252",
+const subtext: React.CSSProperties = {
+  color: "#737373",
   fontSize: "15px",
   margin: "0 0 28px",
 }
 
+const postLink: React.CSSProperties = {
+  color: "#525252",
+  textDecoration: "underline",
+}
+
 const quoteLabel: React.CSSProperties = {
-  color: "#737373",
-  fontSize: "12px",
-  fontWeight: "600",
-  letterSpacing: "0.05em",
+  color: "#a3a3a3",
+  fontSize: "11px",
+  fontWeight: "700",
+  letterSpacing: "0.08em",
   margin: "0 0 8px",
   textTransform: "uppercase",
 }
@@ -157,10 +192,10 @@ const quotedText: React.CSSProperties = {
 }
 
 const replyLabel: React.CSSProperties = {
-  color: "#737373",
-  fontSize: "12px",
-  fontWeight: "600",
-  letterSpacing: "0.05em",
+  color: "#a3a3a3",
+  fontSize: "11px",
+  fontWeight: "700",
+  letterSpacing: "0.08em",
   margin: "0 0 8px",
   textTransform: "uppercase",
 }
@@ -191,6 +226,30 @@ const divider: React.CSSProperties = {
   border: "none",
   borderTop: "1px solid #e5e5e5",
   margin: "0 32px",
+}
+
+const socialSection: React.CSSProperties = {
+  padding: "20px 32px",
+}
+
+const socialLabel: React.CSSProperties = {
+  color: "#a3a3a3",
+  fontSize: "11px",
+  fontWeight: "700",
+  letterSpacing: "0.08em",
+  margin: "0 0 12px",
+  textTransform: "uppercase",
+}
+
+const followRowStyle: React.CSSProperties = {
+  color: "#737373",
+  fontSize: "14px",
+  margin: 0,
+}
+
+const followLink: React.CSSProperties = {
+  color: "#525252",
+  textDecoration: "none",
 }
 
 const footerSection: React.CSSProperties = {
