@@ -1,6 +1,14 @@
 import { redirect } from "next/navigation"
 import { auth, currentUser } from "@clerk/nextjs/server"
-import { authConfig } from "./env"
+import { authConfig, env } from "./env"
+
+// Lets server-to-server callers (e.g. the Blog MCP server) authenticate with
+// BLOG_API_KEY instead of a Clerk session cookie.
+export function isApiKeyAuthorized(req: Request): boolean {
+  const header = req.headers.get("authorization")
+  const token = header?.startsWith("Bearer ") ? header.slice(7) : null
+  return !!token && !!env.BLOG_API_KEY && token === env.BLOG_API_KEY
+}
 
 export async function isAdmin(): Promise<boolean> {
   const { userId } = await auth()

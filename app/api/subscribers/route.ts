@@ -1,14 +1,16 @@
 import { NextResponse } from "next/server"
 import { auth, currentUser } from "@clerk/nextjs/server"
 import { getDb } from "@/lib/mongo"
-import { requireAdmin } from "@/lib/auth"
+import { isAdmin, isApiKeyAuthorized } from "@/lib/auth"
 import type { Subscriber } from "@/models/subscriber"
 import crypto from "crypto"
 
 // GET: admin list all subscribers
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    await requireAdmin()
+    if (!isApiKeyAuthorized(req) && !(await isAdmin())) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
     const db = await getDb()
     const subscribers = await db
       .collection<Subscriber>("subscribers")
@@ -16,10 +18,7 @@ export async function GET() {
       .sort({ createdAt: -1 })
       .toArray()
     return NextResponse.json(subscribers)
-  } catch (err) {
-    if (err instanceof Error && err.message === "Unauthorized") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
+  } catch {
     return NextResponse.json({ error: "Failed to fetch subscribers" }, { status: 500 })
   }
 }

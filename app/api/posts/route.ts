@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { requireAdmin } from "@/lib/auth"
+import { isAdmin, isApiKeyAuthorized } from "@/lib/auth"
 import { getDb } from "@/lib/mongo"
 import { slugify } from "@/lib/utils"
 import type { Post } from "@/models/post"
@@ -21,9 +21,7 @@ export async function GET(req: Request) {
 
     // Non-admins only see published posts
     if (status === "all") {
-      try {
-        await requireAdmin()
-      } catch {
+      if (!isApiKeyAuthorized(req) && !(await isAdmin())) {
         filter.status = "published"
       }
     } else {
@@ -51,7 +49,9 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    await requireAdmin()
+    if (!isApiKeyAuthorized(req) && !(await isAdmin())) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
     const db = await getDb()
     const body = await req.json()
 
@@ -92,10 +92,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ ...post, _id: result.insertedId }, { status: 201 })
-  } catch (err) {
-    if (err instanceof Error && err.message === "Unauthorized") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
+  } catch {
     return NextResponse.json({ error: "Failed to create post" }, { status: 500 })
   }
 }

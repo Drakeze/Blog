@@ -11,7 +11,8 @@ function getBearerToken(req: Request): string | null {
 
 export async function POST(req: Request) {
   const token = getBearerToken(req)
-  if (!env.DRAFT_API_SECRET || token !== env.DRAFT_API_SECRET) {
+  const validTokens = [env.DRAFT_API_SECRET, env.BLOG_API_KEY].filter(Boolean)
+  if (!token || !validTokens.includes(token)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 

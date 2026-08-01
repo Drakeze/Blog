@@ -1,7 +1,7 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
 import { NextRequest, NextResponse } from "next/server"
 import path from "path"
-import { isAdmin } from "@/lib/auth"
+import { isAdmin, isApiKeyAuthorized } from "@/lib/auth"
 import { storageConfig } from "@/lib/env"
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"]
@@ -19,8 +19,9 @@ function getR2Client() {
 }
 
 export async function POST(req: NextRequest) {
-  const admin = await isAdmin()
-  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!isApiKeyAuthorized(req) && !(await isAdmin())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
 
   if (!storageConfig.configured) {
     return NextResponse.json(
