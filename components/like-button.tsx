@@ -58,20 +58,29 @@ export function LikeButton({ postSlug }: LikeButtonProps) {
   async function toggle() {
     setLoading(true)
     try {
-      const fingerprint = getFingerprint()
+      let fingerprint: string
+      try {
+        fingerprint = getFingerprint()
+      } catch {
+        toast.error("Couldn't save your like")
+        return
+      }
+
       if (liked) {
-        await fetch(
+        const res = await fetch(
           `/api/likes?postSlug=${encodeURIComponent(postSlug)}&fingerprint=${encodeURIComponent(fingerprint)}`,
           { method: "DELETE" },
         )
+        if (!res.ok) throw new Error("delete failed")
         persistLiked(postSlug, false)
         posthog.capture("post_unliked", { post_slug: postSlug })
       } else {
-        await fetch("/api/likes", {
+        const res = await fetch("/api/likes", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ postSlug, fingerprint }),
         })
+        if (!res.ok) throw new Error("like failed")
         persistLiked(postSlug, true)
         posthog.capture("post_liked", { post_slug: postSlug })
         toast("Thanks for the like!")

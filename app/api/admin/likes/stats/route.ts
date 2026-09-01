@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getDb } from "@/lib/mongo"
-import { isAdmin } from "@/lib/auth"
+import { requireAdminApi } from "@/lib/auth"
+import { toPositiveInt } from "@/lib/utils"
 
 export async function GET(req: NextRequest) {
-  const admin = await isAdmin()
-  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const denied = await requireAdminApi()
+  if (denied) return denied
 
-  const days = Math.min(parseInt(req.nextUrl.searchParams.get("days") ?? "30"), 90)
+  const days = toPositiveInt(req.nextUrl.searchParams.get("days"), 30, 90)
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
   const db = await getDb()
 

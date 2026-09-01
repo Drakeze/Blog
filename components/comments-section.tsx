@@ -30,9 +30,13 @@ export function CommentsSection({ postId, userId, isAdmin }: Props) {
   const [replyingTo, setReplyingTo] = useState<string | null>(null)
   const [replyContent, setReplyContent] = useState("")
 
-  const { data: comments = [], isLoading } = useQuery<Comment[]>({
+  const { data: comments = [], isLoading, isError } = useQuery<Comment[]>({
     queryKey: ["comments", postId],
-    queryFn: () => fetch(`/api/comments?postId=${postId}`).then((r) => r.json()),
+    queryFn: async () => {
+      const res = await fetch(`/api/comments?postId=${encodeURIComponent(postId)}`)
+      if (!res.ok) throw new Error("Failed to load comments")
+      return res.json()
+    },
   })
 
   const addMutation = useMutation({
@@ -128,6 +132,8 @@ export function CommentsSection({ postId, userId, isAdmin }: Props) {
         <div className="flex justify-center py-8">
           <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
         </div>
+      ) : isError ? (
+        <p className="text-sm text-muted-foreground py-4">Couldn’t load comments. Refresh to try again.</p>
       ) : comments.length === 0 ? (
         <p className="text-sm text-muted-foreground py-4">No comments yet. Be the first!</p>
       ) : (
@@ -264,6 +270,7 @@ function CommentItem({ comment, userId, isAdmin, onDelete, isDeleting, onReply, 
                 className="h-6 w-6"
                 onClick={onDelete}
                 disabled={isDeleting}
+                aria-label="Delete comment"
               >
                 <Trash2 className="h-3 w-3" />
               </Button>
