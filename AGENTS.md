@@ -1,128 +1,64 @@
 # AGENTS.md
 
-This file provides guidance to WARP (warp.dev) when working with code in this repository.
+Guidance for coding agents working in this repository.
 
-## Runtime & Package Manager
+## Runtime & package manager
 
-This project uses **Bun** as both the runtime and package manager. All commands should use `bun` instead of `npm`, `yarn`, or `pnpm`.
+**Bun** for everything — runtime, package manager, script runner. Never `npm`/`yarn`/`pnpm`.
 
-## Development Commands
+## Commands
 
-### Setup & Dependencies
 ```bash
-bun install                    # Install dependencies
+bun install
+bun dev                 # Next.js dev server (http://localhost:3000)
+bun run build           # production build
+bun run lint            # ESLint (flat config, eslint.config.mjs)
+bun run type-check      # tsc --noEmit
+bun run test            # lint + type-check (no test framework)
+bun run seed            # seed starter posts (needs DATABASE_URL)
+bun run ensure-indexes  # create the MongoDB indexes the app assumes
 ```
 
-### Development Server
-```bash
-bun dev                        # Start Next.js development server (default: http://localhost:3000)
-```
+CI (`.github/workflows/ci.yml`) runs lint + type-check + test + build on every push.
 
-### Building
-```bash
-bun run build                  # Production build (Next.js)
-bun start                      # Start production server after build
-```
+## Architecture
 
-### Code Quality
-```bash
-bun run lint                   # Run ESLint
-```
+A single-author blog with a Clerk-gated admin dashboard. Posts are written in
+Markdown in the admin editor and stored in MongoDB. There is **no** content
+aggregation, **no** Prisma, **no** ORM.
 
-**Note**: The CI workflow references `bun run type-check` and `bun run test` scripts, but these are not defined in package.json. If these commands are needed, they must be added to package.json first.
+- **`app/`** — App Router. `app/(public)/` is the reader-facing site,
+  `app/admin/` is the dashboard, `app/api/` holds route handlers.
+- **`lib/`** — the only place that talks to infrastructure.
+  - `lib/mongo.ts` — `getDb()`, the sole MongoDB accessor (native `mongodb` driver).
+  - `lib/auth.ts` — `isAdmin()` (Clerk userId / email allowlist) and
+    `requireAdminApi()` (returns a 401 `NextResponse` for route handlers).
+  - `lib/env.ts` — env access, split into `env` (server) and `publicEnv`.
+  - `lib/email.ts` — Resend; newsletter send lives here.
+  - `lib/markdown.ts` — `renderMarkdown()` = marked + DOMPurify. **All** rendered
+    post HTML must go through this before `dangerouslySetInnerHTML`.
+  - `lib/posthog-server.ts` — `captureServerEvent()` (flushes via `after()`).
+- **`models/`** — plain TypeScript interfaces for the MongoDB documents
+  (`post.ts`, `subscriber.ts`, `comment.ts`, `bookmark.ts`, `like.ts`). No logic.
+- **`emails/`** — React Email templates.
+- **`components/ui/`** — shadcn/Radix primitives. `components/admin/` — dashboard-only.
+- **`scripts/`** — one-off Bun scripts (`seed.ts`, `ensure-indexes.ts`,
+  `migrate-images-to-r2.ts`).
 
-### Database (Prisma)
-```bash
-bunx prisma generate           # Generate Prisma client after schema changes
-bunx prisma db push            # Push schema changes to MongoDB (development)
-bunx prisma studio             # Open Prisma Studio to browse data
-```
+## Conventions
 
-## High-Level Architecture
+- **Admin gate**: route handlers call `requireAdminApi()`; server components call
+  `isAdmin()` then `redirect()`. `proxy.ts` only enforces authentication on
+  `/admin` — real admin checks are per-route.
+- **DB access** goes through `getDb()`. Route handlers may query inline; there is
+  no shared query layer.
+- Validate untrusted input at the boundary — request-body values that reach a
+  Mongo filter must be `typeof`-checked (operator-injection guard).
+- `@/*` path alias → repo root.
+- Keep files under 500 lines.
 
-### Data Flow & External Integrations
+## Stack
 
-This is a **content aggregation platform** that pulls posts from multiple external sources (Patreon, LinkedIn, Reddit, Twitter) and stores them in a MongoDB database alongside manually created blog posts.
-
-**Key architectural pattern**: Each external platform has:
-1. An integration module in `lib/social/[platform].ts` that handles API communication and data transformation
-2. A corresponding API route in `app/api/integrations/[platform]/route.ts` that triggers sync operations
-3. Platform-specific API credentials managed through `lib/env.ts` with a graceful degradation pattern (missing credentials disable the platform but don't break the app)
-
-### Directory Structure
-
-- **`app/`** — Next.js App Router pages and API routes
-  - `app/api/` — API endpoints for posts, integrations, admin auth, subscriptions, health checks
-  - `app/admin/` — Admin UI pages for creating/editing posts
-  - `app/blog/` — Public blog pages
-  
-- **`lib/`** — Shared utilities and configuration
-  - `lib/social/` — External platform integrations (linkedin.ts, patreon.ts, reddit.ts, twitter.ts)
-  - `lib/env.ts` — Environment variable validation and social platform config management (uses Zod)
-  - `lib/auth.ts` — Simple cookie-based admin authentication
-  - `lib/mongo.ts` — MongoDB connection management
-  - `lib/prisma.ts` — Prisma client singleton
-  
-- **`data/`** — Data access layer
-  - `data/posts.ts` — CRUD operations for blog posts with filtering
-  - `data/subscribers.ts` — Email subscription management
-  
-- **`models/`** — Data models and MongoDB collection management
-  - `models/BlogPost.ts` — BlogPost document interface and collection setup
-  
-- **`components/`** — React components
-  - `components/ui/` — Shadcn/Radix UI components
-  - `components/admin/` — Admin-specific components
-
-### Database Schema (Prisma + MongoDB)
-
-The schema defines two main models:
-- **Post** — Unified post model supporting multiple sources (blog, reddit, linkedin, patreon, twitter)
-  - Has slug-based routing and status (draft/published)
-  - Tracks external IDs and URLs for synced content
-  - Uses composite unique index on (source, externalId) to prevent duplicate imports
-  
-- **Subscriber** — Email subscription tracking
-
-### Environment Variables & Configuration
-
-Environment variables are validated using Zod schemas in `lib/env.ts`. The app distinguishes between:
-- **Server-only**: `DATABASE_URL`, Clerk secrets/admin allowlists, and API tokens for external platforms
-- **Public** (NEXT_PUBLIC_*): Site URL, Clerk publishable key/sign-in URL, and public profile links
-
-Authentication is now handled by **Clerk**:
-- `CLERK_SECRET_KEY`
-- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
-- Optional admin restriction via `CLERK_ADMIN_EMAILS` and/or `CLERK_ADMIN_USER_IDS`
-
-Google sign-in and any provider restrictions are configured in the Clerk dashboard.
-
-**Important**: External platform integrations use a `socialConfig` pattern that checks for missing keys and disables features gracefully rather than crashing the app.
-
-### Authentication
-
-Admin authentication uses Clerk:
-- Sign-in lives at `/sign-in`
-- Admin pages and admin-only API routes use server-side Clerk checks
-- Optional allowlists can restrict admin access to specific emails or Clerk user IDs
-- The old password-cookie admin flow is no longer used
-
-### API Testing
-
-A Postman collection is available at `postman/collections/` for testing API endpoints locally.
-
-## Path Aliases
-
-TypeScript path alias `@/*` maps to the root directory `./*` (configured in tsconfig.json).
-
-## Deployment
-
-The application is deployed on Vercel (referenced in README).
-
-## Important Notes
-
-- **No test framework is currently configured** despite CI workflow references
-- **Type checking script is missing** from package.json but referenced in CI
-- ESLint uses flat config format (eslint.config.mjs)
-- The project uses Next.js 16.x with React 19.x
-- MongoDB is accessed both directly (via mongodb driver in models/) and through Prisma
+Next.js 16 · React 19 · TypeScript 5 (strict) · Tailwind v4 (`@tailwindcss/postcss`)
+· MongoDB (native driver) · Clerk · Resend · PostHog · Cloudflare R2 (uploads via
+`@aws-sdk/client-s3`) · deployed on Vercel.
