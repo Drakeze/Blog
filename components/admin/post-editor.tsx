@@ -4,7 +4,6 @@ import { useState, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { toast } from "sonner"
-import { marked } from "marked"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -13,6 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Eye, EyeOff, X, Loader2, Send, Save, FolderOpen, ImageIcon } from "lucide-react"
 import { slugify } from "@/lib/utils"
+import { renderMarkdown } from "@/lib/markdown"
 import type { Post } from "@/models/post"
 
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"]
@@ -207,9 +207,7 @@ export function PostEditor({ post, authorId, authorName, authorImageUrl }: PostE
     }
   }
 
-  const renderedHtml = preview
-    ? (marked.parse(content) as string)
-    : ""
+  const renderedHtml = preview ? renderMarkdown(content) : ""
 
   return (
     <div className="space-y-6 max-w-4xl">

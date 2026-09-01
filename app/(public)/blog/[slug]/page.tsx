@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import { auth } from "@clerk/nextjs/server"
-import { marked } from "marked"
 import { getDb } from "@/lib/mongo"
+import { renderMarkdown } from "@/lib/markdown"
 import { isAdmin } from "@/lib/auth"
 import type { Post } from "@/models/post"
 import type { Bookmark } from "@/models/bookmark"
@@ -56,7 +56,7 @@ export default async function BlogPostPage({
     isBookmarked = !!bookmark
   }
 
-  const html = marked.parse(post.content) as string
+  const html = renderMarkdown(post.content)
   const mins = readingTime(post.content)
 
   return (
