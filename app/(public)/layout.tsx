@@ -61,7 +61,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             ))}
           </div>
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Blog. Built by Drakeze.
+            © {new Date().getFullYear()} Drakeze Blog. Built by Anthony.
           </p>
         </div>
       </footer>

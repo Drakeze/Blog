@@ -21,11 +21,11 @@ export default async function SubscribersPage() {
         </p>
       </div>
 
-      <div className="rounded-lg border border-border">
+      <div className="rounded-lg border border-border overflow-x-auto">
         {subscribers.length === 0 ? (
           <p className="p-8 text-center text-sm text-muted-foreground">No subscribers yet.</p>
         ) : (
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[32rem] text-sm">
             <thead>
               <tr className="border-b border-border">
                 <th className="text-left font-medium text-muted-foreground px-4 py-3">Email</th>
