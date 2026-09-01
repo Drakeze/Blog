@@ -21,6 +21,17 @@ export function formatDate(date: Date | string): string {
   })
 }
 
+/**
+ * Parse an untrusted query-string integer. Returns `fallback` for anything
+ * missing, non-numeric, negative, or NaN; clamps to `max` when given. Guards
+ * `skip(NaN)` / `new Date(NaN)` / unbounded `limit` from raw `parseInt`.
+ */
+export function toPositiveInt(value: string | null | undefined, fallback: number, max?: number): number {
+  const n = Number.parseInt(value ?? "", 10)
+  if (!Number.isFinite(n) || n < 1) return fallback
+  return max != null ? Math.min(n, max) : n
+}
+
 export function readingTime(content: string): number {
   const words = content.trim().split(/\s+/).length
   return Math.ceil(words / 200)

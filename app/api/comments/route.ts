@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { auth, currentUser } from "@clerk/nextjs/server"
 import { getDb } from "@/lib/mongo"
 import { sendReplyNotification } from "@/lib/email"
-import { getPostHogClient } from "@/lib/posthog-server"
+import { captureServerEvent } from "@/lib/posthog-server"
 import { env } from "@/lib/env"
 import type { Comment } from "@/models/comment"
 
@@ -33,11 +33,14 @@ export async function POST(req: Request) {
     const user = await currentUser()
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
     const { postId, content, parentId } = body
 
-    if (!postId || !content?.trim()) {
+    if (typeof postId !== "string" || typeof content !== "string" || !content.trim()) {
       return NextResponse.json({ error: "postId and content are required" }, { status: 400 })
+    }
+    if (parentId !== undefined && parentId !== null && typeof parentId !== "string") {
+      return NextResponse.json({ error: "Invalid parentId" }, { status: 400 })
     }
     if (content.length > 2000) {
       return NextResponse.json({ error: "Comment must be under 2000 characters" }, { status: 400 })
@@ -58,8 +61,7 @@ export async function POST(req: Request) {
 
     const result = await db.collection<Comment>("comments").insertOne(comment)
 
-    const posthog = getPostHogClient()
-    posthog.capture({
+    captureServerEvent({
       distinctId: userId,
       event: "server_comment_posted",
       properties: {
