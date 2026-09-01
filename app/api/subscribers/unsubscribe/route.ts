@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { getDb } from "@/lib/mongo"
-import { getPostHogClient } from "@/lib/posthog-server"
+import { captureServerEvent } from "@/lib/posthog-server"
 import type { Subscriber } from "@/models/subscriber"
 
 // GET: redirect email unsubscribe links to the confirmation page
@@ -14,25 +14,25 @@ export async function GET(req: Request) {
 // DELETE: perform the actual unsubscribe (called from the confirmation page)
 export async function DELETE(req: Request) {
   try {
-    const { token } = await req.json()
-    if (!token) return NextResponse.json({ error: "Token required" }, { status: 400 })
+    const { token } = await req.json().catch(() => ({}))
+    if (typeof token !== "string" || !token) {
+      return NextResponse.json({ error: "Token required" }, { status: 400 })
+    }
 
     const db = await getDb()
-    const subscriber = await db.collection<Subscriber>("subscribers").findOne({ unsubscribeToken: token })
-
-    const result = await db
+    // Atomic: a double-click can't race findOne against deleteOne.
+    const subscriber = await db
       .collection<Subscriber>("subscribers")
-      .deleteOne({ unsubscribeToken: token })
+      .findOneAndDelete({ unsubscribeToken: token })
 
-    if (result.deletedCount === 0) {
+    if (!subscriber) {
       return NextResponse.json({ error: "Invalid token" }, { status: 404 })
     }
 
-    const posthog = getPostHogClient()
-    posthog.capture({
-      distinctId: subscriber?.userId ?? subscriber?.email ?? token,
+    captureServerEvent({
+      distinctId: subscriber.userId ?? subscriber.email ?? token,
       event: "server_newsletter_unsubscribed",
-      properties: { email: subscriber?.email },
+      properties: { email: subscriber.email },
     })
 
     return NextResponse.json({ success: true })

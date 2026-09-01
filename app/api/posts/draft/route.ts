@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import crypto from "crypto"
 import { getDb } from "@/lib/mongo"
 import { env } from "@/lib/env"
 import type { Post } from "@/models/post"
@@ -9,9 +10,15 @@ function getBearerToken(req: Request): string | null {
   return header.slice(7)
 }
 
+function timingSafeEqual(a: string, b: string): boolean {
+  const bufA = Buffer.from(a)
+  const bufB = Buffer.from(b)
+  return bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB)
+}
+
 export async function POST(req: Request) {
   const token = getBearerToken(req)
-  if (!env.DRAFT_API_SECRET || token !== env.DRAFT_API_SECRET) {
+  if (!env.DRAFT_API_SECRET || !token || !timingSafeEqual(token, env.DRAFT_API_SECRET)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 

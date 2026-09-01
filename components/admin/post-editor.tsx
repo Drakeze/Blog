@@ -4,7 +4,6 @@ import { useState, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { toast } from "sonner"
-import { marked } from "marked"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -13,6 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Eye, EyeOff, X, Loader2, Send, Save, FolderOpen, ImageIcon } from "lucide-react"
 import { slugify } from "@/lib/utils"
+import { renderMarkdown } from "@/lib/markdown"
 import type { Post } from "@/models/post"
 
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"]
@@ -118,11 +118,18 @@ export function PostEditor({ post, authorId, authorName, authorImageUrl }: PostE
   }
 
   async function handleDrop(e: React.DragEvent<HTMLTextAreaElement>) {
+    // Cancel the browser default (navigating to the dropped file) FIRST — before
+    // any early return — or dropping a non-image nukes the unsaved draft.
+    if (e.dataTransfer.types.includes("Files")) e.preventDefault()
     setIsDraggingOver(false)
+    if (uploadingInline) return
     const files = Array.from(e.dataTransfer.files).filter(f => ALLOWED_IMAGE_TYPES.includes(f.type))
-    if (files.length === 0) return
-    e.preventDefault()
-    // Try to get the character offset at the drop coordinates
+    if (files.length === 0) {
+      if (e.dataTransfer.files.length > 0) toast.error("Only image files can be dropped here")
+      return
+    }
+    // caretPositionFromPoint is unreliable inside a <textarea> across browsers;
+    // fall back to the last known caret. ponytail: not worth chasing pixel-exact.
     const dropOffset = getCaretOffsetAtPoint(e.clientX, e.clientY) ?? lastCursorRef.current.start
     lastCursorRef.current = { start: dropOffset, end: dropOffset }
     await uploadInlineFile(files[0])
@@ -207,9 +214,7 @@ export function PostEditor({ post, authorId, authorName, authorImageUrl }: PostE
     }
   }
 
-  const renderedHtml = preview
-    ? (marked.parse(content) as string)
-    : ""
+  const renderedHtml = preview ? renderMarkdown(content) : ""
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -305,15 +310,17 @@ export function PostEditor({ post, authorId, authorName, authorImageUrl }: PostE
           />
           {coverImage && (
             <div className="relative mt-2 h-32 w-full overflow-hidden rounded-md">
+              {/* unoptimized: admin may paste an arbitrary (non-allowlisted) URL here */}
               <Image src={coverImage} alt="Cover preview" fill className="object-cover" unoptimized />
             </div>
           )}
         </div>
 
         <div className="space-y-1.5">
-          <Label>Tags</Label>
+          <Label htmlFor="tag-input">Tags</Label>
           <div className="flex gap-2">
             <Input
+              id="tag-input"
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag() } }}
@@ -328,7 +335,12 @@ export function PostEditor({ post, authorId, authorName, authorImageUrl }: PostE
               {tags.map((tag) => (
                 <Badge key={tag} variant="secondary" className="gap-1 pr-1">
                   {tag}
-                  <button onClick={() => removeTag(tag)} className="ml-0.5 hover:text-destructive">
+                  <button
+                    type="button"
+                    onClick={() => removeTag(tag)}
+                    aria-label={`Remove tag ${tag}`}
+                    className="ml-0.5 hover:text-destructive"
+                  >
                     <X className="h-3 w-3" />
                   </button>
                 </Badge>
@@ -386,6 +398,7 @@ export function PostEditor({ post, authorId, authorName, authorImageUrl }: PostE
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
+            disabled={uploadingInline}
             placeholder={`# Your post title\n\nStart writing in Markdown...`}
             rows={28}
             className={`font-mono text-sm resize-y transition-colors ${isDraggingOver ? "border-primary bg-primary/5" : ""}`}

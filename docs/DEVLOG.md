@@ -35,7 +35,7 @@ All 5 published post cover images were stored as external Pinterest URLs. Pinter
 
 **Fix:** Created `scripts/migrate-images-to-r2.ts` — downloads each Pinterest image, re-uploads it to R2, and updates the MongoDB record with the new R2 URL. Script is idempotent (skips posts already pointing at R2).
 
-**Result:** All 5 posts now serve images from `pub-196fa866c9204ea18c2dc7ae564f3bad.r2.dev`. Pinterest dependency eliminated.
+**Result:** All 5 posts now serve images from `the R2 public bucket URL`. Pinterest dependency eliminated.
 
 **TypeScript fix (`289e145`):** The MongoDB query used duplicate `$ne` keys in the same object literal which TypeScript correctly rejects. Fixed by replacing `{ $ne: null, $ne: "" }` with `{ $nin: [null, ""] }`.
 
@@ -48,7 +48,7 @@ Diagnosed the "Error 404 — Object not found" error showing on R2 image URLs.
 
 **Findings:**
 - R2 bucket `blog-images` credentials are valid — uploads and reads work
-- Public access was already enabled; `pub-196fa866c9204ea18c2dc7ae564f3bad.r2.dev` serves correctly
+- Public access was already enabled; `the R2 public bucket URL` serves correctly
 - Bucket was essentially empty (only a test file) — the real issue was Pinterest URLs in the DB, not R2
 
 **R2 config confirmed working:**
@@ -71,7 +71,7 @@ Diagnosed the "Error 404 — Object not found" error showing on R2 image URLs.
 
 `blog.drakeze.com` was returning 404. The Vercel deployment was `READY` and the domain was assigned to the project, but the DNS was wrong.
 
-**Root cause:** The `blog` DNS record in Cloudflare was set as an A record pointing to Cloudflare proxy IPs (`104.21.85.50`, `172.67.202.119`) instead of Vercel.
+**Root cause:** The `blog` DNS record in Cloudflare was an A record pointing at Cloudflare proxy IPs instead of Vercel.
 
 **Fix (done in Cloudflare dashboard):**
 - Changed `blog` record to CNAME → `cname.vercel-dns.com`
@@ -83,17 +83,13 @@ Diagnosed the "Error 404 — Object not found" error showing on R2 image URLs.
 
 | Layer | Tech |
 |---|---|
-| Framework | Next.js 15, React 19, TypeScript 5 |
+| Framework | Next.js 16, React 19, TypeScript 5 |
 | Styling | Tailwind CSS v4 |
 | Database | MongoDB (native driver) |
 | Auth | Clerk (live keys on prod) |
-| Image storage | Cloudflare R2 (`blog-images` bucket) |
+| Image storage | Cloudflare R2 |
 | Email | Resend |
-| Deployment | Vercel (SorenLab team) |
+| Deployment | Vercel |
 | Package manager | Bun |
 
-**Key env vars:**
-- `NEXT_PUBLIC_R2_PUBLIC_URL` — R2 public base URL
-- `R2_BUCKET_NAME` — `blog-images`
-- `CLOUDFLARE_ACCOUNT_ID` — used to build the S3-compatible endpoint
-- `CLERK_ADMIN_EMAILS` / `CLERK_ADMIN_USER_IDS` — gates admin access
+**Key env vars:** see `.env.example`.

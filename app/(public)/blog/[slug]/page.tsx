@@ -1,9 +1,12 @@
+import { cache } from "react"
 import { notFound } from "next/navigation"
 import Image from "next/image"
+import Link from "next/link"
 import { auth } from "@clerk/nextjs/server"
-import { marked } from "marked"
 import { getDb } from "@/lib/mongo"
+import { renderMarkdown } from "@/lib/markdown"
 import { isAdmin } from "@/lib/auth"
+import { publicEnv } from "@/lib/env"
 import type { Post } from "@/models/post"
 import type { Bookmark } from "@/models/bookmark"
 import { Badge } from "@/components/ui/badge"
@@ -16,19 +19,42 @@ import type { Metadata } from "next"
 
 export const revalidate = 60
 
+const siteUrl = (publicEnv.NEXT_PUBLIC_SITE_URL || "https://blog.drakeze.com").replace(/\/$/, "")
+
+// Deduped across generateMetadata + the page render within one request.
+const getPost = cache(async (slug: string) => {
+  const db = await getDb()
+  return db.collection<Post>("posts").findOne({ slug })
+})
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const db = await getDb()
-  const post = await db.collection<Post>("posts").findOne({ slug })
+  const post = await getPost(slug)
   if (!post) return {}
+  const url = `${siteUrl}/blog/${post.slug}`
   return {
     title: post.title,
     description: post.excerpt,
-    openGraph: { title: post.title, description: post.excerpt, images: post.coverImage ? [post.coverImage] : [] },
+    authors: post.authorName ? [{ name: post.authorName }] : undefined,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "article",
+      url,
+      title: post.title,
+      description: post.excerpt,
+      publishedTime: post.publishedAt ? new Date(post.publishedAt).toISOString() : undefined,
+      images: post.coverImage ? [post.coverImage] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+      images: post.coverImage ? [post.coverImage] : [],
+    },
   }
 }
 
@@ -38,8 +64,7 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const db = await getDb()
-  const post = await db.collection<Post>("posts").findOne({ slug })
+  const post = await getPost(slug)
 
   if (!post) notFound()
 
@@ -52,23 +77,40 @@ export default async function BlogPostPage({
   // Check if user has bookmarked this post
   let isBookmarked = false
   if (userId) {
+    const db = await getDb()
     const bookmark = await db.collection<Bookmark>("bookmarks").findOne({ userId, postSlug: slug })
     isBookmarked = !!bookmark
   }
 
-  const html = marked.parse(post.content) as string
+  const html = renderMarkdown(post.content)
   const mins = readingTime(post.content)
+  const canonicalUrl = `${siteUrl}/blog/${post.slug}`
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.excerpt,
+    image: post.coverImage ? [post.coverImage] : undefined,
+    datePublished: post.publishedAt ? new Date(post.publishedAt).toISOString() : undefined,
+    dateModified: post.updatedAt ? new Date(post.updatedAt).toISOString() : undefined,
+    author: post.authorName ? { "@type": "Person", name: post.authorName } : undefined,
+    mainEntityOfPage: canonicalUrl,
+  }
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Header */}
       <header className="mb-8 space-y-4">
         {post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {post.tags.map((tag) => (
-              <a key={tag} href={`/?tag=${tag}`}>
+              <Link key={tag} href={`/?tag=${encodeURIComponent(tag)}`}>
                 <Badge className={cn("border-transparent", getTagColorClasses(tag))}>{tag}</Badge>
-              </a>
+              </Link>
             ))}
           </div>
         )}

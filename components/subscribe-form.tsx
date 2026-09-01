@@ -1,34 +1,46 @@
 "use client"
 
-import { useState } from "react"
+import { useId, useState } from "react"
 import posthog from "posthog-js"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Loader2 } from "lucide-react"
 
+async function subscribe(
+  body: Record<string, unknown>,
+  method: "email_form" | "one_click",
+): Promise<boolean> {
+  const res = await fetch("/api/subscribers", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  })
+  const data = await res.json().catch(() => ({}))
+
+  if (!res.ok) {
+    toast.error(data.error ?? "Failed to subscribe")
+    return false
+  }
+  if (data.message === "Already subscribed") {
+    toast("You’re already on the list.")
+    return true
+  }
+  posthog.capture("newsletter_subscribed", { method })
+  toast.success("You're subscribed!")
+  return true
+}
+
 export function SubscribeForm({ userId }: { userId?: string }) {
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
+  const inputId = useId()
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
+  async function run(body: Record<string, unknown>, method: "email_form" | "one_click") {
     setLoading(true)
     try {
-      const res = await fetch("/api/subscribers", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      })
-      const data = await res.json()
-      if (!res.ok && res.status !== 200) {
-        toast.error(data.error ?? "Failed to subscribe")
-        return
-      }
-      setDone(true)
-      posthog.capture("newsletter_subscribed", { method: "email_form" })
-      toast.success("You're subscribed!")
+      if (await subscribe(body, method)) setDone(true)
     } catch {
       toast.error("Something went wrong")
     } finally {
@@ -46,31 +58,8 @@ export function SubscribeForm({ userId }: { userId?: string }) {
 
   // Signed-in users subscribe with one click (email comes from their account server-side)
   if (userId) {
-    async function handleClick() {
-      setLoading(true)
-      try {
-        const res = await fetch("/api/subscribers", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({}),
-        })
-        const data = await res.json()
-        if (!res.ok && res.status !== 200) { toast.error(data.error ?? "Failed to subscribe"); return }
-        setDone(true)
-        posthog.capture("newsletter_subscribed", { method: "one_click" })
-        toast.success("You're subscribed!")
-      } catch {
-        toast.error("Something went wrong")
-      } finally {
-        setLoading(false)
-      }
-    }
     return (
-      <Button
-        onClick={handleClick}
-        disabled={loading}
-        size="sm"
-      >
+      <Button onClick={() => run({}, "one_click")} disabled={loading} size="sm">
         {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
         Subscribe to newsletter
       </Button>
@@ -78,8 +67,18 @@ export function SubscribeForm({ userId }: { userId?: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        run({ email }, "email_form")
+      }}
+      className="flex gap-2"
+    >
+      <label htmlFor={inputId} className="sr-only">
+        Email address
+      </label>
       <Input
+        id={inputId}
         type="email"
         placeholder="your@email.com"
         value={email}

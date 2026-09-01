@@ -14,9 +14,13 @@ interface Stats {
 export function LikesAnalytics() {
   const [days, setDays] = useState(30)
 
-  const { data, isLoading } = useQuery<Stats>({
+  const { data, isLoading, isError } = useQuery<Stats>({
     queryKey: ["admin-likes", days],
-    queryFn: () => fetch(`/api/admin/likes/stats?days=${days}`).then((r) => r.json()),
+    queryFn: async () => {
+      const res = await fetch(`/api/admin/likes/stats?days=${days}`)
+      if (!res.ok) throw new Error("Failed to load like stats")
+      return res.json()
+    },
   })
 
   return (
@@ -41,6 +45,10 @@ export function LikesAnalytics() {
           ))}
         </div>
       </div>
+
+      {isError && (
+        <p className="text-sm text-muted-foreground mb-4">Couldn’t load like stats.</p>
+      )}
 
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="rounded-lg border border-border bg-card p-5">

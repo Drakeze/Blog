@@ -1,4 +1,5 @@
 import { Resend } from "resend"
+import crypto from "crypto"
 import { render } from "@react-email/components"
 import { NewsletterEmail } from "@/emails/newsletter"
 import { CommentNotificationEmail } from "@/emails/comment-notification"
@@ -7,50 +8,87 @@ import type { Db } from "mongodb"
 import { ObjectId } from "mongodb"
 import type { Comment } from "@/models/comment"
 import type { Post } from "@/models/post"
+import type { Subscriber } from "@/models/subscriber"
 
 const resend = new Resend(env.RESEND_API_KEY)
 
-export async function sendNewsletterEmail({
-  to,
-  subject,
-  postTitle,
-  postExcerpt,
-  postUrl,
-  unsubscribeUrl,
-  postImage,
-  authorName,
-  authorImageUrl,
-}: {
-  to: string
-  subject: string
-  postTitle: string
-  postExcerpt: string
-  postUrl: string
-  unsubscribeUrl: string
-  postImage?: string
-  authorName?: string
-  authorImageUrl?: string
-}) {
-  const html = await render(
-    NewsletterEmail({
-      postTitle,
-      postExcerpt,
-      postUrl,
-      unsubscribeUrl,
-      postImage,
-      authorName,
-      authorImageUrl,
-      siteUrl: env.SITE_URL,
-    })
-  )
+const CHUNK = 100 // Resend batch limit
 
-  return resend.emails.send({
-    from: env.RESEND_FROM_EMAIL,
-    replyTo: env.RESEND_REPLY_TO_EMAIL,
-    to,
-    subject,
-    html,
-  })
+/**
+ * Email a published post to every confirmed subscriber. Renders a per-recipient
+ * unsubscribe link, backfills any missing `unsubscribeToken`, and sends in
+ * batches of 100 to stay under Resend's rate limit / avoid a per-email loop.
+ * Idempotent-ish: sets `post.newsletterSentAt`; callers should check it first.
+ *
+ * ponytail: a real job queue is the ceiling for very large lists; batch send
+ * covers the current subscriber count fine.
+ */
+export async function sendNewsletterToConfirmedSubscribers(
+  post: Post,
+  db: Db,
+): Promise<{ sent: number; failed: number; total: number }> {
+  const subscribers = await db
+    .collection<Subscriber>("subscribers")
+    .find({ confirmed: true })
+    .toArray()
+
+  const postUrl = `${env.SITE_URL}/blog/${post.slug}`
+  let sent = 0
+  let failed = 0
+
+  for (let i = 0; i < subscribers.length; i += CHUNK) {
+    const batch = subscribers.slice(i, i + CHUNK)
+    const payloads = await Promise.all(
+      batch.map(async (sub) => {
+        let token = sub.unsubscribeToken
+        if (!token) {
+          token = crypto.randomUUID()
+          await db
+            .collection<Subscriber>("subscribers")
+            .updateOne({ _id: sub._id }, { $set: { unsubscribeToken: token } })
+        }
+        return {
+          from: env.RESEND_FROM_EMAIL,
+          replyTo: env.RESEND_REPLY_TO_EMAIL,
+          to: sub.email,
+          subject: post.title,
+          html: await render(
+            NewsletterEmail({
+              postTitle: post.title,
+              postExcerpt: post.excerpt,
+              postUrl,
+              unsubscribeUrl: `${env.SITE_URL}/api/subscribers/unsubscribe?token=${token}`,
+              postImage: post.coverImage,
+              authorName: post.authorName,
+              authorImageUrl: post.authorImageUrl,
+              siteUrl: env.SITE_URL,
+            }),
+          ),
+        }
+      }),
+    )
+
+    try {
+      const { error } = await resend.batch.send(payloads)
+      if (error) {
+        failed += batch.length
+        console.error("Newsletter batch failed:", error.message)
+      } else {
+        sent += batch.length
+      }
+    } catch (err) {
+      failed += batch.length
+      console.error("Newsletter batch threw:", err)
+    }
+  }
+
+  if (post._id) {
+    await db
+      .collection<Post>("posts")
+      .updateOne({ _id: post._id }, { $set: { newsletterSentAt: new Date() } })
+  }
+
+  return { sent, failed, total: subscribers.length }
 }
 
 export async function sendCommentNotificationEmail({
@@ -81,13 +119,14 @@ export async function sendCommentNotificationEmail({
     })
   )
 
-  return resend.emails.send({
+  const { error } = await resend.emails.send({
     from: env.RESEND_FROM_EMAIL,
     replyTo: env.RESEND_REPLY_TO_EMAIL,
     to,
     subject: `${replierDisplayName} replied to your comment on "${postTitle}"`,
     html,
   })
+  if (error) throw new Error(`Resend: ${error.message}`)
 }
 
 export async function sendSubscriptionConfirmationEmail(email: string) {
@@ -96,13 +135,14 @@ export async function sendSubscriptionConfirmationEmail(email: string) {
   }
 
   try {
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: env.RESEND_FROM_EMAIL,
       replyTo: env.RESEND_REPLY_TO_EMAIL,
       to: email,
       subject: "You're subscribed!",
       html: `<p>Thanks for subscribing. You'll receive new posts straight to your inbox.</p>`,
     })
+    if (error) return { status: "error" as const, message: error.message }
     return { status: "sent" as const }
   } catch {
     return { status: "error" as const, message: "Failed to send confirmation email." }

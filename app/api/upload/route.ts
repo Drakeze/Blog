@@ -1,10 +1,17 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
 import { NextRequest, NextResponse } from "next/server"
-import path from "path"
 import { isAdmin } from "@/lib/auth"
 import { storageConfig } from "@/lib/env"
 
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"]
+// Extension is derived from the validated MIME type, never from file.name —
+// a crafted filename would otherwise flow into the stored key and the markdown.
+const EXT_BY_TYPE: Record<string, string> = {
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp",
+  "image/gif": ".gif",
+  "image/avif": ".avif",
+}
 const MAX_SIZE = 10 * 1024 * 1024 // 10 MB
 
 function getR2Client() {
@@ -33,14 +40,14 @@ export async function POST(req: NextRequest) {
   const file = formData.get("file") as File | null
   if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 })
 
-  if (!ALLOWED_TYPES.includes(file.type))
+  const ext = EXT_BY_TYPE[file.type]
+  if (!ext)
     return NextResponse.json({ error: "File type not allowed" }, { status: 400 })
 
   if (file.size > MAX_SIZE)
     return NextResponse.json({ error: "File too large (max 10 MB)" }, { status: 400 })
 
   const bytes = await file.arrayBuffer()
-  const ext = path.extname(file.name).toLowerCase()
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`
 
   const client = getR2Client()

@@ -15,6 +15,7 @@ export interface Post {
   authorName: string
   authorImageUrl?: string
   publishedAt?: Date
+  newsletterSentAt?: Date   // set once the post has been emailed to subscribers
   createdAt: Date
   updatedAt: Date
 }

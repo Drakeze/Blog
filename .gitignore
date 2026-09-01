@@ -56,3 +56,9 @@ coverage/
 # Optional: VS Code settings override
 !.vscode/settings.json
 !.vscode/extensions.json
+
+# Tooling scratch
+.claude-flow/
+.claude/
+.hive-mind/
+.swarm/

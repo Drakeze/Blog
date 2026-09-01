@@ -3,22 +3,32 @@
 import { ClerkProvider, useUser } from "@clerk/nextjs"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ThemeProvider } from "next-themes"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import posthog from "posthog-js"
 import { Toaster } from "sonner"
 
 function PostHogIdentity() {
   const { user, isSignedIn } = useUser()
+  const userId = user?.id
+  const wasSignedIn = useRef(false)
+
   useEffect(() => {
     if (isSignedIn && user) {
+      // Keyed on userId, not the `user` object — Clerk hands back a fresh
+      // reference on many re-renders and we don't want to re-identify each time.
       posthog.identify(user.id, {
         email: user.primaryEmailAddress?.emailAddress,
         name: user.fullName ?? user.username ?? undefined,
       })
-    } else if (isSignedIn === false) {
+      wasSignedIn.current = true
+    } else if (isSignedIn === false && wasSignedIn.current) {
+      // Only reset on an actual sign-out — not on every anonymous page load,
+      // which would throw away the anon distinct_id and break funnel stitching.
       posthog.reset()
+      wasSignedIn.current = false
     }
-  }, [isSignedIn, user])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSignedIn, userId])
   return null
 }
 

@@ -2,6 +2,7 @@ import Link from "next/link"
 import { getDb } from "@/lib/mongo"
 import type { PostSummary } from "@/models/post"
 import { PostCard } from "@/components/post-card"
+import { toPositiveInt } from "@/lib/utils"
 
 export const revalidate = 60
 
@@ -11,7 +12,7 @@ export default async function HomePage({
   searchParams: Promise<{ tag?: string; page?: string }>
 }) {
   const { tag, page: pageParam } = await searchParams
-  const page = parseInt(pageParam ?? "1")
+  const page = toPositiveInt(pageParam, 1)
   const limit = 12
 
   const db = await getDb()
