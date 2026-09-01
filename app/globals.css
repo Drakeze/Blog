@@ -26,8 +26,8 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --font-sans: var(--font-inter, ui-sans-serif, system-ui, sans-serif);
-  --font-mono: var(--font-mono);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, "SF Mono", Menlo, monospace;
 }
 
 :root {
@@ -119,7 +119,7 @@
     @apply border-border my-8;
   }
   .prose table {
-    @apply w-full text-sm my-4;
+    @apply w-full text-sm my-4 block overflow-x-auto;
   }
   .prose th {
     @apply text-left font-semibold border-b border-border pb-2;
