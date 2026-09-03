@@ -14,7 +14,7 @@ import { CommentsSection } from "@/components/comments-section"
 import { BookmarkButton } from "@/components/bookmark-button"
 import { SubscribeForm } from "@/components/subscribe-form"
 import { Separator } from "@/components/ui/separator"
-import { formatDate, readingTime, getTagColorClasses, cn } from "@/lib/utils"
+import { formatDate, readingTime, getTagColorClasses, cn, toIsoOrUndefined } from "@/lib/utils"
 import type { Metadata } from "next"
 
 export const revalidate = 60
@@ -46,7 +46,7 @@ export async function generateMetadata({
       url,
       title: post.title,
       description: post.excerpt,
-      publishedTime: post.publishedAt ? new Date(post.publishedAt).toISOString() : undefined,
+      publishedTime: toIsoOrUndefined(post.publishedAt),
       images: post.coverImage ? [post.coverImage] : [],
     },
     twitter: {
@@ -91,8 +91,8 @@ export default async function BlogPostPage({
     headline: post.title,
     description: post.excerpt,
     image: post.coverImage ? [post.coverImage] : undefined,
-    datePublished: post.publishedAt ? new Date(post.publishedAt).toISOString() : undefined,
-    dateModified: post.updatedAt ? new Date(post.updatedAt).toISOString() : undefined,
+    datePublished: toIsoOrUndefined(post.publishedAt),
+    dateModified: toIsoOrUndefined(post.updatedAt),
     author: post.authorName ? { "@type": "Person", name: post.authorName } : undefined,
     mainEntityOfPage: canonicalUrl,
   }

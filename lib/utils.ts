@@ -21,6 +21,13 @@ export function formatDate(date: Date | string): string {
   })
 }
 
+/** ISO string for schema.org / OG tags, or undefined if the date is missing or invalid. */
+export function toIsoOrUndefined(date: Date | string | undefined | null): string | undefined {
+  if (!date) return undefined
+  const d = new Date(date)
+  return Number.isNaN(d.getTime()) ? undefined : d.toISOString()
+}
+
 /**
  * Parse an untrusted query-string integer. Returns `fallback` for anything
  * missing, non-numeric, negative, or NaN; clamps to `max` when given. Guards
