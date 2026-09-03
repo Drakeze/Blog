@@ -2,7 +2,9 @@ import { getDb } from "@/lib/mongo"
 import { publicEnv } from "@/lib/env"
 import type { Post } from "@/models/post"
 
-export const revalidate = 3600
+// Rendered on request, not at build — the feed needs the DB and the build
+// must not depend on Atlas being reachable. CDN-cached via the response header.
+export const dynamic = "force-dynamic"
 
 const base = (publicEnv.NEXT_PUBLIC_SITE_URL || "https://blog.drakeze.com").replace(/\/$/, "")
 
@@ -46,6 +48,9 @@ ${items}
 </rss>`
 
   return new Response(xml, {
-    headers: { "Content-Type": "application/rss+xml; charset=utf-8" },
+    headers: {
+      "Content-Type": "application/rss+xml; charset=utf-8",
+      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+    },
   })
 }

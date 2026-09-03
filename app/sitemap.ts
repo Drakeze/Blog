@@ -3,6 +3,10 @@ import { getDb } from "@/lib/mongo"
 import { publicEnv } from "@/lib/env"
 import type { Post } from "@/models/post"
 
+// Rendered on request, not at build — needs the DB, and the build must not
+// depend on Atlas being reachable.
+export const dynamic = "force-dynamic"
+
 const base = (publicEnv.NEXT_PUBLIC_SITE_URL || "https://blog.drakeze.com").replace(/\/$/, "")
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
