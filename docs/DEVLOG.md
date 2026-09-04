@@ -4,6 +4,49 @@ Running log of changes made to the blog project. Most recent first.
 
 ---
 
+## 2026-09-04
+
+### Production Hardening Pass
+**Commits:** `4ea4cc2`, `2bc511a`, `2efa2ea`, `6265001`, `daa919f`, `8d6dadd` (branch `hardening-pass`, merged to `main` via PR #32 + a follow-up merge)
+
+Full pass to fix prod 500s, unblock the draft-push API, and clean up backend/admin rough edges, followed by two reader-facing UI additions.
+
+**Prod 500 fixes:**
+- `4ea4cc2` — dropped jsdom from the post-page render path (was crashing post pages in prod)
+- `2bc511a` — `lib/mongo.ts` now connects lazily and clears its cached connection promise on a failed connect, instead of leaving an unhandled rejection that poisoned the whole serverless instance
+- `2efa2ea` — `feed.xml` and `sitemap.ts` no longer hit the DB during the build (were failing static builds)
+
+**Draft-push API unblocked** (`6265001`):
+- `POST /api/posts/draft` already existed (bearer-token auth, timing-safe compare, 409 on slug collision) but `DRAFT_API_SECRET` was never set and the endpoint was undocumented — that was the actual gap, not a missing feature
+- Documented the endpoint in `AGENTS.md` (URL, header, body shape, curl example)
+- Set `DRAFT_API_SECRET` in `.env.local` and pushed it to Vercel production via `vercel env add`
+- Verified end-to-end: create → `201`, duplicate slug → `409`, bad token → `401`
+
+**Newsletter + seed QoL** (`6265001`):
+- `components/admin/newsletter-send-form.tsx` — exposed the existing `force` resend flag (the API already supported it; the UI never sent it); shows sent-status and a "Resend anyway" action on a `409`
+- `app/admin/newsletter/page.tsx` — passes `newsletterSentAt` through so the post picker shows which posts were already sent
+- `scripts/seed.ts` — now also seeds 2 test subscribers (idempotent, same `deleteMany`-then-`insertMany` pattern already used for posts)
+
+**Admin usability/a11y fixes** (`6265001`):
+- `components/admin/admin-nav-link.tsx` (new) — client component using `usePathname()` for active-route highlighting (the nav's `exact` prop existed but was never read) plus `aria-label` on the icon-only collapsed nav links
+- `app/(public)/blog/[slug]/page.tsx` — header row wraps instead of clipping on narrow screens; cover image got a proper `sizes` prop instead of always fetching the largest breakpoint
+
+**Design-system cleanup** (`6265001`):
+- `components/ui/card.tsx` (new) — shared Card primitive, replacing 4+ duplicated `rounded-.. border border-border bg-card` class strings (admin stat tiles, likes analytics, newsletter/Patreon boxes)
+- Hand-rolled status-pill `<span>`s in `app/admin/page.tsx` and `app/admin/subscribers/page.tsx` replaced with the existing `Badge` component, matching the pattern already used in `app/admin/posts/page.tsx`
+- `components/comments-section.tsx` — the error state gets a "Try again" retry button, matching the pattern used elsewhere
+
+**Reader-facing additions** (`daa919f`):
+- `components/reading-progress.tsx` (new) — fixed scroll-progress bar under the navbar on post pages
+- `app/(public)/blog/[slug]/page.tsx` — "Read next" section: a Mongo aggregation matches posts by shared tags, sorted by overlap count then recency, top 3, rendered with the existing `PostCard`. Omitted entirely when there's no tag overlap with the current post
+
+**Incident — seed script wrote to production** (`8d6dadd`):
+- While testing the newsletter QoL work, `bun run seed` was run against `.env.local`'s `DATABASE_URL` — which turned out to be the live production database, since this project has no separate dev/staging DB. This inserted 4 fake placeholder posts (published, backdated) and 2 fake subscribers directly into prod. No real newsletter email was ever sent. Caught and cleaned up in the same session — `deleteMany` on the seed markers (`authorId: "seed_author"`, `@seed.example` emails) — verified back to exactly the original 12 real posts and 3 real subscribers
+- Fix: `scripts/seed.ts` now prints the target DB host and pauses 5s before writing anything, so seeding the wrong database is loud and interruptible instead of silent
+- Not fixed: there's still no actual dev/staging database, so this can recur. Flagged as a real follow-up, not just a nice-to-have
+
+---
+
 ## 2026-06-15
 
 ### Like Button + Admin Analytics
