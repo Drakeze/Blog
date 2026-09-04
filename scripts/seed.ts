@@ -255,7 +255,27 @@ const subscribers: Subscriber[] = [
   { email: "pending@seed.example", confirmed: false, unsubscribeToken: crypto.randomUUID(), createdAt: daysAgo(2) },
 ]
 
+function targetHost(): string {
+  try {
+    return new URL(DATABASE_URL!.replace(/^mongodb(\+srv)?:/, "https:")).host
+  } catch {
+    return "(unparseable DATABASE_URL)"
+  }
+}
+
 async function seed() {
+  console.warn(`
+⚠️  ⚠️  ⚠️  SEEDING DATABASE  ⚠️  ⚠️  ⚠️
+This writes fake placeholder posts and subscribers directly into:
+
+    ${targetHost()}
+
+There is no separate dev/staging database in this project — if that's
+your PRODUCTION database, fake data will go live on the real site.
+Ctrl+C now if this isn't a database you're okay seeding.
+`)
+  await new Promise((r) => setTimeout(r, 5000))
+
   const client = new MongoClient(DATABASE_URL!)
   await client.connect()
   const db = client.db()
