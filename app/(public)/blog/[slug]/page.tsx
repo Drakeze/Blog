@@ -7,7 +7,7 @@ import { getDb } from "@/lib/mongo"
 import { renderMarkdown } from "@/lib/markdown"
 import { isAdmin } from "@/lib/auth"
 import { publicEnv } from "@/lib/env"
-import type { Post } from "@/models/post"
+import type { Post, PostSummary } from "@/models/post"
 import type { Bookmark } from "@/models/bookmark"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
@@ -15,6 +15,8 @@ import { CommentsSection } from "@/components/comments-section"
 import { BookmarkButton } from "@/components/bookmark-button"
 import { SubscribeForm } from "@/components/subscribe-form"
 import { Separator } from "@/components/ui/separator"
+import { PostCard } from "@/components/post-card"
+import { ReadingProgress } from "@/components/reading-progress"
 import { formatDate, readingTime, getTagColorClasses, cn, toIsoOrUndefined } from "@/lib/utils"
 import type { Metadata } from "next"
 
@@ -85,6 +87,21 @@ export default async function BlogPostPage({
 
   const html = renderMarkdown(post.content)
   const mins = readingTime(post.content)
+
+  let relatedPosts: PostSummary[] = []
+  if (post.tags.length > 0) {
+    const db = await getDb()
+    relatedPosts = await db
+      .collection<Post>("posts")
+      .aggregate<PostSummary>([
+        { $match: { slug: { $ne: slug }, status: "published", tags: { $in: post.tags } } },
+        { $addFields: { sharedTags: { $size: { $setIntersection: ["$tags", post.tags] } } } },
+        { $sort: { sharedTags: -1, publishedAt: -1 } },
+        { $limit: 3 },
+        { $project: { content: 0, sharedTags: 0 } },
+      ])
+      .toArray()
+  }
   const canonicalUrl = `${siteUrl}/blog/${post.slug}`
   const jsonLd = {
     "@context": "https://schema.org",
@@ -99,91 +116,110 @@ export default async function BlogPostPage({
   }
 
   return (
-    <article className="mx-auto max-w-3xl px-4 py-12">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      {/* Header */}
-      <header className="mb-8 space-y-4">
-        {post.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {post.tags.map((tag) => (
-              <Link key={tag} href={`/?tag=${encodeURIComponent(tag)}`}>
-                <Badge className={cn("border-transparent", getTagColorClasses(tag))}>{tag}</Badge>
-              </Link>
-            ))}
+    <>
+      <ReadingProgress />
+      <article className="mx-auto max-w-3xl px-4 py-12">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        {/* Header */}
+        <header className="mb-8 space-y-4">
+          {post.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {post.tags.map((tag) => (
+                <Link key={tag} href={`/?tag=${encodeURIComponent(tag)}`}>
+                  <Badge className={cn("border-transparent", getTagColorClasses(tag))}>{tag}</Badge>
+                </Link>
+              ))}
+            </div>
+          )}
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight leading-tight">{post.title}</h1>
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+              {post.authorImageUrl && (
+                <Image
+                  src={post.authorImageUrl}
+                  alt={post.authorName}
+                  width={24}
+                  height={24}
+                  className="rounded-full"
+                />
+              )}
+              <span>{post.authorName}</span>
+              <span>·</span>
+              <span>{post.publishedAt ? formatDate(post.publishedAt) : "Draft"}</span>
+              <span>·</span>
+              <span>{mins} min read</span>
+            </div>
+            <BookmarkButton
+              postSlug={slug}
+              postTitle={post.title}
+              postExcerpt={post.excerpt}
+              postCoverImage={post.coverImage}
+              initialBookmarked={isBookmarked}
+              isSignedIn={!!userId}
+            />
+          </div>
+        </header>
+
+        {post.coverImage && (
+          <div className="relative aspect-[16/9] overflow-hidden rounded-xl bg-muted mb-10">
+            <Image
+              src={post.coverImage}
+              alt={post.title}
+              fill
+              className="object-cover"
+              priority
+              sizes="(max-width: 768px) 100vw, 768px"
+            />
           </div>
         )}
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight leading-tight">{post.title}</h1>
-        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-            {post.authorImageUrl && (
-              <Image
-                src={post.authorImageUrl}
-                alt={post.authorName}
-                width={24}
-                height={24}
-                className="rounded-full"
-              />
-            )}
-            <span>{post.authorName}</span>
-            <span>·</span>
-            <span>{post.publishedAt ? formatDate(post.publishedAt) : "Draft"}</span>
-            <span>·</span>
-            <span>{mins} min read</span>
-          </div>
-          <BookmarkButton
-            postSlug={slug}
-            postTitle={post.title}
-            postExcerpt={post.excerpt}
-            postCoverImage={post.coverImage}
-            initialBookmarked={isBookmarked}
-            isSignedIn={!!userId}
-          />
-        </div>
-      </header>
 
-      {post.coverImage && (
-        <div className="relative aspect-[16/9] overflow-hidden rounded-xl bg-muted mb-10">
-          <Image
-            src={post.coverImage}
-            alt={post.title}
-            fill
-            className="object-cover"
-            priority
-            sizes="(max-width: 768px) 100vw, 768px"
-          />
-        </div>
-      )}
+        {/* Post body */}
+        <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />
 
-      {/* Post body */}
-      <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />
+        <Separator className="my-12" />
 
-      <Separator className="my-12" />
+        {relatedPosts.length > 0 && (
+          <>
+            <div className="mb-12">
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+                Read next
+              </h2>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {relatedPosts.map((related) => (
+                  <PostCard key={related.slug} post={related} />
+                ))}
+              </div>
+            </div>
+            <Separator className="my-12" />
+          </>
+        )}
 
-      {/* Newsletter */}
-      <Card className="rounded-xl bg-muted/30 p-6 mb-12">
-        <h3 className="font-semibold mb-1">Enjoyed this post?</h3>
-        <p className="text-sm text-muted-foreground mb-4">Get new posts delivered straight to your inbox.</p>
-        <SubscribeForm userId={userId ?? undefined} />
-      </Card>
+        {/* Newsletter */}
+        <Card className="rounded-xl bg-muted/30 p-6 mb-12">
+          <h3 className="font-semibold mb-1">Enjoyed this post?</h3>
+          <p className="text-sm text-muted-foreground mb-4">Get new posts delivered straight to your inbox.</p>
+          <SubscribeForm userId={userId ?? undefined} />
+        </Card>
 
-      {/* Patreon */}
-      <Card className="flex items-center justify-between gap-4 rounded-xl bg-muted/30 px-6 py-4 mb-12">
-        <p className="text-sm text-muted-foreground">☕ Enjoying the content?</p>
-        <a
-          href="https://www.patreon.com/cw/Drakeze"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm font-medium hover:underline whitespace-nowrap"
-        >
-          Support on Patreon →
-        </a>
-      </Card>
+        {/* Patreon */}
+        <Card className="flex items-center justify-between gap-4 rounded-xl bg-muted/30 px-6 py-4 mb-12">
+          <p className="text-sm text-muted-foreground">☕ Enjoying the content?</p>
+          <a
+            href="https://www.patreon.com/cw/Drakeze"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-medium hover:underline whitespace-nowrap"
+          >
+            Support on Patreon →
+          </a>
+        </Card>
 
-      {/* Comments */}
-      <CommentsSection postId={slug} userId={userId ?? undefined} isAdmin={admin} />
-    </article>
+        {/* Comments */}
+        <CommentsSection postId={slug} userId={userId ?? undefined} isAdmin={admin} />
+      </article>
+    </>
   )
 }
