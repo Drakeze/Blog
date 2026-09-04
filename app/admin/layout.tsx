@@ -2,7 +2,7 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { isAdmin } from "@/lib/auth"
 import { LayoutDashboard, FileText, Users, Send } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { AdminNavLink } from "@/components/admin/admin-nav-link"
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
@@ -34,29 +34,5 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="p-4 md:p-8">{children}</div>
       </main>
     </div>
-  )
-}
-
-function AdminNavLink({
-  href,
-  label,
-  icon: Icon,
-}: {
-  href: string
-  label: string
-  icon: React.ElementType
-  exact?: boolean
-}) {
-  return (
-    <Link
-      href={href}
-      title={label}
-      className={cn(
-        "flex items-center gap-2.5 rounded-md px-2 md:px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors justify-center md:justify-start"
-      )}
-    >
-      <Icon className="h-4 w-4 shrink-0" />
-      <span className="hidden md:inline">{label}</span>
-    </Link>
   )
 }

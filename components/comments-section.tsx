@@ -30,7 +30,7 @@ export function CommentsSection({ postId, userId, isAdmin }: Props) {
   const [replyingTo, setReplyingTo] = useState<string | null>(null)
   const [replyContent, setReplyContent] = useState("")
 
-  const { data: comments = [], isLoading, isError } = useQuery<Comment[]>({
+  const { data: comments = [], isLoading, isError, refetch } = useQuery<Comment[]>({
     queryKey: ["comments", postId],
     queryFn: async () => {
       const res = await fetch(`/api/comments?postId=${encodeURIComponent(postId)}`)
@@ -133,7 +133,10 @@ export function CommentsSection({ postId, userId, isAdmin }: Props) {
           <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
         </div>
       ) : isError ? (
-        <p className="text-sm text-muted-foreground py-4">Couldn’t load comments. Refresh to try again.</p>
+        <div className="flex items-center gap-3 py-4">
+          <p className="text-sm text-muted-foreground">Couldn’t load comments.</p>
+          <Button variant="outline" size="sm" onClick={() => refetch()}>Try again</Button>
+        </div>
       ) : comments.length === 0 ? (
         <p className="text-sm text-muted-foreground py-4">No comments yet. Be the first!</p>
       ) : (

@@ -1,5 +1,7 @@
 import { MongoClient } from "mongodb"
+import crypto from "crypto"
 import type { Post } from "@/models/post"
+import type { Subscriber } from "@/models/subscriber"
 
 const DATABASE_URL = process.env.DATABASE_URL
 if (!DATABASE_URL) throw new Error("DATABASE_URL is not set")
@@ -248,17 +250,25 @@ Then show up tomorrow.`,
   },
 ]
 
+const subscribers: Subscriber[] = [
+  { email: "confirmed@seed.example", confirmed: true, unsubscribeToken: crypto.randomUUID(), createdAt: daysAgo(10) },
+  { email: "pending@seed.example", confirmed: false, unsubscribeToken: crypto.randomUUID(), createdAt: daysAgo(2) },
+]
+
 async function seed() {
   const client = new MongoClient(DATABASE_URL!)
   await client.connect()
   const db = client.db()
-  const col = db.collection("posts")
 
-  // Remove existing seed posts so re-running is safe
-  await col.deleteMany({ authorId: "seed_author" })
+  // Remove existing seed data so re-running is safe
+  await db.collection("posts").deleteMany({ authorId: "seed_author" })
+  await db.collection("subscribers").deleteMany({ email: /@seed\.example$/ })
 
-  const result = await col.insertMany(posts)
-  console.log(`✓ Inserted ${result.insertedCount} seed posts into blog_db.posts`)
+  const postResult = await db.collection("posts").insertMany(posts)
+  console.log(`✓ Inserted ${postResult.insertedCount} seed posts into blog_db.posts`)
+
+  const subResult = await db.collection("subscribers").insertMany(subscribers)
+  console.log(`✓ Inserted ${subResult.insertedCount} seed subscribers into blog_db.subscribers`)
 
   await client.close()
 }
