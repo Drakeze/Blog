@@ -4,6 +4,8 @@ import type { Subscriber } from "@/models/subscriber"
 import type { Comment } from "@/models/comment"
 import { FileText, Users, MessageSquare, TrendingUp } from "lucide-react"
 import { LikesAnalytics } from "@/components/admin/likes-analytics"
+import { Card } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 
 export const metadata = { title: "Admin Dashboard" }
 
@@ -40,14 +42,14 @@ export default async function AdminDashboard() {
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {stats.map((stat) => (
-          <div key={stat.label} className="rounded-lg border border-border bg-card p-5">
+          <Card key={stat.label} className="p-5">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm text-muted-foreground">{stat.label}</span>
               <stat.icon className="h-4 w-4 text-muted-foreground" />
             </div>
             <div className="text-3xl font-bold">{stat.value}</div>
             <div className="text-xs text-muted-foreground mt-1">{stat.sub}</div>
-          </div>
+          </Card>
         ))}
       </div>
 
@@ -69,15 +71,9 @@ export default async function AdminDashboard() {
                     {new Date(post.createdAt).toLocaleDateString()}
                   </p>
                 </div>
-                <span
-                  className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                    post.status === "published"
-                      ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                      : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                  }`}
-                >
+                <Badge variant={post.status === "published" ? "default" : "secondary"} className="shrink-0">
                   {post.status}
-                </span>
+                </Badge>
               </div>
             ))
           )}

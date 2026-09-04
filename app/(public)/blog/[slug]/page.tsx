@@ -10,6 +10,7 @@ import { publicEnv } from "@/lib/env"
 import type { Post } from "@/models/post"
 import type { Bookmark } from "@/models/bookmark"
 import { Badge } from "@/components/ui/badge"
+import { Card } from "@/components/ui/card"
 import { CommentsSection } from "@/components/comments-section"
 import { BookmarkButton } from "@/components/bookmark-button"
 import { SubscribeForm } from "@/components/subscribe-form"
@@ -115,8 +116,8 @@ export default async function BlogPostPage({
           </div>
         )}
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight leading-tight">{post.title}</h1>
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             {post.authorImageUrl && (
               <Image
                 src={post.authorImageUrl}
@@ -145,7 +146,14 @@ export default async function BlogPostPage({
 
       {post.coverImage && (
         <div className="relative aspect-[16/9] overflow-hidden rounded-xl bg-muted mb-10">
-          <Image src={post.coverImage} alt={post.title} fill className="object-cover" priority />
+          <Image
+            src={post.coverImage}
+            alt={post.title}
+            fill
+            className="object-cover"
+            priority
+            sizes="(max-width: 768px) 100vw, 768px"
+          />
         </div>
       )}
 
@@ -155,14 +163,14 @@ export default async function BlogPostPage({
       <Separator className="my-12" />
 
       {/* Newsletter */}
-      <div className="rounded-xl border border-border bg-muted/30 p-6 mb-12">
+      <Card className="rounded-xl bg-muted/30 p-6 mb-12">
         <h3 className="font-semibold mb-1">Enjoyed this post?</h3>
         <p className="text-sm text-muted-foreground mb-4">Get new posts delivered straight to your inbox.</p>
         <SubscribeForm userId={userId ?? undefined} />
-      </div>
+      </Card>
 
       {/* Patreon */}
-      <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-muted/30 px-6 py-4 mb-12">
+      <Card className="flex items-center justify-between gap-4 rounded-xl bg-muted/30 px-6 py-4 mb-12">
         <p className="text-sm text-muted-foreground">☕ Enjoying the content?</p>
         <a
           href="https://www.patreon.com/cw/Drakeze"
@@ -172,7 +180,7 @@ export default async function BlogPostPage({
         >
           Support on Patreon →
         </a>
-      </div>
+      </Card>
 
       {/* Comments */}
       <CommentsSection postId={slug} userId={userId ?? undefined} isAdmin={admin} />

@@ -1,6 +1,7 @@
 import { getDb } from "@/lib/mongo"
 import type { Subscriber } from "@/models/subscriber"
 import { formatDate } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
 
 export const metadata = { title: "Subscribers" }
 
@@ -40,15 +41,9 @@ export default async function SubscribersPage() {
                   <td className="px-4 py-3 font-medium">{sub.email}</td>
                   <td className="px-4 py-3 text-muted-foreground">{sub.userId ? "Yes" : "—"}</td>
                   <td className="px-4 py-3">
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                        sub.confirmed
-                          ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                          : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                      }`}
-                    >
+                    <Badge variant={sub.confirmed ? "default" : "secondary"}>
                       {sub.confirmed ? "Confirmed" : "Pending"}
-                    </span>
+                    </Badge>
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">{formatDate(sub.createdAt)}</td>
                 </tr>

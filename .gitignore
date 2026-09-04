@@ -62,3 +62,5 @@ coverage/
 .claude/
 .hive-mind/
 .swarm/
+.vercel
+.env*

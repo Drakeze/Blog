@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { Heart } from "lucide-react"
+import { Card } from "@/components/ui/card"
 
 interface Stats {
   totalAllTime: number
@@ -51,22 +52,22 @@ export function LikesAnalytics() {
       )}
 
       <div className="grid grid-cols-2 gap-4 mb-4">
-        <div className="rounded-lg border border-border bg-card p-5">
+        <Card className="p-5">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-muted-foreground">All Time</span>
             <Heart className="h-4 w-4 text-muted-foreground" />
           </div>
           <div className="text-3xl font-bold">{isLoading ? "—" : (data?.totalAllTime ?? 0)}</div>
           <div className="text-xs text-muted-foreground mt-1">total likes</div>
-        </div>
-        <div className="rounded-lg border border-border bg-card p-5">
+        </Card>
+        <Card className="p-5">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-muted-foreground">Last {days} Days</span>
             <Heart className="h-4 w-4 text-red-400" />
           </div>
           <div className="text-3xl font-bold">{isLoading ? "—" : (data?.totalInPeriod ?? 0)}</div>
           <div className="text-xs text-muted-foreground mt-1">recent likes</div>
-        </div>
+        </Card>
       </div>
 
       {!isLoading && data?.topPosts && data.topPosts.length > 0 && (

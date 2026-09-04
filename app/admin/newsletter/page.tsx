@@ -20,7 +20,14 @@ export default async function NewsletterPage() {
           Manually send a post to all confirmed subscribers.
         </p>
       </div>
-      <NewsletterSendForm posts={posts.map((p) => ({ slug: p.slug, title: p.title, _id: String(p._id) }))} />
+      <NewsletterSendForm
+        posts={posts.map((p) => ({
+          slug: p.slug,
+          title: p.title,
+          _id: String(p._id),
+          newsletterSentAt: p.newsletterSentAt ? p.newsletterSentAt.toISOString() : null,
+        }))}
+      />
     </div>
   )
 }
