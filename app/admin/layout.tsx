@@ -5,10 +5,10 @@ import { LayoutDashboard, FileText, Users, Send } from "lucide-react"
 import { AdminNavLink } from "@/components/admin/admin-nav-link"
 
 const navItems = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { href: "/admin/posts", label: "Posts", icon: FileText },
-  { href: "/admin/subscribers", label: "Subscribers", icon: Users },
-  { href: "/admin/newsletter", label: "Newsletter", icon: Send },
+  { href: "/admin", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4 shrink-0" />, exact: true },
+  { href: "/admin/posts", label: "Posts", icon: <FileText className="h-4 w-4 shrink-0" /> },
+  { href: "/admin/subscribers", label: "Subscribers", icon: <Users className="h-4 w-4 shrink-0" /> },
+  { href: "/admin/newsletter", label: "Newsletter", icon: <Send className="h-4 w-4 shrink-0" /> },
 ]
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

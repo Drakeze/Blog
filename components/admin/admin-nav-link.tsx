@@ -7,12 +7,12 @@ import { cn } from "@/lib/utils"
 export function AdminNavLink({
   href,
   label,
-  icon: Icon,
+  icon,
   exact,
 }: {
   href: string
   label: string
-  icon: React.ElementType
+  icon: React.ReactNode
   exact?: boolean
 }) {
   const pathname = usePathname()
@@ -31,7 +31,7 @@ export function AdminNavLink({
           : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
       )}
     >
-      <Icon className="h-4 w-4 shrink-0" />
+      {icon}
       <span className="hidden md:inline">{label}</span>
     </Link>
   )
