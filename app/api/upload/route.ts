@@ -22,6 +22,9 @@ function getR2Client() {
       accessKeyId: storageConfig.accessKeyId,
       secretAccessKey: storageConfig.secretAccessKey,
     },
+    // R2 doesn't support the AWS SDK v3 default request checksum trailer —
+    // leaving it on makes every PUT fail with SignatureDoesNotMatch.
+    requestChecksumCalculation: "WHEN_REQUIRED",
   })
 }
 
