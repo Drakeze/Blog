@@ -10,7 +10,14 @@ import type { Comment } from "@/models/comment"
 import type { Post } from "@/models/post"
 import type { Subscriber } from "@/models/subscriber"
 
-const resend = new Resend(env.RESEND_API_KEY)
+// Lazy so `next build` doesn't construct it at module load — `new Resend("")`
+// throws "Missing API key", which broke CI (no RESEND_API_KEY there). Send paths
+// are already guarded by emailConfig.resendEnabled in their callers.
+let _resend: Resend | null = null
+function getResend() {
+  if (!_resend) _resend = new Resend(env.RESEND_API_KEY || "re_missing")
+  return _resend
+}
 
 const CHUNK = 100 // Resend batch limit
 
@@ -69,7 +76,7 @@ export async function sendNewsletterToConfirmedSubscribers(
     )
 
     try {
-      const { error } = await resend.batch.send(payloads)
+      const { error } = await getResend().batch.send(payloads)
       if (error) {
         failed += batch.length
         console.error("Newsletter batch failed:", error.message)
@@ -119,7 +126,7 @@ export async function sendCommentNotificationEmail({
     })
   )
 
-  const { error } = await resend.emails.send({
+  const { error } = await getResend().emails.send({
     from: env.RESEND_FROM_EMAIL,
     replyTo: env.RESEND_REPLY_TO_EMAIL,
     to,
@@ -135,7 +142,7 @@ export async function sendSubscriptionConfirmationEmail(email: string) {
   }
 
   try {
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: env.RESEND_FROM_EMAIL,
       replyTo: env.RESEND_REPLY_TO_EMAIL,
       to: email,

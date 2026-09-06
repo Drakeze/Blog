@@ -53,15 +53,25 @@ export async function POST(req: NextRequest) {
   const bytes = await file.arrayBuffer()
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`
 
-  const client = getR2Client()
-  await client.send(
-    new PutObjectCommand({
-      Bucket: storageConfig.bucketName,
-      Key: filename,
-      Body: Buffer.from(bytes),
-      ContentType: file.type,
-    }),
-  )
+  try {
+    const client = getR2Client()
+    await client.send(
+      new PutObjectCommand({
+        Bucket: storageConfig.bucketName,
+        Key: filename,
+        Body: Buffer.from(bytes),
+        ContentType: file.type,
+      }),
+    )
+  } catch (err) {
+    // Most common cause: the R2 key pair in this environment is wrong/revoked
+    // (R2 returns 403 SignatureDoesNotMatch). Surface it instead of a bare 500.
+    console.error("R2 upload failed", err)
+    return NextResponse.json(
+      { error: "Upload to storage failed. Check R2 credentials." },
+      { status: 502 },
+    )
+  }
 
   return NextResponse.json({ url: `${storageConfig.publicUrl}/${filename}` })
 }
