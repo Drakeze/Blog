@@ -4,7 +4,9 @@ import type { NextConfig } from 'next';
 // will fetch any URL it's allowed to, which turns /_next/image into an open
 // proxy (SSRF to cloud metadata / internal services).
 const imageHosts = [
-  'images-blog.drakeze.com', // Cloudflare R2 public bucket "blog" (NEXT_PUBLIC_R2_PUBLIC_URL)
+  // Cloudflare R2 bucket "blog" — r2.dev managed subdomain (NEXT_PUBLIC_R2_PUBLIC_URL).
+  // Swap for a custom domain (e.g. images-blog.drakeze.com) later if desired.
+  'pub-3bd4501a91c64cf7974067760df73ce9.r2.dev',
   'img.clerk.com', // author + commenter avatars
   'images.unsplash.com', // seed / fallback cover images
 ];

@@ -20,7 +20,7 @@ keys go in Vercel (Preview and Production separately).
 | `CLOUDFLARE_ACCOUNT_ID` | shown on the R2 API-token page | ✓ | ✓ | ✓ |
 | `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | R2 API token (Object Read & Write, scoped to `blog`) | ✓ | ✓ | ✓ |
 | `R2_BUCKET_NAME` | `blog` (exists, WNAM) | `blog` | `blog` | `blog` |
-| `NEXT_PUBLIC_R2_PUBLIC_URL` | `https://images-blog.drakeze.com` (custom domain on the `blog` bucket) | ✓ | ✓ | ✓ |
+| `NEXT_PUBLIC_R2_PUBLIC_URL` | the `blog` bucket's r2.dev Public Development URL (`https://pub-…r2.dev`); a custom domain is a later upgrade | ✓ | ✓ | ✓ |
 | `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` / `_HOST` | analytics | opt | opt | ✓ |
 | `MCP_SERVICE_SECRET` | shared secret: MCP Worker → `/api/mcp/*`. `openssl rand -hex 32` | opt | ✓ | ✓ |
 | `DRAFT_API_SECRET` | legacy bearer for `POST /api/posts/draft` | opt | opt | opt |
