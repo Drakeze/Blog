@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+.bun/
+
+# Next.js
+.next/
+out/
+build/
+dist/
+next-env.d.ts
+
+# Environment — REAL SECRETS, never commit. .env.example IS committed.
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+
+# Uploaded images (local dev only)
+public/uploads/
+
+# Logs
+*-debug.log*
+npm-debug.log*
+yarn-error.log*
+
+# Test / build artifacts
+coverage/
+*.tsbuildinfo
+
+# Deploy
+.vercel/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Agent tooling scratch
+.claude/
+.claude-flow/
+.hive-mind/
+.swarm/
+.impeccable/
