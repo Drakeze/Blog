@@ -17,10 +17,10 @@ keys go in Vercel (Preview and Production separately).
 | `NEXT_PUBLIC_CLERK_SIGN_IN_URL` / `_SIGN_UP_URL` | routes | `/sign-in` / `/sign-up` | same | same |
 | `CLERK_ADMIN_EMAILS` | comma list; match → admin | ✓ | ✓ | ✓ |
 | `CLERK_ADMIN_USER_IDS` | comma list of Clerk user ids | opt | opt | opt |
-| `CLOUDFLARE_ACCOUNT_ID` | R2 account | new | new | new |
-| `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | **fresh** scoped token for the new bucket | new | new | new |
-| `R2_BUCKET_NAME` | new bucket name | new | new | new |
-| `NEXT_PUBLIC_R2_PUBLIC_URL` | public read URL, e.g. `https://images-blog.drakeze.com` | new | new | new |
+| `CLOUDFLARE_ACCOUNT_ID` | shown on the R2 API-token page | ✓ | ✓ | ✓ |
+| `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | R2 API token (Object Read & Write, scoped to `blog`) | ✓ | ✓ | ✓ |
+| `R2_BUCKET_NAME` | `blog` (exists, WNAM) | `blog` | `blog` | `blog` |
+| `NEXT_PUBLIC_R2_PUBLIC_URL` | `https://images-blog.drakeze.com` (custom domain on the `blog` bucket) | ✓ | ✓ | ✓ |
 | `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` / `_HOST` | analytics | opt | opt | ✓ |
 | `MCP_SERVICE_SECRET` | shared secret: MCP Worker → `/api/mcp/*`. `openssl rand -hex 32` | opt | ✓ | ✓ |
 | `DRAFT_API_SECRET` | legacy bearer for `POST /api/posts/draft` | opt | opt | opt |
