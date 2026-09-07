@@ -1,0 +1,14 @@
+{
+  "mappings": {
+    "dynamic": false,
+    "fields": {
+      "title": [
+        { "type": "string" },
+        { "type": "autocomplete", "tokenization": "edgeGram", "minGrams": 2, "maxGrams": 15 }
+      ],
+      "excerpt": { "type": "string" },
+      "content": { "type": "string" },
+      "tags": { "type": "string" }
+    }
+  }
+}
