@@ -13,6 +13,10 @@ bun run verify-env
 bun dev
 ```
 
+> CI workflow (`.github/workflows/ci.yml`) is on disk but **not yet committed** —
+> the push token lacks `workflow` scope. Run `gh auth refresh -h github.com -s workflow`
+> then `git add .github && git commit -m "Add CI workflow" && git push`.
+
 Coding-agent notes: [`AGENTS.md`](./AGENTS.md). Rebuild plan:
 `~/.claude/plans/so-what-i-want-imperative-hellman.md`. Previous version kept at
 `../Blog-Legacy` until cutover.
