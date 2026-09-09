@@ -43,19 +43,31 @@ CI (`.github/workflows/ci.yml`) runs lint + type-check + test + build on every p
   - `lib/markdown.ts` — `renderMarkdown()` = marked + sanitize-html. **All**
     rendered post HTML goes through this before `dangerouslySetInnerHTML`.
   - `lib/posthog-server.ts` — `captureServerEvent()` (flushes via `after()`).
-  - `lib/domains/<entity>/` *(Phase 3)* — thin route → service layer + zod
-    validators, shared by the admin UI and the MCP connector.
+  - `lib/api.ts` — `apiOk()` / `apiError()`; `apiError` funnels everything through
+    `toErrorResponse` and logs 5xx.
+  - `lib/domains/<entity>/{types,validators,service}.ts` — the write path shared by
+    the admin UI and the MCP connector (Phase 4). `types` = TS interfaces,
+    `validators` = zod (also the operator-injection guard), `service` = free
+    functions on `getDb()`. Entities: `posts`, `subscribers`, `comments`, `likes`,
+    `bookmarks`.
+  - `lib/email/` — `sendEmail()` is the one outbound chokepoint; honors
+    `EMAIL_DELIVERY_MODE` (`live`/`log`/`off`) and writes an `EmailLog` row.
+    `newsletter.ts` (confirmed-only batch send + `sendNewsletterTest`),
+    `notifications.ts` (subscription confirmation, reply notifications).
+- **`emails/`** — React Email templates (`newsletter`, `comment-notification`,
+  `confirm-subscription`).
 - **`models/`** — plain TS interfaces for Mongo documents. No logic.
 - **`scripts/`** — one-off Bun scripts.
 
 ## Conventions
 
-- **API route** = `try { auth guard → zod.parse → service call → success body }
-  catch { toErrorResponse }`.
-- **Admin gate**: route handlers call `requireAdminApi()`; server components call
-  `isAdmin()` then `redirect()`. `proxy.ts` only enforces *authentication* on `/admin`.
-- Untrusted string input that reaches a Mongo filter must be `typeof`-checked
-  (operator-injection guard).
+- **API route** = `try { auth guard → zod.parse → service call → apiOk(...) }
+  catch (e) { return apiError(e) }`. Services throw `Errors.*`; `apiError` maps them.
+- **Admin gate**: route handlers call `requireAdminApi()` (early return); per-user
+  routes call `requireUserId()` (throws 401 inside the `try`). Server components
+  call `isAdmin()` then `redirect()`. `proxy.ts` only enforces *authentication* on `/admin`.
+- Untrusted string input that reaches a Mongo filter must pass a `z.string()` in the
+  entity's `validators.ts` (operator-injection guard).
 - `@/*` → repo root. Keep files under 500 lines. Bun, not npm.
 - Design tokens live in `app/globals.css` (warm paper / oxblood-claret,
   Newsreader / Hanken Grotesk / JetBrains Mono). Approved artifact:

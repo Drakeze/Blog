@@ -38,6 +38,12 @@ async function ensureIndexes() {
     ['subscribers', { email: 1 }, { unique: true }],
     ['subscribers', { confirmToken: 1 }, { sparse: true }],
     ['subscribers', { unsubscribeToken: 1 }, { unique: true }],
+    // Newsletter send scans { confirmed: true } — Review A flagged it unindexed.
+    [
+      'subscribers',
+      { confirmed: 1 },
+      { partialFilterExpression: { confirmed: true } },
+    ],
     ['likes', { fingerprint: 1, postSlug: 1 }, { unique: true }],
     ['likes', { createdAt: -1 }, {}],
     ['comments', { postId: 1, createdAt: -1 }, {}],

@@ -47,6 +47,12 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },
+  async redirects() {
+    // Posts moved from /blog/[slug] to /[slug] (the `blog.` subdomain already
+    // says "blog"). Per-post slugHistory 301s are handled in the Phase 5
+    // /[slug] page via resolveSlug().
+    return [{ source: '/blog/:slug', destination: '/:slug', permanent: true }];
+  },
   async rewrites() {
     return [
       {
