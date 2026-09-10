@@ -3,7 +3,14 @@ import { blogCollectionNames, getDb } from '@/lib/mongo';
 import { slugify } from '@/lib/utils';
 
 import { nextSlug } from './slug';
-import type { ListPostsParams, ListPostsResult, Post, PostInput, PostUpdateInput } from './types';
+import type {
+  ListPostsParams,
+  ListPostsResult,
+  Post,
+  PostInput,
+  PostSummary,
+  PostUpdateInput,
+} from './types';
 
 const C = blogCollectionNames;
 
@@ -65,6 +72,25 @@ export async function resolveSlug(slug: string): Promise<{ post: Post; redirect:
   if (historical) return { post: historical, redirect: true };
 
   return null;
+}
+
+/** Up to `limit` published posts sharing the most tags with `slug`, for "Read next". */
+export async function getRelatedPosts(
+  slug: string,
+  tags: string[],
+  limit = 3
+): Promise<PostSummary[]> {
+  if (tags.length === 0) return [];
+  const col = await postsCol();
+  return col
+    .aggregate<PostSummary>([
+      { $match: { slug: { $ne: slug }, status: 'published', tags: { $in: tags } } },
+      { $addFields: { shared: { $size: { $setIntersection: ['$tags', tags] } } } },
+      { $sort: { shared: -1, publishedAt: -1 } },
+      { $limit: limit },
+      { $project: { content: 0, shared: 0 } },
+    ])
+    .toArray();
 }
 
 export async function createPost(input: PostInput): Promise<Post> {
