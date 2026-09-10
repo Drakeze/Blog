@@ -16,11 +16,11 @@ const imageHosts = [
 // tighten, then rename the header to "Content-Security-Policy" (Phase 6).
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.accounts.dev https://challenges.cloudflare.com https://*.posthog.com",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.accounts.dev https://challenges.cloudflare.com https://*.posthog.com https://va.vercel-scripts.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com data:",
   `img-src 'self' data: blob: ${imageHosts.map((h) => `https://${h}`).join(' ')} https://*.clerk.accounts.dev https://*.posthog.com`,
-  "connect-src 'self' https://*.clerk.accounts.dev https://*.posthog.com https://*.i.posthog.com",
+  "connect-src 'self' https://*.clerk.accounts.dev https://clerk-telemetry.com https://*.posthog.com https://*.i.posthog.com https://vitals.vercel-insights.com",
   "worker-src 'self' blob:",
   "frame-src 'self' https://*.clerk.accounts.dev https://challenges.cloudflare.com",
   "frame-ancestors 'none'",

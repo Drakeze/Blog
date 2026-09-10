@@ -38,6 +38,20 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
   return col.findOne({ slug });
 }
 
+/** Distinct tags across published posts, most-used first — for the homepage tag bar. */
+export async function listPublishedTags(): Promise<string[]> {
+  const col = await postsCol();
+  const rows = await col
+    .aggregate<{ _id: string; n: number }>([
+      { $match: { status: 'published' } },
+      { $unwind: '$tags' },
+      { $group: { _id: '$tags', n: { $sum: 1 } } },
+      { $sort: { n: -1, _id: 1 } },
+    ])
+    .toArray();
+  return rows.map((r) => r._id);
+}
+
 /**
  * Resolve a URL slug to its post, following `slugHistory`. `redirect: true`
  * means the request hit a former slug and should 301 to `post.slug`.
