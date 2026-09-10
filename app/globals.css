@@ -181,6 +181,14 @@
   .prose pre code {
     @apply bg-transparent p-0 text-inherit;
   }
+  /* Shiki (post page) — force the design's sunk panel, swap to the dark palette. */
+  .prose pre.shiki {
+    background-color: var(--sunk) !important;
+  }
+  .dark .prose pre.shiki,
+  .dark .prose pre.shiki span {
+    color: var(--shiki-dark, inherit) !important;
+  }
   .prose img {
     @apply my-6 w-full rounded-lg;
   }

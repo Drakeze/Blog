@@ -9,6 +9,21 @@ interface Props {
   searchParams: Promise<{ token?: string | string[] }>;
 }
 
+function Shell({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="mx-auto max-w-[32rem] py-10 text-center">
+      <h1 className="font-display text-[1.75rem] font-medium">{title}</h1>
+      <p className="mt-3 text-muted-foreground">{children}</p>
+      <Link
+        href="/"
+        className="mt-6 inline-block font-mono text-xs uppercase tracking-wider text-primary hover:underline"
+      >
+        ← Back to the blog
+      </Link>
+    </section>
+  );
+}
+
 export default async function ConfirmPage({ searchParams }: Props) {
   const { token } = await searchParams;
   // Parse before it reaches the Mongo filter — repeated `?token=` params arrive
@@ -18,31 +33,17 @@ export default async function ConfirmPage({ searchParams }: Props) {
 
   if (subscriber) {
     return (
-      <section className="space-y-3">
-        <h1 className="text-2xl font-semibold">You&apos;re subscribed</h1>
-        <p className="opacity-70">
-          Thanks for confirming — new posts will land in your inbox. You can unsubscribe from the
-          link in any email.
-        </p>
-        <Link href="/" className="inline-block underline">
-          Back to the blog
-        </Link>
-      </section>
+      <Shell title="You're subscribed">
+        Thanks for confirming — new posts will land in your inbox. Every email has a one-click
+        unsubscribe.
+      </Shell>
     );
   }
 
-  // An unknown or already-spent token (a second click on the same link) lands
-  // here — the token is `$unset` on first confirm.
   return (
-    <section className="space-y-3">
-      <h1 className="text-2xl font-semibold">This link is invalid or expired</h1>
-      <p className="opacity-70">
-        If you already confirmed, you&apos;re all set. Otherwise, subscribe again to get a fresh
-        confirmation email.
-      </p>
-      <Link href="/" className="inline-block underline">
-        Back to the blog
-      </Link>
-    </section>
+    <Shell title="This link is invalid or expired">
+      If you already confirmed, you&apos;re all set. Otherwise, subscribe again for a fresh
+      confirmation email.
+    </Shell>
   );
 }

@@ -1,7 +1,19 @@
 import { apiError, apiOk } from '@/lib/api';
-import { add, remove } from '@/lib/domains/likes/service';
-import { likeInputSchema } from '@/lib/domains/likes/validators';
+import { add, getLikeState, remove } from '@/lib/domains/likes/service';
+import { likeInputSchema, likeStateQuerySchema } from '@/lib/domains/likes/validators';
 import { captureServerEvent } from '@/lib/posthog-server';
+
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const { postSlug, fingerprint } = likeStateQuerySchema.parse(
+      Object.fromEntries(searchParams)
+    );
+    return apiOk(await getLikeState(postSlug, fingerprint));
+  } catch (err) {
+    return apiError(err);
+  }
+}
 
 export async function POST(req: Request) {
   try {

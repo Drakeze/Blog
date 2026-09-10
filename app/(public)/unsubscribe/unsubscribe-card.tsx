@@ -3,25 +3,31 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
+import { Button } from '@/components/ui/button';
+
 type State = 'confirm' | 'loading' | 'success' | 'error';
 
-/**
- * Plain markup — no shadcn. Phase 5 restyles the public pages; this just has to
- * work end-to-end for the double opt-in verification.
- */
+function Shell({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="mx-auto max-w-[32rem] py-10 text-center">
+      <h1 className="font-display text-[1.75rem] font-medium">{title}</h1>
+      <div className="mt-3 text-muted-foreground">{children}</div>
+    </section>
+  );
+}
+
 export function UnsubscribeCard({ token }: { token?: string }) {
   const [state, setState] = useState<State>('confirm');
   const [error, setError] = useState('');
 
   if (!token) {
     return (
-      <section className="space-y-3">
-        <h1 className="text-2xl font-semibold">Invalid unsubscribe link</h1>
-        <p className="opacity-70">This link looks broken or expired.</p>
-        <Link href="/" className="inline-block underline">
+      <Shell title="Invalid unsubscribe link">
+        <p>This link looks broken or expired.</p>
+        <Link href="/" className="mt-4 inline-block text-primary hover:underline">
           Back to the blog
         </Link>
-      </section>
+      </Shell>
     );
   }
 
@@ -48,47 +54,37 @@ export function UnsubscribeCard({ token }: { token?: string }) {
 
   if (state === 'success') {
     return (
-      <section className="space-y-3">
-        <h1 className="text-2xl font-semibold">You&apos;ve been unsubscribed</h1>
-        <p className="opacity-70">
-          You&apos;ll no longer receive newsletter emails. Re-subscribe any time from the site.
-        </p>
-        <Link href="/" className="inline-block underline">
+      <Shell title="You've been unsubscribed">
+        <p>You&apos;ll no longer receive newsletter emails. Re-subscribe any time from the site.</p>
+        <Link href="/" className="mt-4 inline-block text-primary hover:underline">
           Back to the blog
         </Link>
-      </section>
+      </Shell>
     );
   }
 
   if (state === 'error') {
     return (
-      <section className="space-y-3">
-        <h1 className="text-2xl font-semibold">Unsubscribe failed</h1>
-        <p className="opacity-70">{error}</p>
-        <button type="button" onClick={() => setState('confirm')} className="underline">
+      <Shell title="Unsubscribe failed">
+        <p>{error}</p>
+        <Button variant="outline" size="sm" className="mt-4" onClick={() => setState('confirm')}>
           Try again
-        </button>
-      </section>
+        </Button>
+      </Shell>
     );
   }
 
   return (
-    <section className="space-y-4">
-      <h1 className="text-2xl font-semibold">Unsubscribe from the newsletter?</h1>
-      <p className="opacity-70">You&apos;ll stop receiving new-post emails.</p>
-      <div className="flex gap-4">
-        <button
-          type="button"
-          onClick={confirm}
-          disabled={state === 'loading'}
-          className="rounded border px-4 py-2 disabled:opacity-50"
-        >
-          {state === 'loading' ? 'Unsubscribing…' : 'Yes, unsubscribe me'}
-        </button>
-        <Link href="/" className="rounded px-4 py-2 underline">
-          Keep me subscribed
-        </Link>
+    <Shell title="Unsubscribe from the newsletter?">
+      <p>You&apos;ll stop receiving new-post emails.</p>
+      <div className="mt-5 flex justify-center gap-3">
+        <Button variant="destructive" disabled={state === 'loading'} onClick={confirm}>
+          {state === 'loading' ? 'Unsubscribing…' : 'Yes, unsubscribe'}
+        </Button>
+        <Button variant="ghost" asChild>
+          <Link href="/">Keep me subscribed</Link>
+        </Button>
       </div>
-    </section>
+    </Shell>
   );
 }

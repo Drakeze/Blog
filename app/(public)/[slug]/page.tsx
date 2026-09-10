@@ -4,13 +4,15 @@ import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { cache } from 'react';
 
+import { CommentsSection } from '@/components/site/comments-section';
 import { Plate } from '@/components/site/plate';
 import { PostEndBlock } from '@/components/site/post-end-block';
+import { PostEngagement } from '@/components/site/post-engagement';
 import { ReadingProgress } from '@/components/site/reading-progress';
 import { isAdmin } from '@/lib/auth';
 import { getRelatedPosts, resolveSlug } from '@/lib/domains/posts/service';
 import { publicEnv } from '@/lib/env';
-import { renderMarkdown } from '@/lib/markdown';
+import { renderMarkdownRich } from '@/lib/highlight';
 import { cn, formatDate, readingTime, toIsoOrUndefined } from '@/lib/utils';
 
 export const revalidate = 60;
@@ -63,7 +65,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
   if (post.status === 'draft' && !(await isAdmin())) notFound();
 
-  const html = renderMarkdown(post.content);
+  const html = await renderMarkdownRich(post.content);
   const mins = readingTime(post.content);
   const related = await getRelatedPosts(post.slug, post.tags);
 
@@ -131,6 +133,17 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             <span className="text-line-strong">/</span>
             <span>{mins} min read</span>
           </div>
+
+          {post.status === 'published' ? (
+            <div className="mt-5">
+              <PostEngagement
+                slug={post.slug}
+                title={post.title}
+                excerpt={post.excerpt}
+                coverImage={post.coverImage}
+              />
+            </div>
+          ) : null}
         </header>
 
         <figure className="my-9">
@@ -143,6 +156,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />
 
         <PostEndBlock />
+
+        {post.status === 'published' ? <CommentsSection slug={post.slug} /> : null}
 
         {related.length > 0 ? (
           <section className="mt-12 border-t border-border pt-8">

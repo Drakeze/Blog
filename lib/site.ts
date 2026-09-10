@@ -13,9 +13,9 @@ export const navLinks = [
   { href: '/search', label: 'Search' },
 ] as const;
 
-/** Footer socials. `reddit` intentionally omitted until Anthony provides the URL. */
 export const socialLinks = [
   { label: 'X', href: 'https://x.com/SorenIdeas' },
   { label: 'GitHub', href: 'https://github.com/Drakeze' },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/anthonyshead/' },
+  { label: 'Reddit', href: 'https://www.reddit.com/user/Putrid-Economy1639/' },
 ] as const;

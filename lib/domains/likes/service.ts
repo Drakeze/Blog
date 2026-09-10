@@ -31,3 +31,17 @@ export async function remove({ postSlug, fingerprint }: LikeInput): Promise<void
   const db = await getDb();
   await db.collection<Like>(blogCollectionNames.likes).deleteOne({ fingerprint, postSlug });
 }
+
+/** Public like count + whether this fingerprint has liked — the post page's initial state. */
+export async function getLikeState(
+  postSlug: string,
+  fingerprint?: string
+): Promise<{ count: number; liked: boolean }> {
+  const db = await getDb();
+  const likes = db.collection<Like>(blogCollectionNames.likes);
+  const [count, mine] = await Promise.all([
+    likes.countDocuments({ postSlug }),
+    fingerprint ? likes.findOne({ postSlug, fingerprint }, { projection: { _id: 1 } }) : null,
+  ]);
+  return { count, liked: !!mine };
+}
