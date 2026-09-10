@@ -148,9 +148,9 @@ export async function sendNewsletterToConfirmedSubscribers(
   return { sent, failed, total: subscribers.length };
 }
 
-/** Preview send — one copy of the newsletter to a single address, no `newsletterSentAt`. */
-export async function sendNewsletterTest(post: Post, to: string): Promise<void> {
-  const html = await render(
+/** Render the newsletter HTML for a post (admin preview + test send share this). */
+export function renderNewsletterHtml(post: Post): Promise<string> {
+  return render(
     NewsletterEmail({
       postTitle: post.title,
       postExcerpt: post.excerpt,
@@ -162,6 +162,11 @@ export async function sendNewsletterTest(post: Post, to: string): Promise<void> 
       siteUrl: env.SITE_URL,
     })
   );
+}
+
+/** Preview send — one copy of the newsletter to a single address, no `newsletterSentAt`. */
+export async function sendNewsletterTest(post: Post, to: string): Promise<void> {
+  const html = await renderNewsletterHtml(post);
   await sendEmail({
     to,
     subject: `[test] ${post.title}`,

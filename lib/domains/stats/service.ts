@@ -56,6 +56,47 @@ async function dailyCounts(
   return out;
 }
 
+export interface Analytics {
+  likesByDay: DayCount[];
+  commentsByDay: DayCount[];
+  /** Most-liked published posts, top 10. */
+  topPosts: { slug: string; title: string; likes: number }[];
+}
+
+export async function getAnalytics(): Promise<Analytics> {
+  const db = await getDb();
+  const since = daysAgo(29);
+
+  const [likesByDay, commentsByDay, topPosts] = await Promise.all([
+    dailyCounts(C.likes, since, 30),
+    dailyCounts(C.comments, since, 30),
+    db
+      .collection(C.likes)
+      .aggregate<{ _id: string; likes: number; title: string }>([
+        { $group: { _id: '$postSlug', likes: { $sum: 1 } } },
+        { $sort: { likes: -1 } },
+        { $limit: 10 },
+        {
+          $lookup: {
+            from: C.posts,
+            localField: '_id',
+            foreignField: 'slug',
+            as: 'post',
+          },
+        },
+        { $set: { title: { $ifNull: [{ $first: '$post.title' }, '$_id'] } } },
+        { $project: { post: 0 } },
+      ])
+      .toArray(),
+  ]);
+
+  return {
+    likesByDay,
+    commentsByDay,
+    topPosts: topPosts.map((p) => ({ slug: p._id, title: p.title, likes: p.likes })),
+  };
+}
+
 export async function getAdminOverview(): Promise<AdminOverview> {
   const db = await getDb();
   const posts = db.collection(C.posts);

@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { ObjectId } from 'mongodb';
 
 import { blogCollectionNames, getDb } from '@/lib/mongo';
 
@@ -78,4 +79,31 @@ export async function confirmSubscriber(token: string): Promise<Subscriber | nul
 export async function unsubscribe(token: string): Promise<Subscriber | null> {
   const col = await subsCol();
   return col.findOneAndDelete({ unsubscribeToken: token });
+}
+
+/** Admin: hard-delete one subscriber by id. Returns false for an unknown/invalid id. */
+export async function removeSubscriberById(id: string): Promise<boolean> {
+  if (!ObjectId.isValid(id)) return false;
+  const col = await subsCol();
+  const res = await col.deleteOne({ _id: new ObjectId(id) });
+  return res.deletedCount === 1;
+}
+
+/**
+ * Admin: re-issue the confirmation email for a pending subscriber. Regenerates
+ * `confirmToken` (covers rows whose token was already cleared) and returns the
+ * address + token for the caller to send. `null` = unknown id or already confirmed.
+ */
+export async function refreshConfirmToken(
+  id: string
+): Promise<{ email: string; token: string } | null> {
+  if (!ObjectId.isValid(id)) return null;
+  const col = await subsCol();
+  const token = crypto.randomUUID();
+  const row = await col.findOneAndUpdate(
+    { _id: new ObjectId(id), confirmed: false },
+    { $set: { confirmToken: token } },
+    { returnDocument: 'after' }
+  );
+  return row ? { email: row.email, token } : null;
 }
