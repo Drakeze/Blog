@@ -38,7 +38,7 @@ function getHighlighter(): Promise<Highlighter> {
   if (!highlighterPromise) {
     highlighterPromise = import('shiki').then((shiki) =>
       shiki.createHighlighter({
-        themes: ['vitesse-light', 'vitesse-dark'],
+        themes: ['github-light-high-contrast', 'github-dark-high-contrast'],
         langs: [...LANGS],
       })
     );
@@ -86,7 +86,7 @@ export async function renderMarkdownRich(md: string): Promise<string> {
       // Shiki returns a complete <pre class="shiki">…</pre>.
       token.text = hl.codeToHtml(token.text, {
         lang: useLang,
-        themes: { light: 'vitesse-light', dark: 'vitesse-dark' },
+        themes: { light: 'github-light-high-contrast', dark: 'github-dark-high-contrast' },
         defaultColor: 'light',
       });
     },

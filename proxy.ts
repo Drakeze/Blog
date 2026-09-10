@@ -1,14 +1,17 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { clerkMiddleware } from '@clerk/nextjs/server';
 
-const isProtected = createRouteMatcher(['/admin(.*)']);
-
-export default clerkMiddleware(async (auth, req) => {
-  if (isProtected(req)) await auth.protect();
-});
+/**
+ * Bare `clerkMiddleware` — it only has to run so `auth()` / `currentUser()` work
+ * in server components and route handlers. Authorization is resource-based
+ * (Clerk's own recommendation): `app/admin/layout.tsx` calls `isAdmin()` and
+ * redirects, and every admin API route calls `requireAdminApi()`.
+ *
+ * The matcher is deliberately narrow — it skips the public reader routes (`/`,
+ * `/[slug]`, `/search`, `/tags/*`, …) so those can be statically cached / ISR'd
+ * instead of being forced dynamic by a middleware rewrite on every request.
+ */
+export default clerkMiddleware();
 
 export const config = {
-  matcher: [
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    '/(api|trpc)(.*)',
-  ],
+  matcher: ['/admin/:path*', '/bookmarks', '/sign-in/:path*', '/sign-up/:path*', '/(api)(.*)'],
 };

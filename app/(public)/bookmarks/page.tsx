@@ -16,7 +16,7 @@ export default async function BookmarksPage() {
       <div>
         <h1 className="font-display text-2xl font-medium">Bookmarks</h1>
         <p className="mt-3 text-muted-foreground">
-          <Link href="/sign-in" className="text-primary underline-offset-2 hover:underline">
+          <Link href="/sign-in" className="text-primary underline underline-offset-2">
             Sign in
           </Link>{' '}
           to save posts and find them here.

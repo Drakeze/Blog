@@ -23,7 +23,7 @@
   --secondary: oklch(0.955 0.008 90);
   --secondary-foreground: oklch(0.28 0.01 75);
   --muted: oklch(0.955 0.008 90);
-  --muted-foreground: oklch(0.54 0.012 85);
+  --muted-foreground: oklch(0.515 0.013 85); /* ≥4.5:1 on both --background and --sunk */
   --accent: oklch(0.93 0.015 20); /* claret tint for hovers / chips */
   --accent-foreground: oklch(0.42 0.11 15);
 
@@ -34,7 +34,7 @@
 
   /* extra semantic tokens used across the site + admin */
   --sunk: oklch(0.955 0.008 90); /* recessed panels, code blocks */
-  --faint: oklch(0.68 0.015 85); /* metadata, captions */
+  --faint: oklch(0.55 0.014 80); /* metadata, captions — kept ≥4.5:1 on --background for WCAG AA */
   --line-strong: oklch(0.85 0.014 90);
   --ok: oklch(0.52 0.08 155);
   --warn: oklch(0.52 0.09 70);
@@ -69,7 +69,7 @@
   --ring: oklch(0.72 0.09 15);
 
   --sunk: oklch(0.19 0.006 75);
-  --faint: oklch(0.53 0.013 85);
+  --faint: oklch(0.64 0.013 85); /* metadata, captions — ≥4.5:1 on dark --background */
   --line-strong: oklch(0.34 0.008 80);
   --ok: oklch(0.68 0.08 155);
   --warn: oklch(0.7 0.1 72);
@@ -181,13 +181,12 @@
   .prose pre code {
     @apply bg-transparent p-0 text-inherit;
   }
-  /* Shiki (post page) — force the design's sunk panel, swap to the dark palette. */
-  .prose pre.shiki {
-    background-color: var(--sunk) !important;
-  }
+  /* Shiki (post page): keep the theme's own background so its token colors hit
+     their designed contrast (AA); just swap to the dark palette under .dark. */
   .dark .prose pre.shiki,
   .dark .prose pre.shiki span {
     color: var(--shiki-dark, inherit) !important;
+    background-color: var(--shiki-dark-bg, var(--sunk)) !important;
   }
   .prose img {
     @apply my-6 w-full rounded-lg;

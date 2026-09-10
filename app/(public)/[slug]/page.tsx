@@ -9,8 +9,7 @@ import { Plate } from '@/components/site/plate';
 import { PostEndBlock } from '@/components/site/post-end-block';
 import { PostEngagement } from '@/components/site/post-engagement';
 import { ReadingProgress } from '@/components/site/reading-progress';
-import { isAdmin } from '@/lib/auth';
-import { getRelatedPosts, resolveSlug } from '@/lib/domains/posts/service';
+import { getRelatedPosts, listPublishedSlugs, resolveSlug } from '@/lib/domains/posts/service';
 import { publicEnv } from '@/lib/env';
 import { renderMarkdownRich } from '@/lib/highlight';
 import { cn, formatDate, readingTime, toIsoOrUndefined } from '@/lib/utils';
@@ -21,6 +20,14 @@ const siteUrl = (publicEnv.NEXT_PUBLIC_SITE_URL || 'https://blog.drakeze.com').r
 
 // Deduped across generateMetadata + render within one request.
 const resolve = cache((slug: string) => resolveSlug(slug));
+
+export async function generateStaticParams() {
+  try {
+    return (await listPublishedSlugs()).map((slug) => ({ slug }));
+  } catch {
+    return []; // DB unreachable at build → every post renders on-demand instead.
+  }
+}
 
 export async function generateMetadata({
   params,
@@ -63,7 +70,9 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const { post, redirect } = found;
   if (redirect) permanentRedirect(`/${post.slug}`);
 
-  if (post.status === 'draft' && !(await isAdmin())) notFound();
+  // Drafts aren't public — preview them in the admin editor. Keeping auth() out
+  // of this route is what lets it be statically cached for readers.
+  if (post.status === 'draft') notFound();
 
   const html = await renderMarkdownRich(post.content);
   const mins = readingTime(post.content);
@@ -91,18 +100,12 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
       <article>
         <header>
-          {post.status === 'draft' ? (
-            <p className="mb-4 rounded-md border border-[var(--warn)]/40 bg-[var(--warn)]/10 px-3 py-1.5 font-mono text-xs text-[var(--warn)]">
-              Draft preview — not publicly visible
-            </p>
-          ) : null}
-
           {post.tags.length > 0 ? (
             <div className="mb-4 flex flex-wrap gap-2">
               {post.tags.map((tag) => (
                 <Link
                   key={tag}
-                  href={`/?tag=${encodeURIComponent(tag)}`}
+                  href={`/tags/${encodeURIComponent(tag)}`}
                   className="rounded-full border border-line-strong px-2.5 py-1 font-mono text-[0.72rem] tracking-wide text-muted-foreground transition-colors hover:border-primary"
                 >
                   {tag}
@@ -129,21 +132,19 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             )}
             <span>{post.authorName}</span>
             <span className="text-line-strong">/</span>
-            <span>{post.publishedAt ? formatDate(post.publishedAt) : 'Draft'}</span>
+            <span>{post.publishedAt ? formatDate(post.publishedAt) : '—'}</span>
             <span className="text-line-strong">/</span>
             <span>{mins} min read</span>
           </div>
 
-          {post.status === 'published' ? (
-            <div className="mt-5">
-              <PostEngagement
-                slug={post.slug}
-                title={post.title}
-                excerpt={post.excerpt}
-                coverImage={post.coverImage}
-              />
-            </div>
-          ) : null}
+          <div className="mt-5">
+            <PostEngagement
+              slug={post.slug}
+              title={post.title}
+              excerpt={post.excerpt}
+              coverImage={post.coverImage}
+            />
+          </div>
         </header>
 
         <figure className="my-9">
@@ -157,7 +158,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
         <PostEndBlock />
 
-        {post.status === 'published' ? <CommentsSection slug={post.slug} /> : null}
+        <CommentsSection slug={post.slug} />
 
         {related.length > 0 ? (
           <section className="mt-12 border-t border-border pt-8">

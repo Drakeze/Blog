@@ -33,10 +33,10 @@ export function SiteHeader() {
   const showAdmin = !!isSignedIn && isAdmin;
 
   return (
-    <header className="mb-10 flex items-center justify-between gap-4 border-b border-border pb-5">
-      <Brandmark className="text-base" />
+    <header className="mb-10 flex items-center justify-between gap-3 border-b border-border pb-5">
+      <Brandmark className="shrink-0 whitespace-nowrap text-base" />
 
-      <nav className="flex items-center gap-5 font-mono text-[0.78rem] tracking-wide text-muted-foreground">
+      <nav className="hidden items-center gap-5 font-mono text-[0.78rem] tracking-wide text-muted-foreground sm:flex">
         {navLinks.map((l) => {
           const active = l.href === '/' ? pathname === '/' : pathname.startsWith(l.href);
           return (
@@ -52,7 +52,7 @@ export function SiteHeader() {
         })}
       </nav>
 
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2">
         <Link
           href="/search"
           aria-label="Search"
@@ -66,7 +66,7 @@ export function SiteHeader() {
           <SignInButton mode="modal">
             <button
               type="button"
-              className="rounded-lg border border-line-strong bg-card px-3 py-1.5 font-mono text-[0.7rem] uppercase tracking-wider transition-colors hover:border-primary"
+              className="whitespace-nowrap rounded-lg border border-line-strong bg-card px-3 py-1.5 font-mono text-[0.7rem] uppercase tracking-wider transition-colors hover:border-primary"
             >
               Sign in
             </button>

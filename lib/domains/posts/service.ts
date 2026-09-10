@@ -45,6 +45,15 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
   return col.findOne({ slug });
 }
 
+/** Every published slug — for `generateStaticParams` on the post + tag routes. */
+export async function listPublishedSlugs(): Promise<string[]> {
+  const col = await postsCol();
+  const rows = await col
+    .find({ status: 'published' }, { projection: { slug: 1 } })
+    .toArray();
+  return rows.map((r) => r.slug);
+}
+
 /** Distinct tags across published posts, most-used first — for the homepage tag bar. */
 export async function listPublishedTags(): Promise<string[]> {
   const col = await postsCol();

@@ -42,7 +42,7 @@ export function ReadingProgress() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed left-[max(1rem,calc(50vw-24rem))] top-24 bottom-16 z-10 hidden w-[3px] lg:block"
+      className="pointer-events-none fixed left-[max(1rem,calc(50vw-24rem))] top-24 bottom-16 z-10 hidden w-0.75 motion-reduce:hidden! lg:block"
     >
       <div className="relative h-full w-full rounded-full bg-border">
         <div ref={fillRef} className="absolute inset-x-0 top-0 rounded-full bg-primary" style={{ height: '0%' }} />
