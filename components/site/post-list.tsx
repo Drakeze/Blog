@@ -1,8 +1,10 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
+import { Badge } from '@/components/ui/badge';
 import { Plate } from '@/components/site/plate';
 import type { PostSummary } from '@/lib/domains/posts/types';
-import { formatDate } from '@/lib/utils';
+import { cn, formatDate, getTagColorClasses } from '@/lib/utils';
 
 export function PostList({ posts, emptyLabel }: { posts: PostSummary[]; emptyLabel: string }) {
   if (posts.length === 0) {
@@ -12,24 +14,48 @@ export function PostList({ posts, emptyLabel }: { posts: PostSummary[]; emptyLab
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {posts.map((p) => (
         <Link
           key={p.slug}
           href={`/${p.slug}`}
-          className="group grid grid-cols-[4.5rem_1fr] items-start gap-5 border-t border-border py-6 transition-colors last:border-b hover:bg-[linear-gradient(90deg,var(--accent),transparent_60%)]"
+          className="group block overflow-hidden rounded-[14px] border border-line-strong bg-card transition-colors hover:border-primary/40"
         >
-          <Plate src={p.coverImage} alt="" size="sm" />
-          <div className="min-w-0">
-            <p className="font-mono text-[0.68rem] uppercase tracking-wide text-faint">
-              {p.tags[0] ? <span className="text-primary">{p.tags[0]}</span> : null}
-              {p.tags[1] ? ` · ${p.tags[1]}` : ''}
-              {p.publishedAt ? ` — ${formatDate(p.publishedAt)}` : ''}
-            </p>
-            <h2 className="my-1.5 font-display text-[1.375rem] font-medium transition-colors group-hover:text-primary">
+          <Plate src={p.coverImage} alt="" size="lg" />
+          <div className="p-4">
+            {p.tags.length > 0 ? (
+              <div className="mb-3 flex flex-wrap gap-1.5">
+                {p.tags.slice(0, 3).map((tag) => (
+                  <Badge key={tag} className={cn('border-transparent text-xs', getTagColorClasses(tag))}>
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            ) : null}
+            <h2 className="mb-2 font-display text-[1.25rem] font-medium leading-snug transition-colors group-hover:text-primary line-clamp-2">
               {p.title}
             </h2>
-            <p className="line-clamp-2 max-w-[52ch] text-muted-foreground">{p.excerpt}</p>
+            <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">{p.excerpt}</p>
+            <div className="flex items-center gap-2 font-mono text-xs text-faint">
+              {p.authorImageUrl ? (
+                <Image
+                  src={p.authorImageUrl}
+                  alt=""
+                  width={20}
+                  height={20}
+                  className="rounded-full border border-line-strong"
+                />
+              ) : (
+                <span className="size-5 rounded-full border border-line-strong bg-accent" />
+              )}
+              <span>{p.authorName}</span>
+              {p.publishedAt ? (
+                <>
+                  <span>·</span>
+                  <span>{formatDate(p.publishedAt)}</span>
+                </>
+              ) : null}
+            </div>
           </div>
         </Link>
       ))}
