@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { site } from '@/lib/site';
@@ -9,7 +10,14 @@ export function Brandmark({ className }: { className?: string }) {
       href="/"
       className={cn('font-display inline-flex items-center gap-2 font-medium', className)}
     >
-      <span className="size-2.5 rounded-full bg-primary" aria-hidden="true" />
+      <Image
+        src="/DrakezeWind.png"
+        alt=""
+        width={22}
+        height={22}
+        className="rounded-full"
+        priority
+      />
       {site.name}
     </Link>
   );
