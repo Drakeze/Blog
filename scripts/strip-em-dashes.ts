@@ -20,7 +20,7 @@ async function main() {
 
   const matches = await db
     .collection('posts')
-    .find({ $or: FIELDS.map((f) => ({ [f]: /—/ })) })
+    .find({ $or: FIELDS.map((f) => ({ [f]: { $regex: '—' } })) })
     .project({ title: 1, slug: 1, ...Object.fromEntries(FIELDS.map((f) => [f, 1])) })
     .toArray();
 
