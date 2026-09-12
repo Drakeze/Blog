@@ -32,10 +32,10 @@ const posts: Post[] = [
     slug: 'getting-the-languages-back',
     slugHistory: [],
     excerpt:
-      "I let the portfolio sit for a few months. Coming back, the concepts were all there — the fluency wasn't. This is the log of getting it back.",
+      "I let the portfolio sit for a few months. Coming back, the concepts were all there - the fluency wasn't. This is the log of getting it back.",
     content: `The concepts were all still there. The **fluency** was gone.
 
-I'd stall on things that used to be automatic — the shape of a generic, where a
+I'd stall on things that used to be automatic - the shape of a generic, where a
 lifetime goes, which trait to reach for.
 
 ## The rule: ship the small thing
@@ -56,7 +56,7 @@ bool Alarm::isDue(const std::tm& now) const {
 > Fluency isn't knowledge. It's the tax you pay for not practising.
 
 The [NOTES.md walkthrough](https://drakeze.com) in each repo is the real
-deliverable — writing the explanation is what proved I understood it.`,
+deliverable - writing the explanation is what proved I understood it.`,
     coverImage: undefined,
     tags: ['dev journey', 'portfolio', 'learning'],
     status: 'published',
@@ -70,7 +70,7 @@ deliverable — writing the explanation is what proved I understood it.`,
     slug: 'escaping-the-hotkey-trap',
     slugHistory: [],
     excerpt:
-      "A keyboard-driven automation that kept firing the wrong macro. The fix wasn't more automation — it was changing the question.",
+      "A keyboard-driven automation that kept firing the wrong macro. The fix wasn't more automation - it was changing the question.",
     content: `By changing the query, the code became valid TypeScript and the loop fell
 out for free.
 
@@ -84,7 +84,7 @@ const match = windows.find((w) => w.title.startsWith(prefix))
 
 ## The reframe
 
-Stop asking "which window is focused?" Ask "which *workspace* am I in?" — that's
+Stop asking "which window is focused?" Ask "which *workspace* am I in?" - that's
 a stable id, not a fuzzy string.`,
     coverImage: undefined,
     tags: ['automation', 'dev journey'],

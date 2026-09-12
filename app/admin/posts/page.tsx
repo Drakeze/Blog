@@ -61,7 +61,7 @@ export default async function AdminPostsPage() {
                     ) : null}
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">
-                    <span className="text-xs text-muted-foreground">{p.tags.join(', ') || '—'}</span>
+                    <span className="text-xs text-muted-foreground">{p.tags.join(', ') || '-'}</span>
                   </TableCell>
                   <TableCell className="hidden whitespace-nowrap text-xs text-muted-foreground md:table-cell">
                     {formatDate(p.updatedAt)}

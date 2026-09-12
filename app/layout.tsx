@@ -30,9 +30,9 @@ export const metadata: Metadata = {
     template: '%s · Thinking Out Loud',
   },
   description:
-    'Software, systems, and the craft of building things — mostly in public. By Anthony (Drakeze).',
+    'My Public Blog talking about recent builds and learning',
   applicationName: 'Thinking Out Loud',
-  authors: [{ name: 'Anthony Shead', url: 'https://drakeze.com' }],
+  authors: [{ name: 'Anthony', url: 'https://drakeze.com' }],
   alternates: {
     canonical: '/',
     types: { 'application/rss+xml': '/feed.xml' },
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     url: siteUrl,
     siteName: 'Thinking Out Loud',
     title: 'Thinking Out Loud',
-    description: 'Software, systems, and the craft of building things — mostly in public.',
+    description: 'My Public Blog talking about recent builds and learning',
   },
   twitter: {
     card: 'summary_large_image',

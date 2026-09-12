@@ -132,7 +132,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             )}
             <span>{post.authorName}</span>
             <span className="text-line-strong">/</span>
-            <span>{post.publishedAt ? formatDate(post.publishedAt) : '—'}</span>
+            <span>{post.publishedAt ? formatDate(post.publishedAt) : '-'}</span>
             <span className="text-line-strong">/</span>
             <span>{mins} min read</span>
           </div>
@@ -150,7 +150,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         <figure className="my-9">
           <Plate src={post.coverImage} alt={post.coverImage ? post.title : ''} size="lg" priority />
           <figcaption className="mt-2.5 font-mono text-[0.68rem] tracking-wide text-faint">
-            {post.coverImage ? `fig. 1 — ${post.title}` : 'fig. 1 — commissioned plate (placeholder)'}
+            {post.coverImage ? `fig. 1 - ${post.title}` : 'fig. 1 - commissioned plate (placeholder)'}
           </figcaption>
         </figure>
 
