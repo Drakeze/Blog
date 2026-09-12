@@ -8,14 +8,14 @@ export interface SearchHit {
   tags: string[];
   publishedAt?: Date;
   score: number;
-  /** Atlas Search highlight fragments — `[{ path, texts: [{ value, type }] }]`. */
+  /** Atlas Search highlight fragments - `[{ path, texts: [{ value, type }] }]`. */
   highlights: unknown[];
 }
 
 /**
  * Full-text search over published posts via the `posts_search` Atlas Search
  * index (see `atlas/posts_search.json`). Fuzzy (`maxEdits: 1`) so typos still
- * land. `status` is filtered post-`$search` with a plain `$match` — the archive
+ * land. `status` is filtered post-`$search` with a plain `$match` - the archive
  * is small enough that it doesn't hurt relevance.
  */
 export async function searchPosts(q: string, limit = 20): Promise<SearchHit[]> {

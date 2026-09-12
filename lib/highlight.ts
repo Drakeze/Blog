@@ -3,7 +3,7 @@ import sanitizeHtml from 'sanitize-html';
 import type { Highlighter } from 'shiki';
 
 /**
- * Rich markdown render for the **post page** — same pipeline as `renderMarkdown`
+ * Rich markdown render for the **post page** - same pipeline as `renderMarkdown`
  * (marked + sanitize-html) but fenced code blocks go through Shiki first. Async
  * (Shiki is), so the editor preview keeps using the sync `renderMarkdown`.
  *
@@ -46,7 +46,7 @@ function getHighlighter(): Promise<Highlighter> {
   return highlighterPromise;
 }
 
-// Shiki emits inline styles + custom props on pre/code/span — allow them through.
+// Shiki emits inline styles + custom props on pre/code/span - allow them through.
 const SANITIZE: sanitizeHtml.IOptions = {
   allowedTags: [...sanitizeHtml.defaults.allowedTags, 'h1', 'h2', 'img'],
   allowedAttributes: {
@@ -91,7 +91,7 @@ export async function renderMarkdownRich(md: string): Promise<string> {
       });
     },
     renderer: {
-      // The token text is already a full <pre> — emit it as-is, no <pre><code> wrap.
+      // The token text is already a full <pre> - emit it as-is, no <pre><code> wrap.
       code({ text }) {
         return text;
       },

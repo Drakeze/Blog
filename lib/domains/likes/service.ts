@@ -7,7 +7,7 @@ import type { Like, LikeInput } from './types';
  * Anonymous, fingerprint-scoped like. Race-safe via the unique
  * `{ fingerprint, postSlug }` index behind the upsert.
  *
- * ponytail: the count is still inflatable by rotating the client fingerprint —
+ * ponytail: the count is still inflatable by rotating the client fingerprint -
  * IP+UA rate limiting or signed tokens is the fix, not worth the infra yet.
  */
 export async function add({ postSlug, fingerprint }: LikeInput): Promise<void> {
@@ -32,7 +32,7 @@ export async function remove({ postSlug, fingerprint }: LikeInput): Promise<void
   await db.collection<Like>(blogCollectionNames.likes).deleteOne({ fingerprint, postSlug });
 }
 
-/** Public like count + whether this fingerprint has liked — the post page's initial state. */
+/** Public like count + whether this fingerprint has liked - the post page's initial state. */
 export async function getLikeState(
   postSlug: string,
   fingerprint?: string

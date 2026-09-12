@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 /**
- * The framed "plate" that fronts every post — a commissioned illustration held
+ * The framed "plate" that fronts every post - a commissioned illustration held
  * like a specimen in a field notebook. Falls back to a warm gradient + the cat
  * mark when a post has no cover image yet.
  */

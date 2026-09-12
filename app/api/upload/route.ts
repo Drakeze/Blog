@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import { isAdmin } from '@/lib/auth';
 import { storageConfig } from '@/lib/env';
 
-// Extension is derived from the validated MIME type, never from file.name —
+// Extension is derived from the validated MIME type, never from file.name -
 // a crafted filename would otherwise flow into the stored key and the markdown.
 const EXT_BY_TYPE: Record<string, string> = {
   'image/jpeg': '.jpg',
@@ -24,7 +24,7 @@ function getR2Client() {
       secretAccessKey: storageConfig.secretAccessKey,
     },
     // R2 rejects the AWS SDK v3 default request-checksum trailer with
-    // SignatureDoesNotMatch — every PUT fails unless this is set.
+    // SignatureDoesNotMatch - every PUT fails unless this is set.
     requestChecksumCalculation: 'WHEN_REQUIRED',
   });
 }

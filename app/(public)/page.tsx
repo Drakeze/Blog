@@ -3,7 +3,7 @@ import { TagBar } from '@/components/site/tag-bar';
 import { listPosts, listPublishedTags } from '@/lib/domains/posts/service';
 import { site } from '@/lib/site';
 
-// Static + ISR — the homepage is the hot path for readers.
+// Static + ISR - the homepage is the hot path for readers.
 export const revalidate = 60;
 
 // The recent archive. Numbered pagination isn't worth adding until the list

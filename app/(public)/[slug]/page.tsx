@@ -70,7 +70,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const { post, redirect } = found;
   if (redirect) permanentRedirect(`/${post.slug}`);
 
-  // Drafts aren't public — preview them in the admin editor. Keeping auth() out
+  // Drafts aren't public - preview them in the admin editor. Keeping auth() out
   // of this route is what lets it be statically cached for readers.
   if (post.status === 'draft') notFound();
 

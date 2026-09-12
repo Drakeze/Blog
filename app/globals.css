@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================
-   Design tokens — "Thinking Out Loud"
+   Design tokens - "Thinking Out Loud"
    Warm paper ground, oxblood-claret accent, Newsreader display.
    Approved Phase 0 artifact: claude.ai/code/artifact/10464f9a-99c0-4bfe-acdf-d5f0c653db06
    ============================================================ */
@@ -34,7 +34,7 @@
 
   /* extra semantic tokens used across the site + admin */
   --sunk: oklch(0.955 0.008 90); /* recessed panels, code blocks */
-  --faint: oklch(0.55 0.014 80); /* metadata, captions — kept ≥4.5:1 on --background for WCAG AA */
+  --faint: oklch(0.55 0.014 80); /* metadata, captions - kept ≥4.5:1 on --background for WCAG AA */
   --line-strong: oklch(0.85 0.014 90);
   --ok: oklch(0.52 0.08 155);
   --warn: oklch(0.52 0.09 70);
@@ -69,7 +69,7 @@
   --ring: oklch(0.72 0.09 15);
 
   --sunk: oklch(0.19 0.006 75);
-  --faint: oklch(0.64 0.013 85); /* metadata, captions — ≥4.5:1 on dark --background */
+  --faint: oklch(0.64 0.013 85); /* metadata, captions - ≥4.5:1 on dark --background */
   --line-strong: oklch(0.34 0.008 80);
   --ok: oklch(0.68 0.08 155);
   --warn: oklch(0.7 0.1 72);
@@ -140,7 +140,7 @@
   }
 }
 
-/* Prose — rendered markdown on the post page + editor preview */
+/* Prose - rendered markdown on the post page + editor preview */
 @layer components {
   .prose {
     @apply text-foreground max-w-[38rem] text-[1.1875rem] leading-[1.75];

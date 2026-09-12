@@ -7,7 +7,7 @@ const dbName = DATABASE_URL.match(/\/([^/?]+)(\?|$)/)?.[1] ?? '(default)';
 
 /**
  * Create the indexes the app assumes. Safe to re-run. Unique indexes are the
- * race-safety guarantee behind the like / subscribe upserts — a MongoDB upsert
+ * race-safety guarantee behind the like / subscribe upserts - a MongoDB upsert
  * without one can double-insert under concurrency.
  */
 async function ensureIndexes() {
@@ -38,7 +38,7 @@ async function ensureIndexes() {
     ['subscribers', { email: 1 }, { unique: true }],
     ['subscribers', { confirmToken: 1 }, { sparse: true }],
     ['subscribers', { unsubscribeToken: 1 }, { unique: true }],
-    // Newsletter send scans { confirmed: true } — Review A flagged it unindexed.
+    // Newsletter send scans { confirmed: true } - Review A flagged it unindexed.
     [
       'subscribers',
       { confirmed: 1 },

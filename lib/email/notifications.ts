@@ -10,7 +10,7 @@ import type { Post } from '@/models/post';
 
 import { sendEmail } from './send';
 
-/** Double opt-in step 1's email — the link that makes `confirmed` real. */
+/** Double opt-in step 1's email - the link that makes `confirmed` real. */
 export async function sendSubscriptionConfirmation(
   email: string,
   confirmToken: string
@@ -30,7 +30,7 @@ export async function sendSubscriptionConfirmation(
 }
 
 /**
- * Notify a parent commenter that someone replied. Fire-and-forget — every error
+ * Notify a parent commenter that someone replied. Fire-and-forget - every error
  * is swallowed so a failed notification never fails the comment POST.
  */
 export async function sendReplyNotification({

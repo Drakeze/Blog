@@ -2,8 +2,8 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { MongoClient, type ObjectId } from 'mongodb';
 import path from 'path';
 
-// Pull every external image referenced by a post — the `coverImage` and any
-// inline `![](url)` in the markdown — into the R2 bucket, and rewrite the doc.
+// Pull every external image referenced by a post - the `coverImage` and any
+// inline `![](url)` in the markdown - into the R2 bucket, and rewrite the doc.
 // Idempotent: URLs already on NEXT_PUBLIC_R2_PUBLIC_URL are skipped.
 // Dry-run by default:
 //   bun run scripts/migrate-images-to-r2.ts            # report only
@@ -124,7 +124,7 @@ async function main() {
 
   await client.close();
   console.log(`\nposts touched: ${touched}   images: ${images}   failed: ${failed}`);
-  if (!APPLY) console.log('Dry run — re-run with --apply to write.');
+  if (!APPLY) console.log('Dry run - re-run with --apply to write.');
 }
 
 main().catch((err) => {

@@ -2,7 +2,7 @@ import { publicEnv } from '@/lib/env';
 import { getDb } from '@/lib/mongo';
 import type { Post } from '@/models/post';
 
-// Rendered on request, not at build — the feed needs the DB and the build must
+// Rendered on request, not at build - the feed needs the DB and the build must
 // not depend on Atlas being reachable. CDN-cached via the response header.
 export const dynamic = 'force-dynamic';
 

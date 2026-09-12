@@ -57,7 +57,7 @@ async function main() {
   }
 
   await client.close();
-  console.log(APPLY ? '\nDone.' : '\nDry run — re-run with --apply to write.');
+  console.log(APPLY ? '\nDone.' : '\nDry run - re-run with --apply to write.');
 }
 
 main().catch((err) => {

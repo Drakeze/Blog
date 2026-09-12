@@ -24,7 +24,7 @@ export async function generateMetadata({
   const { tag } = await params;
   const label = decodeURIComponent(tag);
   return {
-    title: `${label} — posts`,
+    title: `${label} - posts`,
     description: `Every ${site.name} post tagged “${label}”.`,
   };
 }

@@ -28,7 +28,7 @@ export function BookmarksList({ initial }: { initial: Row[] }) {
   if (rows.length === 0) {
     return (
       <p className="text-muted-foreground">
-        No bookmarks yet — hit <span className="font-mono text-sm">Save</span> on a post.
+        No bookmarks yet - hit <span className="font-mono text-sm">Save</span> on a post.
       </p>
     );
   }

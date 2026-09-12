@@ -1,6 +1,6 @@
 import { beforeEach, expect, mock, test } from 'bun:test';
 
-// Mutable fake env — `sendEmail` reads `env.EMAIL_DELIVERY_MODE` at call time.
+// Mutable fake env - `sendEmail` reads `env.EMAIL_DELIVERY_MODE` at call time.
 const fakeEnv = {
   env: {
     EMAIL_DELIVERY_MODE: 'log' as 'live' | 'log' | 'off',

@@ -27,7 +27,7 @@ export async function countConfirmed(): Promise<number> {
 
 /**
  * Double opt-in step 1: insert a pending (`confirmed: false`) subscriber with a
- * fresh `confirmToken`. Idempotent — an existing row is returned untouched with
+ * fresh `confirmToken`. Idempotent - an existing row is returned untouched with
  * `created: false` so the caller knows whether to send a confirmation email.
  */
 export async function subscribe(
@@ -52,7 +52,7 @@ export async function subscribe(
     const res = await col.insertOne(subscriber);
     return { created: true, subscriber: { ...subscriber, _id: res.insertedId } };
   } catch (err) {
-    // Unique index on email — a racing duplicate submit lands here.
+    // Unique index on email - a racing duplicate submit lands here.
     if (err && typeof err === 'object' && 'code' in err && err.code === 11000) {
       const row = await col.findOne({ email });
       if (row) return { created: false, subscriber: row };
@@ -63,7 +63,7 @@ export async function subscribe(
 
 /**
  * Double opt-in step 2: flip `confirmed` and clear the token. Returns `null` for
- * an unknown/spent token (a second click on the same link also lands here — the
+ * an unknown/spent token (a second click on the same link also lands here - the
  * token was `$unset` on the first).
  */
 export async function confirmSubscriber(token: string): Promise<Subscriber | null> {
@@ -75,7 +75,7 @@ export async function confirmSubscriber(token: string): Promise<Subscriber | nul
   );
 }
 
-/** Atomic — a double-click can't race findOne against deleteOne. */
+/** Atomic - a double-click can't race findOne against deleteOne. */
 export async function unsubscribe(token: string): Promise<Subscriber | null> {
   const col = await subsCol();
   return col.findOneAndDelete({ unsubscribeToken: token });

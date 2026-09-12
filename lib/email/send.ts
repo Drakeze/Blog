@@ -9,7 +9,7 @@ export interface SendEmailInput {
   to: string;
   subject: string;
   html: string;
-  /** e.g. "newsletter" | "confirm-subscription" | "comment-notification" — stored on the EmailLog. */
+  /** e.g. "newsletter" | "confirm-subscription" | "comment-notification" - stored on the EmailLog. */
   template: string;
   meta?: Record<string, unknown>;
 }
@@ -31,7 +31,7 @@ async function logEmail(
  * The single outbound-email chokepoint. Honors `EMAIL_DELIVERY_MODE`:
  *
  * - `off`  → nothing sent, nothing logged.
- * - `log`  → nothing sent; one `EmailLog` row, status `skipped` (dev default —
+ * - `log`  → nothing sent; one `EmailLog` row, status `skipped` (dev default -
  *            local never emails real people, but the trail is complete).
  * - `live` → Resend send + an `EmailLog` row (`sent` with `providerMessageId`,
  *            or `failed` with the error). Throws `AppError` on hard failure.

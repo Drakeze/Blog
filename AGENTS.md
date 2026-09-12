@@ -4,13 +4,10 @@ Guidance for coding agents working in this repository.
 
 ## What this is
 
-**Thinking Out Loud** — `blog.drakeze.com`. A single-author blog with a
+**Thinking Out Loud** - `blog.drakeze.com`. A single-author blog with a
 Clerk-gated admin dashboard, a proper double-opt-in newsletter, Atlas Search, and
 a remote MCP connector for drafting posts from Claude. Posts are Markdown stored
-in MongoDB. **No Prisma, no ORM** — native `mongodb` driver only.
-
-This is a fresh rebuild of the old `Blog` repo (kept at `../Blog-Legacy` until
-cutover). Plan: `~/.claude/plans/so-what-i-want-imperative-hellman.md`.
+in MongoDB. **No Prisma, no ORM** - native `mongodb` driver only.
 
 ## Runtime & commands
 
@@ -31,33 +28,33 @@ CI (`.github/workflows/ci.yml`) runs lint + type-check + test + build on every p
 
 ## Architecture
 
-- **`app/`** — App Router. `app/(public)/` reader-facing, `app/admin/` dashboard,
+- **`app/`** - App Router. `app/(public)/` reader-facing, `app/admin/` dashboard,
   `app/api/` route handlers. Post URLs are `/[slug]` (not `/blog/[slug]`).
-- **`lib/`** — the only place that talks to infrastructure.
-  - `lib/mongo.ts` — `getDb()`, the sole Mongo accessor. DB name comes from the
+- **`lib/`** - the only place that talks to infrastructure.
+  - `lib/mongo.ts` - `getDb()`, the sole Mongo accessor. DB name comes from the
     `DATABASE_URL` path (`blog_db_dev` local/preview, `blog_db` prod).
-  - `lib/auth.ts` — `isAdmin()` (Clerk userId / email allowlist) + `requireAdminApi()`.
-  - `lib/env.ts` — all `process.env` access. Non-throwing (zod `safeParse` +
+  - `lib/auth.ts` - `isAdmin()` (Clerk userId / email allowlist) + `requireAdminApi()`.
+  - `lib/env.ts` - all `process.env` access. Non-throwing (zod `safeParse` +
     defaults + `.configured` booleans). Never make it throw.
-  - `lib/errors.ts` — `AppError` / `Errors` / `toErrorResponse` for uniform API errors.
-  - `lib/markdown.ts` — `renderMarkdown()` = marked + sanitize-html. **All**
+  - `lib/errors.ts` - `AppError` / `Errors` / `toErrorResponse` for uniform API errors.
+  - `lib/markdown.ts` - `renderMarkdown()` = marked + sanitize-html. **All**
     rendered post HTML goes through this before `dangerouslySetInnerHTML`.
-  - `lib/posthog-server.ts` — `captureServerEvent()` (flushes via `after()`).
-  - `lib/api.ts` — `apiOk()` / `apiError()`; `apiError` funnels everything through
+  - `lib/posthog-server.ts` - `captureServerEvent()` (flushes via `after()`).
+  - `lib/api.ts` - `apiOk()` / `apiError()`; `apiError` funnels everything through
     `toErrorResponse` and logs 5xx.
-  - `lib/domains/<entity>/{types,validators,service}.ts` — the write path shared by
+  - `lib/domains/<entity>/{types,validators,service}.ts` - the write path shared by
     the admin UI and the MCP connector (Phase 4). `types` = TS interfaces,
     `validators` = zod (also the operator-injection guard), `service` = free
     functions on `getDb()`. Entities: `posts`, `subscribers`, `comments`, `likes`,
     `bookmarks`.
-  - `lib/email/` — `sendEmail()` is the one outbound chokepoint; honors
+  - `lib/email/` - `sendEmail()` is the one outbound chokepoint; honors
     `EMAIL_DELIVERY_MODE` (`live`/`log`/`off`) and writes an `EmailLog` row.
     `newsletter.ts` (confirmed-only batch send + `sendNewsletterTest`),
     `notifications.ts` (subscription confirmation, reply notifications).
-- **`emails/`** — React Email templates (`newsletter`, `comment-notification`,
+- **`emails/`** - React Email templates (`newsletter`, `comment-notification`,
   `confirm-subscription`).
-- **`models/`** — plain TS interfaces for Mongo documents. No logic.
-- **`scripts/`** — one-off Bun scripts.
+- **`models/`** - plain TS interfaces for Mongo documents. No logic.
+- **`scripts/`** - one-off Bun scripts.
 
 ## Conventions
 
@@ -82,8 +79,8 @@ Next.js 16 · React 19 · TypeScript 5 (strict) · Tailwind v4 (`@tailwindcss/po
 
 # This is NOT the Next.js you know
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+This version has breaking changes - APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
 
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+This block is written and re-added by `next dev` - verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->

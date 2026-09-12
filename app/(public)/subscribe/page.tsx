@@ -15,7 +15,7 @@ export default function SubscribePage() {
         New posts, in your inbox
       </h1>
       <p className="mt-3 text-muted-foreground">
-        Roughly one a week — software, systems, and the craft of building things. Confirm your
+        Roughly one a week - software, systems, and the craft of building things. Confirm your
         address once (double opt-in), and every email has a one-click unsubscribe.
       </p>
       <div className="mt-6">

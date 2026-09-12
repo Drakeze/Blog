@@ -1,10 +1,10 @@
 import type { NextConfig } from 'next';
 
-// Explicit image host allowlist. Never use "**" here — the Next image optimizer
+// Explicit image host allowlist. Never use "**" here - the Next image optimizer
 // will fetch any URL it's allowed to, which turns /_next/image into an open
 // proxy (SSRF to cloud metadata / internal services).
 const imageHosts = [
-  // Cloudflare R2 bucket "blog" — r2.dev managed subdomain (NEXT_PUBLIC_R2_PUBLIC_URL).
+  // Cloudflare R2 bucket "blog" - r2.dev managed subdomain (NEXT_PUBLIC_R2_PUBLIC_URL).
   // Swap for a custom domain (e.g. images-blog.drakeze.com) later if desired.
   'pub-3bd4501a91c64cf7974067760df73ce9.r2.dev',
   'img.clerk.com', // author + commenter avatars
@@ -12,7 +12,7 @@ const imageHosts = [
 ];
 
 // ponytail: CSP ships Report-Only. Clerk + PostHog need live verification on a
-// deployed preview before enforcing — check the browser console for violations,
+// deployed preview before enforcing - check the browser console for violations,
 // tighten, then rename the header to "Content-Security-Policy" (Phase 6).
 const csp = [
   "default-src 'self'",

@@ -16,7 +16,7 @@ const REQUIRED = [
   'RESEND_FROM_EMAIL',
 ] as const;
 
-// Not yet wired — warn, don't fail, while these are still being provisioned.
+// Not yet wired - warn, don't fail, while these are still being provisioned.
 const OPTIONAL = [
   'CLOUDFLARE_ACCOUNT_ID',
   'R2_ACCESS_KEY_ID',
@@ -90,7 +90,7 @@ try {
   else
     bad(
       `CLERK_SECRET_KEY (api.clerk.com → ${res.status})`,
-      "invalid — the 'secret-key-invalid' handshake failure"
+      "invalid - the 'secret-key-invalid' handshake failure"
     );
 } catch (err) {
   bad('CLERK_SECRET_KEY', `request failed: ${(err as Error).message}`);
@@ -127,12 +127,12 @@ if (process.env.CLOUDFLARE_ACCOUNT_ID && process.env.R2_ACCESS_KEY_ID) {
     const e = err as { name?: string; $metadata?: { httpStatusCode?: number } };
     bad(
       'R2 credentials',
-      `${e.name} (HTTP ${e.$metadata?.httpStatusCode ?? '?'}) — wrong/revoked key pair`
+      `${e.name} (HTTP ${e.$metadata?.httpStatusCode ?? '?'}) - wrong/revoked key pair`
     );
   }
 } else {
-  warn('R2', 'not configured yet — skipping live check');
+  warn('R2', 'not configured yet - skipping live check');
 }
 
-console.log(failed ? '\nFAILED — see ❌ above.\n' : '\nAll required checks passed.\n');
+console.log(failed ? '\nFAILED - see ❌ above.\n' : '\nAll required checks passed.\n');
 process.exit(failed ? 1 : 0);

@@ -10,7 +10,7 @@ interface SearchIndexRow {
   status?: string;
 }
 
-// Create / update the Atlas Search index on `posts` via the driver — no Atlas
+// Create / update the Atlas Search index on `posts` via the driver - no Atlas
 // Admin API keys needed, it rides the normal DATABASE_URL connection. Works on
 // M0+ Atlas. If your cluster tier has no Atlas Search, this throws a clear
 // error; fall back to a Mongo `$text` index on {title, excerpt, content}.
@@ -35,10 +35,10 @@ async function main() {
 
   if (!found) {
     await posts.createSearchIndex({ name: INDEX, definition });
-    console.log(`✓ created "${INDEX}" — building…`);
+    console.log(`✓ created "${INDEX}" - building…`);
   } else {
     await posts.updateSearchIndex(INDEX, definition);
-    console.log(`✓ updated "${INDEX}" — rebuilding…`);
+    console.log(`✓ updated "${INDEX}" - rebuilding…`);
   }
 
   for (let i = 0; i < 60; i++) {
@@ -51,7 +51,7 @@ async function main() {
     }
     await new Promise((r) => setTimeout(r, 5000));
   }
-  console.warn(`⚠ "${INDEX}" still not queryable after 5 min — check the Atlas UI`);
+  console.warn(`⚠ "${INDEX}" still not queryable after 5 min - check the Atlas UI`);
   await client.close();
 }
 

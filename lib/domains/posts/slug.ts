@@ -2,7 +2,7 @@ import { Errors } from '@/lib/errors';
 import { slugify } from '@/lib/utils';
 
 /**
- * Decide the slug fields to persist when a post is edited. Pure — no DB — so the
+ * Decide the slug fields to persist when a post is edited. Pure - no DB - so the
  * slug-history rule is unit-testable.
  *
  * - `requested` absent or unchanged → `null` (no slug write).

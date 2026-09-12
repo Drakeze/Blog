@@ -26,7 +26,7 @@ function Shell({ title, children }: { title: string; children: React.ReactNode }
 
 export default async function ConfirmPage({ searchParams }: Props) {
   const { token } = await searchParams;
-  // Parse before it reaches the Mongo filter — repeated `?token=` params arrive
+  // Parse before it reaches the Mongo filter - repeated `?token=` params arrive
   // as an array, and validators.ts is the operator-injection guard.
   const parsed = tokenSchema.safeParse({ token });
   const subscriber = parsed.success ? await confirmSubscriber(parsed.data.token) : null;
@@ -34,7 +34,7 @@ export default async function ConfirmPage({ searchParams }: Props) {
   if (subscriber) {
     return (
       <Shell title="You're subscribed">
-        Thanks for confirming — new posts will land in your inbox. Every email has a one-click
+        Thanks for confirming - new posts will land in your inbox. Every email has a one-click
         unsubscribe.
       </Shell>
     );

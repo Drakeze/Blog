@@ -4,7 +4,7 @@ import { publicEnv } from '@/lib/env';
 import { getDb } from '@/lib/mongo';
 import type { Post } from '@/models/post';
 
-// Rendered on request, not at build — needs the DB, and the build must not
+// Rendered on request, not at build - needs the DB, and the build must not
 // depend on Atlas being reachable.
 export const dynamic = 'force-dynamic';
 

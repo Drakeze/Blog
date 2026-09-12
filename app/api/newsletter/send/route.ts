@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       return apiOk({ test: true, to });
     }
 
-    // Atomic claim — two overlapping requests (double-click, retry, auto-send +
+    // Atomic claim - two overlapping requests (double-click, retry, auto-send +
     // manual) can't both pass this and email the list twice. The read above is a
     // fast path for the common already-sent case.
     if (!force && !(await claimNewsletterSend(post.slug))) {

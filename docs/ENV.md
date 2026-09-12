@@ -9,7 +9,7 @@ keys go in Vercel (Preview and Production separately).
 | `NEXT_PUBLIC_SITE_URL` | Canonical origin | `http://localhost:3000` | preview URL | `https://blog.drakeze.com` |
 | `RESEND_API_KEY` | Resend API key | ✓ | ✓ | ✓ |
 | `RESEND_FROM_EMAIL` | Verified sender, e.g. `Thinking Out Loud <hello@blog.drakeze.com>` | ✓ | ✓ | ✓ |
-| `RESEND_REPLY_TO_EMAIL` | optional reply-to | — | — | opt |
+| `RESEND_REPLY_TO_EMAIL` | optional reply-to | - | - | opt |
 | `EMAIL_DELIVERY_MODE` | `live` \| `log` \| `off`. Guards every send. | `log` | `log` | `live` |
 | `AUTO_SEND_POST_EMAILS` | auto-email subscribers on publish | `false` | `false` | `false` until wanted |
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk pk. **Must match sk mode.** | `pk_test_` | `pk_test_` | `pk_live_` |
@@ -24,7 +24,7 @@ keys go in Vercel (Preview and Production separately).
 | `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` / `_HOST` | analytics | opt | opt | ✓ |
 | `MCP_SERVICE_SECRET` | shared secret: MCP Worker → `/api/mcp/*`. `openssl rand -hex 32` | opt | ✓ | ✓ |
 | `DRAFT_API_SECRET` | legacy bearer for `POST /api/posts/draft` | opt | opt | opt |
-| `ATLAS_PUBLIC_KEY` / `ATLAS_PRIVATE_KEY` / `ATLAS_GROUP_ID` / `ATLAS_CLUSTER_NAME` | Atlas Admin API — only `scripts/ensure-atlas-search.ts` (Phase 2) | opt | — | — |
+| `ATLAS_PUBLIC_KEY` / `ATLAS_PRIVATE_KEY` / `ATLAS_GROUP_ID` / `ATLAS_CLUSTER_NAME` | Atlas Admin API - only `scripts/ensure-atlas-search.ts` (Phase 2) | opt | - | - |
 
 ## Rules learned the hard way
 

@@ -84,7 +84,7 @@ export function NewsletterPanel({
   if (posts.length === 0) {
     return (
       <Card className="p-10 text-center text-sm text-muted-foreground">
-        Publish a post first — the newsletter sends a published post to your list.
+        Publish a post first - the newsletter sends a published post to your list.
       </Card>
     );
   }

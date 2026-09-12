@@ -20,7 +20,7 @@ export function SubscribeForm() {
       const res = await fetch('/api/subscribers', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        // Signed-in users subscribe with their account email — server ignores the body.
+        // Signed-in users subscribe with their account email - server ignores the body.
         body: JSON.stringify(isSignedIn ? {} : { email }),
       });
       const json = await res.json().catch(() => ({}));

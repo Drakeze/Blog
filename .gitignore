@@ -11,7 +11,7 @@ build/
 dist/
 next-env.d.ts
 
-# Environment — REAL SECRETS, never commit. .env.example IS committed.
+# Environment - REAL SECRETS, never commit. .env.example IS committed.
 .env
 .env.local
 .env.*.local

@@ -49,7 +49,7 @@ export async function POST(req: Request) {
       return apiOk({ message: 'Check your inbox to confirm your subscription.' }, 201);
     }
 
-    // Don't re-send on repeat submits — the endpoint is unauthenticated, so an
+    // Don't re-send on repeat submits - the endpoint is unauthenticated, so an
     // auto-resend is an email-bomb vector. A pending subscriber who lost the
     // email re-confirms via a Phase 3b admin action or a future "resend" flow.
     if (!subscriber.confirmed) {

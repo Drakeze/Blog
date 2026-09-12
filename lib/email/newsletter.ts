@@ -69,14 +69,14 @@ async function writeLogs(
 
 /**
  * Email a published post to every **confirmed** subscriber. Sets
- * `post.newsletterSentAt` on completion — the caller checks it first for the
+ * `post.newsletterSentAt` on completion - the caller checks it first for the
  * double-send guard.
  *
  * `live` mode uses `resend.batch.send` (100/call). `log`/`off` fall back to a
  * per-recipient `sendEmail` loop so the `EmailLog` trail stays complete without
  * hitting Resend.
  *
- * ponytail: synchronous batched send is the ceiling — a real queue (Cloudflare
+ * ponytail: synchronous batched send is the ceiling - a real queue (Cloudflare
  * Queue / Vercel cron drain) is the upgrade path past a few thousand subscribers.
  */
 export async function sendNewsletterToConfirmedSubscribers(
@@ -164,7 +164,7 @@ export function renderNewsletterHtml(post: Post): Promise<string> {
   );
 }
 
-/** Preview send — one copy of the newsletter to a single address, no `newsletterSentAt`. */
+/** Preview send - one copy of the newsletter to a single address, no `newsletterSentAt`. */
 export async function sendNewsletterTest(post: Post, to: string): Promise<void> {
   const html = await renderNewsletterHtml(post);
   await sendEmail({

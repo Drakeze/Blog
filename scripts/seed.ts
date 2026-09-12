@@ -10,7 +10,7 @@ if (!DATABASE_URL) throw new Error('DATABASE_URL is not set');
 const dbName = DATABASE_URL.match(/\/([^/?]+)(\?|$)/)?.[1] ?? '';
 if (!dbName.endsWith('_dev')) {
   console.error(
-    `Refusing to seed "${dbName}" — the target database name must end in "_dev".\n` +
+    `Refusing to seed "${dbName}" - the target database name must end in "_dev".\n` +
       `Point DATABASE_URL at blog_db_dev before seeding.`
   );
   process.exit(1);

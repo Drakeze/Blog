@@ -25,7 +25,7 @@ export async function requireAdminApi(): Promise<NextResponse | null> {
   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 }
 
-/** Per-user gate for the route `try` block — throws `AppError` 401 when signed out. */
+/** Per-user gate for the route `try` block - throws `AppError` 401 when signed out. */
 export async function requireUserId(): Promise<string> {
   const { userId } = await auth();
   if (!userId) throw Errors.unauthorized();

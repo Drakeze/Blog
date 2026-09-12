@@ -6,7 +6,7 @@ import { tokenSchema } from '@/lib/domains/subscribers/validators';
 import { Errors } from '@/lib/errors';
 import { captureServerEvent } from '@/lib/posthog-server';
 
-/** Email links point here (GET) — bounce to the confirmation page. */
+/** Email links point here (GET) - bounce to the confirmation page. */
 export async function GET(req: Request) {
   const token = new URL(req.url).searchParams.get('token');
   if (!token) return NextResponse.json({ error: 'Token required' }, { status: 400 });

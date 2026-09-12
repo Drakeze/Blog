@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react';
  * Left-edge rail that fills as the article is read, with a % readout. Uses a
  * CSS scroll-timeline where supported; otherwise a rAF-throttled scroll
  * listener. Hidden below `lg` (no gutter room) and for reduced-motion the fill
- * just doesn't animate — it still tracks.
+ * just doesn't animate - it still tracks.
  */
 export function ReadingProgress() {
   const fillRef = useRef<HTMLDivElement>(null);

@@ -45,7 +45,7 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
   return col.findOne({ slug });
 }
 
-/** Every published slug — for `generateStaticParams` on the post + tag routes. */
+/** Every published slug - for `generateStaticParams` on the post + tag routes. */
 export async function listPublishedSlugs(): Promise<string[]> {
   const col = await postsCol();
   const rows = await col
@@ -54,7 +54,7 @@ export async function listPublishedSlugs(): Promise<string[]> {
   return rows.map((r) => r.slug);
 }
 
-/** Distinct tags across published posts, most-used first — for the homepage tag bar. */
+/** Distinct tags across published posts, most-used first - for the homepage tag bar. */
 export async function listPublishedTags(): Promise<string[]> {
   const col = await postsCol();
   const rows = await col
@@ -178,7 +178,7 @@ export async function deletePost(slug: string): Promise<boolean> {
   const removed = await db.collection<Post>(C.posts).findOneAndDelete({ slug });
   if (!removed) return false;
 
-  // Cascade — comments/likes/bookmarks all key off the slug.
+  // Cascade - comments/likes/bookmarks all key off the slug.
   await Promise.all([
     db.collection(C.comments).deleteMany({ postId: slug }),
     db.collection(C.likes).deleteMany({ postSlug: slug }),
@@ -195,10 +195,10 @@ export async function countPosts(filter: Record<string, unknown> = {}): Promise<
 
 /**
  * Atomically reserve the newsletter-send slot. Returns `false` if the post was
- * already sent (or reserved by a racing request) — the caller 409s. This is the
+ * already sent (or reserved by a racing request) - the caller 409s. This is the
  * real double-send guard; a plain `post.newsletterSentAt` read is only a fast path.
  *
- * ponytail: on a failed send the slot stays claimed — the admin re-sends with
+ * ponytail: on a failed send the slot stays claimed - the admin re-sends with
  * `force` after checking `EmailLog`. Auto-releasing it would risk double
  * delivery when a batch send failed partway.
  */

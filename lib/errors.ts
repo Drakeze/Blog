@@ -5,7 +5,7 @@ import { ZodError } from 'zod';
  * `Errors.*` helper); the outer `catch` funnels everything through
  * `toErrorResponse` so responses never leak internals.
  *
- * Adopted from `Creator Store/lib/utils/errors.ts` — kept flat at `lib/errors.ts`
+ * Adopted from `Creator Store/lib/utils/errors.ts` - kept flat at `lib/errors.ts`
  * to match this repo's flat `lib/`.
  */
 

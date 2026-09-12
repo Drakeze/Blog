@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 
-// Strip em dashes (—) from post title/excerpt/content, replacing with a plain
+// Strip em dashes from post title/excerpt/content, replacing with a plain
 // hyphen. Idempotent. Dry-run by default:
 //   bun run scripts/strip-em-dashes.ts           # report only
 //   bun run scripts/strip-em-dashes.ts --apply   # write
@@ -27,7 +27,7 @@ async function main() {
   console.log(`posts containing an em dash: ${matches.length}`);
   for (const post of matches) {
     const hitFields = FIELDS.filter((f) => typeof post[f] === 'string' && post[f].includes('—'));
-    console.log(`  ${post.slug} — fields: ${hitFields.join(', ')}`);
+    console.log(`  ${post.slug} - fields: ${hitFields.join(', ')}`);
 
     if (APPLY) {
       const update: Record<string, string> = {};
@@ -37,7 +37,7 @@ async function main() {
   }
 
   await client.close();
-  console.log(APPLY ? '\nDone.' : '\nDry run — re-run with --apply to write.');
+  console.log(APPLY ? '\nDone.' : '\nDry run - re-run with --apply to write.');
 }
 
 main().catch((err) => {

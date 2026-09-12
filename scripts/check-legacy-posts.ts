@@ -25,7 +25,7 @@ async function main() {
 
   console.log(`total posts: ${posts.length}\n`);
   for (const p of posts) {
-    console.log(`  [${p.status}] ${p.slug} — ${p.title}`);
+    console.log(`  [${p.status}] ${p.slug} - ${p.title}`);
   }
 
   const byStatus = posts.reduce<Record<string, number>>((acc, p) => {

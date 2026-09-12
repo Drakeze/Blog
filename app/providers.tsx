@@ -13,7 +13,7 @@ function PostHogIdentity() {
 
   useEffect(() => {
     if (isSignedIn && user) {
-      // Keyed on userId, not the `user` object — Clerk hands back a fresh
+      // Keyed on userId, not the `user` object - Clerk hands back a fresh
       // reference on many re-renders and we don't want to re-identify each time.
       posthog.identify(user.id, {
         email: user.primaryEmailAddress?.emailAddress,
@@ -21,7 +21,7 @@ function PostHogIdentity() {
       });
       wasSignedIn.current = true;
     } else if (isSignedIn === false && wasSignedIn.current) {
-      // Only reset on an actual sign-out — not on every anonymous page load,
+      // Only reset on an actual sign-out - not on every anonymous page load,
       // which would throw away the anon distinct_id and break funnel stitching.
       posthog.reset();
       wasSignedIn.current = false;

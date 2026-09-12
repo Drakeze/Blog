@@ -34,7 +34,7 @@ export function ConfirmSubscriptionEmail({
             <Text style={title}>Confirm your subscription</Text>
             <Text style={paragraph}>
               Tap the button below to confirm your email and start receiving new posts from Thinking
-              Out Loud. If you didn&apos;t request this, you can ignore this email — nothing will be
+              Out Loud. If you didn&apos;t request this, you can ignore this email - nothing will be
               sent until you confirm.
             </Text>
 

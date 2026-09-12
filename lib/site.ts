@@ -1,8 +1,8 @@
-/** Static site config for "Thinking Out Loud" — chrome, nav, external links. */
+/** Static site config for "Thinking Out Loud" - chrome, nav, external links. */
 
 export const site = {
   name: 'Thinking Out Loud',
-  tagline: 'Software, systems, and the craft of building things — mostly in public.',
+  tagline: 'Software, systems, and the craft of building things - mostly in public.',
   author: 'Anthony Shead',
   portfolioUrl: 'https://drakeze.com',
   patreonUrl: 'https://www.patreon.com/cw/Drakeze',

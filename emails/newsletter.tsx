@@ -40,7 +40,7 @@ export function NewsletterEmail({
     <Html>
       <Head />
       <Preview>
-        {postTitle} — {postExcerpt.slice(0, 90)}
+        {postTitle} - {postExcerpt.slice(0, 90)}
       </Preview>
       <Body style={body}>
         <Container style={container}>

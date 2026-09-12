@@ -14,7 +14,7 @@ export async function GET() {
   const base = { status: 'ok' as const, timestamp: new Date().toISOString() };
 
   // The detailed config state is useful for debugging but is reconnaissance for
-  // everyone else — admin only.
+  // everyone else - admin only.
   if (!(await isAdmin())) return NextResponse.json(base);
 
   return NextResponse.json({

@@ -1,7 +1,7 @@
 import { expect, mock, test } from 'bun:test';
 
 // The claim filters on `newsletterSentAt: { $exists: false }`, so once it's set
-// the same filter no longer matches — model that with a one-shot fake.
+// the same filter no longer matches - model that with a one-shot fake.
 let claimed = false;
 
 mock.module('@/lib/mongo', () => ({
@@ -11,7 +11,7 @@ mock.module('@/lib/mongo', () => ({
       findOneAndUpdate: async () => {
         if (claimed) return null;
         claimed = true;
-        return { slug: 'a-post' }; // the pre-update doc — non-null means "claimed"
+        return { slug: 'a-post' }; // the pre-update doc - non-null means "claimed"
       },
     }),
   }),

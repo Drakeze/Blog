@@ -37,7 +37,7 @@ const key = `_verify-${Date.now()}.txt`;
 
 try {
   await client.send(new HeadBucketCommand({ Bucket: bucket }));
-  console.log('✅ HeadBucket — credentials accepted');
+  console.log('✅ HeadBucket - credentials accepted');
 
   await client.send(
     new PutObjectCommand({
@@ -47,10 +47,10 @@ try {
       ContentType: 'text/plain',
     })
   );
-  console.log('✅ PutObject — upload path works');
+  console.log('✅ PutObject - upload path works');
 
   await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
-  console.log('✅ DeleteObject — cleaned up test object\n');
+  console.log('✅ DeleteObject - cleaned up test object\n');
   console.log('R2 credentials are live.');
 } catch (err) {
   const e = err as { name?: string; $metadata?: { httpStatusCode?: number }; message?: string };

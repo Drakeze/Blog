@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 
-/** Denormalized snapshot — `/bookmarks` renders without a join back to `posts`. */
+/** Denormalized snapshot - `/bookmarks` renders without a join back to `posts`. */
 export interface Bookmark {
   _id?: ObjectId;
   userId: string;
