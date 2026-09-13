@@ -43,7 +43,7 @@ export async function GET() {
   <channel>
     <title>Thinking Out Loud</title>
     <link>${base}</link>
-    <description>Software, systems, and the craft of building things.</description>
+    <description>My Public Blog talking about recent builds and learning</description>
     <language>en</language>
     <atom:link href="${base}/feed.xml" rel="self" type="application/rss+xml" />
 ${items}
