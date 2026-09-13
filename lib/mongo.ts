@@ -50,7 +50,5 @@ export const blogCollectionNames = {
 export async function getDb() {
   global._mongoClientPromise ??= connect();
   const client = await global._mongoClientPromise;
-  const db = client.db();
-  console.log('[mongo debug] resolved db name:', db.databaseName);
-  return db;
+  return client.db();
 }
