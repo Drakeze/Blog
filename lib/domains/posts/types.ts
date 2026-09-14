@@ -8,7 +8,7 @@ export interface PostInput {
   /** Optional explicit slug; defaults to `slugify(title)`. */
   slug?: string;
   content: string;
-  excerpt: string;
+  excerpt?: string;
   coverImage?: string;
   tags?: string[];
   status?: PostStatus;

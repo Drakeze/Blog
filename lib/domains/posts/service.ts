@@ -118,7 +118,7 @@ export async function createPost(input: PostInput): Promise<Post> {
     slug,
     slugHistory: [],
     content: input.content,
-    excerpt: input.excerpt,
+    excerpt: input.excerpt ?? '',
     coverImage: input.coverImage,
     tags: input.tags ?? [],
     status,

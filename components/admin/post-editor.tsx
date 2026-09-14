@@ -66,20 +66,20 @@ export function PostEditor(props: Props) {
     }
   }
 
-  function validate(): string | null {
+  function validate(targetStatus: 'draft' | 'published'): string | null {
     if (!title.trim()) return 'Title is required';
-    if (!excerpt.trim()) return 'Excerpt is required';
     if (!content.trim()) return 'Content is required';
+    if (targetStatus === 'published' && !excerpt.trim()) return 'Excerpt is required to publish';
     return null;
   }
 
   async function persist(nextStatus?: 'draft' | 'published') {
-    const err = validate();
+    const targetStatus = nextStatus ?? status;
+    const err = validate(targetStatus);
     if (err) {
       toast.error(err);
       return;
     }
-    const targetStatus = nextStatus ?? status;
     setBusy(nextStatus === 'published' || nextStatus === 'draft' ? 'publish' : 'save');
 
     const payload: Record<string, unknown> = {
