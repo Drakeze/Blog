@@ -32,6 +32,7 @@ export const metadata: Metadata = {
   description:
     'My Public Blog talking about recent builds and learning',
   applicationName: 'Thinking Out Loud',
+  icons: { icon: '/brain-bubble.svg' },
   authors: [{ name: 'Anthony', url: 'https://drakeze.com' }],
   alternates: {
     canonical: '/',
